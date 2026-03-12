@@ -78,7 +78,12 @@ Overall: ✅ Healthy
 ========================
 ```
 
-## Quick Start
+## Quick Start Option 1 - NPX
+```bash
+npx getsitrep init
+```
+
+## Quick Start Option 2 - Native
 
 ### 1. Copy the commands
 
