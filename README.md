@@ -87,11 +87,11 @@ Overall: ✅ Healthy
 mkdir -p .claude/commands
 
 # Download all commands
-curl -sL https://raw.githubusercontent.com/getsitrep/sitrep/main/commands/session-start.md -o .claude/commands/session-start.md
-curl -sL https://raw.githubusercontent.com/getsitrep/sitrep/main/commands/session-end.md -o .claude/commands/session-end.md
-curl -sL https://raw.githubusercontent.com/getsitrep/sitrep/main/commands/sitrep.md -o .claude/commands/sitrep.md
-curl -sL https://raw.githubusercontent.com/getsitrep/sitrep/main/commands/plan-update.md -o .claude/commands/plan-update.md
-curl -sL https://raw.githubusercontent.com/getsitrep/sitrep/main/commands/doctor.md -o .claude/commands/doctor.md
+curl -sL https://raw.githubusercontent.com/viitorohit/sitrep/main/commands/session-start.md -o .claude/commands/session-start.md
+curl -sL https://raw.githubusercontent.com/viitorohit/sitrep/main/commands/session-end.md -o .claude/commands/session-end.md
+curl -sL https://raw.githubusercontent.com/viitorohit/sitrep/main/commands/sitrep.md -o .claude/commands/sitrep.md
+curl -sL https://raw.githubusercontent.com/viitorohit/sitrep/main/commands/plan-update.md -o .claude/commands/plan-update.md
+curl -sL https://raw.githubusercontent.com/viitorohit/sitrep/main/commands/doctor.md -o .claude/commands/doctor.md
 ```
 
 ### 2. Create your sitrep folder
@@ -267,7 +267,7 @@ Built for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) slash co
 
 ## Built In Public
 
-sitrep was born while building [Atlas](https://github.com/getsitrep/atlas) — an AI Workforce Platform — using only AI tools. Read the story:
+sitrep was born while building [Atlas] — an AI Knwledge Workbench Platform by ViitorCloud — using only AI tools. Read the story:
 
 📝 [I Replaced My Entire Dev Team With 3 AI Tools. Here's What Broke First.](https://www.linkedin.com/pulse/i-replaced-my-entire-dev-team-build-ai-product-3-tools-rohit-purohit-vlstc)
 
