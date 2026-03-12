@@ -4,7 +4,7 @@
 
 set -e
 
-REPO="https://raw.githubusercontent.com/getsitrep/sitrep/main"
+REPO="https://raw.githubusercontent.com/viitorohit/sitrep/main"
 
 echo "=== Installing sitrep ==="
 echo ""
