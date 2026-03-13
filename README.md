@@ -1,6 +1,6 @@
 # sitrep
 
-**AI-native project management. Two markdown files. Five slash commands. Zero dependencies.**
+**AI-native project management. Two markdown files. Nine slash commands. Zero dependencies.**
 
 > You don't need Jira to build with AI. You need a system that your AI assistant can read, update, and commit — automatically.
 
@@ -8,275 +8,181 @@
 
 ## The Problem
 
-AI coding tools start every session with a blank slate. No memory of yesterday. No idea what decisions were made. No clue what's been tested.
-
-You lose the first 20 minutes of every session rebuilding context. Decisions get re-debated. Progress is invisible. The code gets built but the project drifts.
+AI coding tools start every session blank. No memory. No context. No idea what happened yesterday. You waste 15-20 minutes every session rebuilding context. Nobody knows what it cost.
 
 ## The Fix
 
-**sitrep** is a drop-in project tracking system that lives in your repo. Your AI assistant reads it at the start of every session and updates it at the end. Git tracks the history. You stay in control.
+**sitrep** lives inside your repo. Your AI reads it at session start, updates it at session end. Git tracks everything. A visual dashboard gives you the MIS view. Costs are logged per session.
 
-```
-your-project/
-├── sitrep/
-│   ├── PROJECT_PLAN.md     ← what to build
-│   └── STATUS_REPORT.md    ← where you are
-└── .claude/
-    └── commands/
-        ├── session-start.md
-        ├── session-end.md
-        ├── sitrep.md
-        ├── plan-update.md
-        └── doctor.md
-```
-
-## How It Works
-
-**Start of session** — type `/session-start`
-```
-=== MyProject SESSION START ===
-Last session: 4 — built auth system
-Current phase: Phase 3 — 2/6 tasks done
-Overall: 18/44 — 41%
-Blockers: None
-Queued: task 3.3 (role-based access), 3.4 (token refresh)
-=======================================
-```
-
-**End of session** — type `/session-end`
-
-It automatically:
-- Updates every task status (✅ 🟡 🔲 ❌)
-- Recalculates progress bars
-- Adds a session log entry
-- Syncs the project plan with any new features or decisions
-- Git commits everything
-
-**Quick check anytime** — type `/sitrep`
-```
-=== MyProject SITREP ===
-Phase: Frontend Foundation — 5/8 tasks done
-Overall: 14/44 — 32%
-Active: 2.6 Dashboard page 🟡
-Blockers: None
-========================
-```
-
-**Scope changes** — type `/plan-update`
-
-New feature idea? Architecture decision? Risk discovered? It logs to the right place in your project plan.
-
-**Health check** — type `/doctor`
-```
-=== MyProject DOCTOR ===
-File Structure:     ✅ All files in place
-File Integrity:     ✅ Clean
-Cross-File Sync:    ⚠️ 1 mismatch (auto-fixed)
-Progress Accuracy:  ✅ Correct
-Codebase Sync:      ⏭️ Skipped (run /doctor deep)
-Overall: ✅ Healthy
-========================
-```
-
-## Quick Start Option 1 - NPX
 ```bash
 npx getsitrep init
 ```
 
-## Quick Start Option 2 - Native
+That's the entire setup.
 
-### 1. Copy the commands
+---
+
+## What You Get
+
+```
+sitrep/
+├── MANIFEST.md              ← framework version and rules
+├── PROJECT_PLAN.md          ← what to build (phases, decisions, risks)
+├── STATUS_REPORT.md         ← where you are (tasks, progress, sessions)
+├── .sitrep-data.json        ← cost + token + user tracking data
+├── HANDOFF.md               ← context package (auto-generated)
+├── dashboard.html           ← visual MIS report (auto-generated)
+└── history/
+    ├── sessions/            ← per-session detail logs
+    ├── handoffs/            ← archived handoff snapshots
+    └── dashboards/          ← archived dashboard snapshots
+```
+
+---
+
+## Daily Workflow
+
+```
+/session-start  →  know where you left off
+      ↓
+   you build
+      ↓
+/session-end    →  progress, costs, tokens, decisions — logged and committed
+```
+
+Two commands minimum. Everything else is optional but compounds in value.
+
+---
+
+## Commands
+
+| Command | When | What it does |
+|---------|------|--------------|
+| `/session-start` | Start of session | Reads status, prints orientation with cost summary |
+| `/session-end` | End of session | Updates tasks, progress, costs, tokens, session log. Commits. |
+| `/sitrep` | Anytime | Quick read-only status check |
+| `/capture` | New work surfaces | `/capture fix auth bug --phase 3` → adds to both files |
+| `/plan-update` | Scope changes | Add features, decisions, risks to the plan |
+| `/selfheal` | Things feel off | Health check + auto-fix. `/selfheal deep` for codebase audit. |
+| `/handoff` | Switching context | Context package. `/handoff human` or `/handoff ai` |
+| `/dashboard` | Visual report | Generates full MIS dashboard as HTML |
+| `/pulse` | Mid-session | Shows which commands ran, suggests what to do next |
+
+---
+
+## The Dashboard
+
+`/dashboard` generates a self-contained HTML report you open in any browser:
+
+- **Summary** — progress, total cost, sessions, blockers at a glance
+- **Progress** — visual bars per phase with cost attribution
+- **Sprint** — active tasks with status badges
+- **Sessions** — timeline of who did what, when, at what cost
+- **Costs** — token usage over time, cost by phase, projections
+- **Users** — team activity and contribution tracking
+- **Decisions** — architecture decision log
+- **Risks** — blockers and risk register
+- **Documents** — full plan and status rendered inline
+- **History** — archived handoffs, dashboards, git log
+
+Dark mode. Print-friendly. Mobile-responsive. No server needed.
+
+---
+
+## Cost Tracking
+
+Every `/session-end` logs:
+- Tokens used (input + output)
+- Cost in USD (based on model pricing)
+- Model used (Claude Sonnet, Opus, GPT-4, etc.)
+- Session duration
+- Who did the session
+
+Know exactly what each feature costs before your budget surprises you.
+
+---
+
+## Quick Start
 
 ```bash
-# In your project root
-mkdir -p .claude/commands
-
-# Download all commands
-curl -sL https://raw.githubusercontent.com/viitorohit/sitrep/main/commands/session-start.md -o .claude/commands/session-start.md
-curl -sL https://raw.githubusercontent.com/viitorohit/sitrep/main/commands/session-end.md -o .claude/commands/session-end.md
-curl -sL https://raw.githubusercontent.com/viitorohit/sitrep/main/commands/sitrep.md -o .claude/commands/sitrep.md
-curl -sL https://raw.githubusercontent.com/viitorohit/sitrep/main/commands/plan-update.md -o .claude/commands/plan-update.md
-curl -sL https://raw.githubusercontent.com/viitorohit/sitrep/main/commands/doctor.md -o .claude/commands/doctor.md
+cd your-project
+npx getsitrep init
 ```
 
-### 2. Create your sitrep folder
+Customize `sitrep/PROJECT_PLAN.md` with your phases. Open Claude Code:
 
-```bash
-mkdir -p sitrep
 ```
-
-### 3. Create PROJECT_PLAN.md
-
-```markdown
-# My Project — Master Project Plan
-
-> **Project:** My Project
-> **Owner:** Your Name
-> **Started:** 2026-03-12
-> **Last Updated:** 2026-03-12
-
----
-
-## Phase 1: Foundation
-
-| # | Feature | Description |
-|---|---------|-------------|
-| 1.1 | Project setup | Scaffold, config, base structure |
-| 1.2 | Core feature | The main thing it does |
-| 1.3 | Tests | Verify it works |
-
----
-
-## Key Decisions
-
-| # | Decision | Rationale | Date |
-|---|----------|-----------|------|
-
-## Risk Register
-
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-
-## Future / Post-MVP Ideas
-
-| # | Idea | Priority | Target |
-|---|------|----------|--------|
-```
-
-### 4. Create STATUS_REPORT.md
-
-```markdown
-# My Project — Status Report
-
-> **Last Updated:** 2026-03-12 — Session 1
-> **Current Phase:** Phase 1 (Foundation)
-> **Overall Progress:** 0/3 tasks (0%)
-> **Next Milestone:** v0.1.0
-
----
-
-## Active Sprint
-
-**Phase 1: Foundation**
-
-| # | Task | Status | Notes |
-|---|------|--------|-------|
-| 1.1 | Project setup | 🔲 Todo | |
-| 1.2 | Core feature | 🔲 Todo | |
-| 1.3 | Tests | 🔲 Todo | |
-
----
-
-## Progress Dashboard
-
-| Phase | Name | Tasks | Done | Bar |
-|-------|------|-------|------|-----|
-| 1 | Foundation | 3 | 0 | ░░░░░░░░░░ 0% |
-| **TOTAL** | | **3** | **0** | **0%** |
-
----
-
-## Session Log
-
-### Session 1 — 2026-03-12
-- **Focus:** Project setup
-- **Done:** Initialized sitrep tracking
-- **Blockers:** None
-- **Next:** Start building
-
----
-
-## Blockers & Risks
-
-| # | Issue | Status | Impact | Resolution |
-|---|-------|--------|--------|------------|
-| — | None | — | — | — |
-
-## Changes & Scope Updates
-
-| Date | Change | Reason |
-|------|--------|--------|
-```
-
-### 5. Start building
-
-```bash
-# Open Claude Code and type:
 /session-start
 ```
 
-That's it. You're tracking.
+You're tracking.
 
 ---
 
-## Commands Reference
+## Use Cases
 
-| Command | When | Modifies files? |
-|---------|------|-----------------|
-| `/session-start` | Start of every session | No (read-only) |
-| `/session-end` | End of every session | Yes + git commit |
-| `/sitrep` | Quick check anytime | No (read-only) |
-| `/plan-update` | Scope/feature changes | Yes + git commit |
-| `/doctor` | When things feel off | Yes (auto-fixes) + git commit |
-| `/doctor deep` | Periodic audit | Yes + scans codebase |
+| Situation | What to do |
+|-----------|-----------|
+| Starting a new project | `npx getsitrep init` → customize plan → `/session-start` |
+| Resuming after a break | `/session-start` — zero context rebuilding |
+| New task mid-session | `/capture [description] --phase N` |
+| Handing off to a person | `/handoff human` — 5-minute onboarding doc |
+| Switching AI sessions | `/handoff ai` — structured context for next session |
+| Checking costs | `/dashboard` — visual cost breakdown |
+| Something feels wrong | `/selfheal` or `/selfheal deep` |
+| Stakeholder update | `/dashboard` → open HTML → Cmd+P to print |
+| End of day | `/session-end` — always, no exceptions |
+| Forgot what I ran | `/pulse` — see session command history |
 
-## Status Codes
-
-| Code | Meaning |
-|------|---------|
-| ✅ | Done — completed and verified |
-| 🟡 | In Progress — started, not finished |
-| 🔲 | Todo — not started |
-| ❌ | Blocked — cannot proceed |
-| ⏭️ | Deferred — pushed to future |
+Full usage guide: [docs/USAGE_GUIDE.md](docs/USAGE_GUIDE.md)
 
 ---
 
-## Why Not Jira / Notion / Linear?
+## What's New in v0.2
 
-Those tools aren't designed for AI-assisted development. They live outside your repo. Your AI assistant can't read them, can't update them, and can't commit changes to them.
-
-sitrep lives where your code lives. It's plain markdown that any AI tool can read and write. Git gives you versioning, history, and diffs for free. No SaaS. No sync. No subscription.
+- `/capture` — structured task creation mid-session
+- `/selfheal` — health check + auto-fix with deep codebase audit
+- `/handoff` — context packages with auto-archiving
+- `/dashboard` — visual MIS with 10 sections
+- `/pulse` — session awareness, shows what ran and suggests next
+- `MANIFEST.md` — self-documenting framework reference
+- `.sitrep-data.json` — machine-readable cost and session data
+- `history/` — structured archives (sessions, handoffs, dashboards)
+- Cost tracking — per-session token and cost logging
+- User tracking — who did what, when
 
 ---
 
-## Principles
+## Roadmap
 
-1. **Two files, two purposes.** Plan = what to build. Status = where you are.
-2. **Git is the database.** Full history via `git log sitrep/`.
-3. **Never delete tasks.** Mark ⏭️ Deferred and move to Future table.
-4. **Commands validate first.** Every command checks files exist before acting.
-5. **Project-agnostic.** Works for any repo, any stack, any AI tool.
+- [x] Core commands (session-start, session-end, sitrep, plan-update)
+- [x] npm package (`npx getsitrep init`)
+- [x] Task capture (`/capture`)
+- [x] Context handoffs (`/handoff`)
+- [x] Visual MIS dashboard (`/dashboard`)
+- [x] Cost and token tracking
+- [x] User tracking
+- [x] Session history archives
+- [x] Session awareness (`/pulse`)
+- [x] Self-healing (`/selfheal`)
+- [ ] `getsitrep.dev` landing page
+- [ ] HTML intake form for project onboarding
+- [ ] GitHub Actions integration
+- [ ] Multi-project unified view
+
+---
+
+## Built In Public
+
+sitrep was born while building an AI product using only AI tools. Read the story:
+
+📝 [I Replaced My Entire Dev Team With 3 AI Tools. Here's What Broke First.](https://www.linkedin.com/pulse/i-replaced-my-entire-dev-team-build-ai-product-3-tools-rohit-purohit-vlstc)
 
 ---
 
 ## Compatibility
 
 Built for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) slash commands. The markdown format works with any AI tool that can read and write files.
-
----
-
-## Roadmap
-
-- [x] Slash commands (session-start, session-end, sitrep, plan-update, doctor)
-- [x] Self-healing file validation
-- [x] Cross-file sync checks
-- [x] Codebase audit (`/doctor deep`)
-- [ ] `npx getsitrep init` — one-command setup
-- [ ] GitHub Actions integration — auto-update on PR merge
-- [ ] Web dashboard — visual progress from sitrep/ files
-- [ ] Multi-project support — monorepo tracking
-- [ ] Plugin system — custom commands and checks
-
----
-
-## Built In Public
-
-sitrep was born while building [Atlas] — an AI Knwledge Workbench Platform by ViitorCloud — using only AI tools. Read the story:
-
-📝 [I Replaced My Entire Dev Team With 3 AI Tools. Here's What Broke First.](https://www.linkedin.com/pulse/i-replaced-my-entire-dev-team-build-ai-product-3-tools-rohit-purohit-vlstc)
-
----
 
 ## License
 
