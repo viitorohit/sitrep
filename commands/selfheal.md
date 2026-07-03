@@ -2,6 +2,8 @@
 
 Run a full diagnostic on the sitrep framework. Fix what you can, report what needs human input.
 
+> Intentional (manually invoked). This command owns all file-repair behavior for sitrep — session-start, session-end, capture, plan-update, and handoff deliberately do not search for or move files themselves; they defer to /selfheal. Path-agnostic per hard law #1 (no platform lock-in) — this is the GETSITREP-28 foundation; the full hash-manifest/drift/lock-diff-restore system lands there.
+
 Read `sitrep/PROJECT_PLAN.md` to extract the project name. Use as [PROJECT] in output.
 
 ---
@@ -14,19 +16,11 @@ Read `sitrep/PROJECT_PLAN.md` to extract the project name. Use as [PROJECT] in o
 - [ ] `sitrep/history/sessions/` exists
 - [ ] `sitrep/history/handoffs/` exists
 - [ ] `sitrep/history/dashboards/` exists
-- [ ] `.claude/commands/session-start.md` exists
-- [ ] `.claude/commands/session-end.md` exists
-- [ ] `.claude/commands/sitrep.md` exists
-- [ ] `.claude/commands/plan-update.md` exists
-- [ ] `.claude/commands/capture.md` exists
-- [ ] `.claude/commands/selfheal.md` exists
-- [ ] `.claude/commands/handoff.md` exists
-- [ ] `.claude/commands/dashboard.md` exists
-- [ ] `.claude/commands/pulse.md` exists
 - [ ] `sitrep/.sitrep-active-session` is in `.gitignore`
+- [ ] The active platform's command directory contains all 8 canon commands: `session-start`, `session-end`, `sitrep`, `capture`, `plan-update`, `selfheal`, `handoff`, `dashboard` (canon: `docs/specs/command-canon.md`). Read the directory from adapter config, not a hardcoded path — today that's `.claude/commands/` for Claude Code; this becomes fully config-driven once GETSITREP-36's adapter contract ships. Never hardcode a second platform's path here.
 
-**Auto-fix:** Move misplaced files. Create missing directories. Add gitignore entry.
-**Cannot fix:** Files that don't exist anywhere.
+**Auto-fix:** Create missing directories. Add gitignore entry.
+**Cannot fix:** Files that don't exist anywhere. A missing or misplaced command file is flagged for the developer, not auto-moved — without a hash manifest (GETSITREP-28) selfheal can't yet tell a stale file from an intentionally customized one, so it doesn't guess.
 
 ---
 

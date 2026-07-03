@@ -2,9 +2,11 @@
 
 Create a handoff document that gives another person or AI session everything they need to continue this project without losing context.
 
-## Step 0: Validate sitrep location (MANDATORY)
+> Intentional (manually invoked).
+
+## Step 0: Check sitrep presence
 1. Verify `sitrep/PROJECT_PLAN.md` and `sitrep/STATUS_REPORT.md` exist
-2. If missing → search, move, or report. Do NOT proceed until both are in `sitrep/`
+2. If either is missing → print "⚠️ Cannot generate handoff — [filename] not found. Run /selfheal to diagnose and fix." and stop. File repair is /selfheal's job, not handoff's.
 
 ---
 

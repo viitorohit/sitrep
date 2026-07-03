@@ -1,14 +1,10 @@
 # Update Project Plan
 
-## Step 0: Validate sitrep location (MANDATORY)
-1. Verify these exact files exist:
-   - `sitrep/PROJECT_PLAN.md` (relative to repo root)
-   - `sitrep/STATUS_REPORT.md` (relative to repo root)
-2. If either file is MISSING:
-   - Search the repo for any file named `PROJECT_PLAN.md` or `STATUS_REPORT.md`
-   - If found in wrong location → move it to `sitrep/` and notify the user
-   - If not found at all → print: "⚠️ Cannot update — [filename] not found."
-   - Do NOT proceed until both files are in `sitrep/`
+> Intentional (manually invoked).
+
+## Step 0: Check sitrep presence
+1. Verify `sitrep/PROJECT_PLAN.md` and `sitrep/STATUS_REPORT.md` exist
+2. If either is missing → print "⚠️ Cannot update — [filename] not found. Run /selfheal to diagnose and fix." and stop. File repair is /selfheal's job, not plan-update's.
 
 ---
 

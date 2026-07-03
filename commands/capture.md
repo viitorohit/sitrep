@@ -2,9 +2,11 @@
 
 Capture a new task into the project plan and status report in one step. Never lose an idea mid-session.
 
-## Step 0: Validate sitrep location (MANDATORY)
+> Intentional (manually invoked). Task-ID assignment below is slated to move into the CLI (`getsitrep capture`) once GETSITREP-8 ships; until then it stays here in prose.
+
+## Step 0: Check sitrep presence
 1. Verify `sitrep/PROJECT_PLAN.md` and `sitrep/STATUS_REPORT.md` exist
-2. If missing → search, move, or report. Do NOT proceed until both are in `sitrep/`
+2. If either is missing → print "⚠️ Cannot capture — [filename] not found in sitrep/. Run /selfheal to diagnose and fix." and stop. This command only reads and appends to files that already exist — file repair is /selfheal's job, not capture's.
 
 ---
 
