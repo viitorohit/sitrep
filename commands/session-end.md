@@ -112,6 +112,8 @@ Read `sitrep/.sitrep-data.json` (create if it doesn't exist with empty structure
 - Calculate cost using model pricing from MANIFEST.md
 - Never write a token/cost figure without its `actual`/`estimate` label — this is a hard law, not a style preference
 - This heuristic is slated to move into the CLI (`getsitrep cost estimate`) once GETSITREP-8 ships
+- **Subagent-cost awareness:** if this session spawned subagents (Task tool calls), count their token usage too — each subagent call carries its own input/output cost on top of the main thread. Don't undercount by tracking only the primary conversation.
+- **/compact hygiene:** if auto-compact fired during this session, note it in Part D's Notes section — a post-compact estimate is a lower bound, not exact, since pre-compact context isn't fully reconstructable. If the session ran long enough that /compact is imminent, consider running /handoff first to preserve full context before it's lost.
 
 ### 3. Add session record
 Add a new entry to the `sessions` array in `.sitrep-data.json`:

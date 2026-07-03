@@ -39,3 +39,10 @@ Queued for this session: [next tasks from status report]
 ```
 
 This is orientation, not a gate — nothing here should stop the developer from starting work immediately. Wait for instructions on what to work on this session before making changes.
+
+---
+
+## 2026 best-practice reminders (print once alongside orientation)
+
+- **Model routing:** default to Sonnet for this session. Reach for Opus only on genuinely hard reasoning (ambiguous architecture, tricky debugging) — not as a default. Route subagent/Task-tool work to Haiku by default; subagents multiply token cost, so cheap-by-default matters there specifically.
+- **/clear hygiene:** session-start orients you *within* the current project context — it doesn't reset it. If this session is starting genuinely unrelated work (not a continuation of the last one), run `/clear` first. Don't `/clear` mid-task.

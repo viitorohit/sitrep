@@ -2,7 +2,7 @@
 
 Capture a new task into the project plan and status report in one step. Never lose an idea mid-session.
 
-> Intentional (manually invoked). Task-ID assignment below is slated to move into the CLI (`getsitrep capture`) once GETSITREP-8 ships; until then it stays here in prose.
+> Intentional (manually invoked). Task-ID assignment below is slated to move into the CLI (`getsitrep capture`) once GETSITREP-8 ships; until then it stays here in prose. **Model routing:** this is a lightweight, low-reasoning task — no need to switch models for it; whatever model is already active for the session handles it fine.
 
 ## Step 0: Check sitrep presence
 1. Verify `sitrep/PROJECT_PLAN.md` and `sitrep/STATUS_REPORT.md` exist

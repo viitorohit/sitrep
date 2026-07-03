@@ -19,10 +19,10 @@ Math: 9 files in `commands/` − `pulse` (merged into `sitrep`) − `doctor` (dr
 
 | Command | Class | This refresh |
 |---|---|---|
-| `session-start` | Automatic | Rewritten — stripped file-repair (now solely /selfheal's job), removed blocking "Do NOT proceed" language, fail-open |
-| `session-end` | Automatic | Refreshed — same fail-open/no-file-repair fix; cost figures now explicitly labeled `actual`/`estimate`; added `Branch` field to the session log template. Token/cost estimation logic **stays in prose for now** — moving it into the CLI is deferred until GETSITREP-8 exists (see below) |
+| `session-start` | Automatic | Rewritten — stripped file-repair (now solely /selfheal's job), removed blocking "Do NOT proceed" language, fail-open. Adds 2026 best-practice reminders: model routing (Sonnet default, Opus for hard reasoning, Haiku for subagents) and `/clear` hygiene (GETSITREP-14 scope) |
+| `session-end` | Automatic | Refreshed — same fail-open/no-file-repair fix; cost figures now explicitly labeled `actual`/`estimate`; added `Branch` field to the session log template; subagent-cost awareness and `/compact` hygiene notes (GETSITREP-14 scope). Token/cost estimation logic **stays in prose for now** — moving it into the CLI is deferred until GETSITREP-8 exists (see below) |
 | `sitrep` | Intentional | Rewritten — absorbed `/pulse`'s session command tracker and next-suggestion logic |
-| `capture` | Intentional | Refreshed — removed file-repair overlap with /selfheal. Task-ID assignment math **stays in prose for now**, same CLI deferral as session-end |
+| `capture` | Intentional | Refreshed — removed file-repair overlap with /selfheal, brief model-routing note (GETSITREP-14 scope). Task-ID assignment math **stays in prose for now**, same CLI deferral as session-end |
 | `plan-update` | Intentional | Light refresh — removed file-repair overlap with /selfheal |
 | `selfheal` | Intentional | Rewritten — removed hardcoded `.claude/commands/` paths (Hard Law #1 violation); now checks the canon against the active platform's command directory generically. Foundation for GETSITREP-28 (hash manifest, drift detection, lock/diff/restore) — that full system is not yet built |
 | `handoff` | Intentional | Light refresh — removed file-repair overlap with /selfheal |
