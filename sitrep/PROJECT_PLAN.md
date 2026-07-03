@@ -3,13 +3,14 @@
 > **Project:** sitrep
 > **Owner:** Rohit
 > **Started:** 2026-03-11
-> **Last Updated:** 2026-04-06
+> **Last Updated:** 2026-07-03
+> **Roadmap source of truth:** Jira project GETSITREP (Epics GETSITREP-1/2/3 = v0.3/v0.4/v0.5). This file mirrors Jira — if they diverge, Jira wins. See CLAUDE.md Sources of Truth.
 
 ---
 
 ## Product Vision
 
-sitrep is the project management framework built for AI-assisted development. It gives solo developers and vibe coders session continuity, cost visibility, and progress tracking — all inside their repo, with zero dependencies.
+sitrep is the operations, cost, and continuity layer for AI-assisted development. It sits **beside** existing planning tools (Jira, OpenSpec, Spec Kit) — never replaces them. It gives solo developers and vibe coders session continuity, cost visibility, and progress tracking — all inside their repo, with zero dependencies.
 
 **Tech Stack:** Node.js (CLI) · Markdown (commands + data) · HTML (dashboard) · Git (versioning)
 
@@ -56,48 +57,83 @@ sitrep is the project management framework built for AI-assisted development. It
 
 ---
 
-## Phase 3: Onboarding & Polish — `v0.3.0`
+## Phase 3: Sharper & Self-Sufficient — `v0.3.0` 🟡 In Progress
 
-> Make first experience frictionless
+> **Jira Epic:** GETSITREP-1. Make sitrep platform-agnostic, self-sufficient, and honest about what it measures — before any traffic-driving content ships.
 
-| # | Feature | Description |
-|---|---------|-------------|
-| 3.1 | HTML intake form | Browser-based project brief capture |
-| 3.2 | Import existing plans | Paste PRD/brief → sitrep generates plan |
-| 3.3 | Session awareness integration | All commands write to .sitrep-active-session |
-| 3.4 | Dashboard improvements | Cost charts, session timeline, print CSS |
-| 3.5 | getsitrep.dev landing page | Product website |
-| 3.6 | LinkedIn Article 2 | "The npm Package I Built to Stop Wasting AI Tokens" |
+**Hard architectural laws (apply to all releases, not just this one):** no agentic-platform lock-in · every cost figure labeled `actual`/`estimate` · zero-dependency core is sacred · CLAUDE.md/AGENTS.md are factual context only, never imperative · sitrep never blocks a workflow (fail-open, idempotent, non-interactive hooks).
+
+**Multi-platform commitment (2026-07-02):** Claude Code, Codex, Cursor adapters from day one; Copilot/VS Code conditional on GETSITREP-38.
+
+### Tier 0 — parallel, no dependencies (current)
+
+| Story | Component | Goal |
+|---|---|---|
+| GETSITREP-4 — Confirm cost data sources & schema | `cost` | Define schema before any cost code is written; actual vs estimate labeling |
+| GETSITREP-13 — Refresh command MDs, canon per signed audit | `commands` | 9 − pulse − doctor + dashboard (relocated from root) = 8. Audit (2026-07-02) found doctor≈selfheal duplicate + misplaced dashboard.md. Binding spec: Command MD Audit (Confluence) → mirrored to `docs/specs/command-canon.md`. |
+| GETSITREP-36 — Adapter contract | `cli-core` | Plan/cost/auto-run interfaces, all optional; 3 committed platforms + Copilot conditional |
+
+### Tier 1 — needs Tier 0
+
+| Story | Component | Goal |
+|---|---|---|
+| GETSITREP-8 — Platform-agnostic core/CLI extraction | `cli-core` | Move all logic into a real CLI; slash commands become thin wrappers |
+| GETSITREP-28 — selfheal: MD-drift + upgrade protection | `selfheal` | Hash manifest, drift report, lock/diff/restore; absorbs doctor's role |
+
+### Tier 2 — needs GETSITREP-8
+
+| Story | Component | Goal |
+|---|---|---|
+| GETSITREP-17 — CLI onboarding wizard + config | `onboarding` | `getsitrep init`: plan source + cost source + tools in use; residue-detection/restore (GETSITREP-39) |
+| GETSITREP-21 — Auto-run adapters | `onboarding` | SessionStart + SessionEnd hook writers per platform + AGENTS.md factual nudge; Codex spike |
+| GETSITREP-25 — Plan-presence guard | `cli-core` | If no plan found, offer to generate one from repo introspection |
+
+### Tier 3 — pre-launch gate
+
+| Story | Component | Goal |
+|---|---|---|
+| GETSITREP-32 — Housekeeping | `docs` | README says "eight" commands, publish v0.2 GitHub release, npm source visible in public repo |
+
+**Explicitly OUT of v0.3** (deferred to v0.4+): cost-to-outcome pipeline, Jira read-adapter, activity attribution, business brief, nudge engine (GETSITREP-35), adoption nudge (GETSITREP-40).
+
+**Definition of Done:** fresh `getsitrep init` on a bare repo → working config + hooks in under 2 minutes; all 8 command MDs pass the audit's cross-cutting rules; `selfheal --verify` flags manual edits; SessionStart/SessionEnd auto-fire with zero typing on Claude Code, Codex, Cursor; no hook ever blocks a session; public repo is traffic-ready.
 
 ---
 
-## Phase 4: Community & Growth — `v0.4.0`
+## Phase 4: Cost-to-Outcome & Beside — `v0.4.0` (planned)
 
-> Build the user base
+> **Jira Epic:** GETSITREP-2. Depends on v0.3 shipping (needs the platform-agnostic CLI + confirmed cost schema). The category-flag release — no other SDD tool or meter maps spend to shipped outcome.
 
-| # | Feature | Description |
-|---|---------|-------------|
-| 4.1 | Submit to awesome-claude-code | Get listed in the curated list |
-| 4.2 | Product Hunt launch | Ship page + launch post |
-| 4.3 | Hacker News Show HN | "Show HN: sitrep — AI-native project management" |
-| 4.4 | Dev.to / Hashnode tutorials | Technical how-to articles |
-| 4.5 | GitHub Actions integration | Auto-update on PR merge |
-| 4.6 | Community feedback loop | Issues → features pipeline |
+| Planned capability | What it does |
+|---|---|
+| Cost-to-outcome pipeline | Ingest ccusage/CCUM JSON or thin local-log fallback; attribute spend to plan phase / ticket / feature |
+| Jira adapter (read) | Pull epics/stories/status from the configured Jira project; overlay cost + progress — enables sitrep to self-report on its own GETSITREP board |
+| Native + file-based adapter | Read `PROJECT_PLAN.md` or an OpenSpec/Spec Kit folder as plan source; not hardcoded to Jira |
+| Scoped conflict check | Plan-vs-reality divergence + contradicted-decision flags (extension of selfheal) — not full multi-agent conflict resolution |
+| Read/report commands | `getsitrep report`, `plan --phase N`, `progress` |
+| Cost optimization advisory | e.g. "Phase 3 cost 3× Phase 2 for similar scope," tied to outcome data |
+| Tier-B / Tier-C cost separation | Tier-B (input/output/thinking/cache) = `actual`; Tier-C (activity attribution) = `attributed (estimate)` — never blurred |
+
+**Explicitly OUT of v0.4:** business brief, nudge engine, adoption nudge (deferred to v0.5+).
+
+*Titles only — Stories not yet broken into subtasks per Jira ("detailed once v0.3 ships"). Authoritative scope: Jira Epic GETSITREP-2.*
 
 ---
 
-## Phase 5: Scale — `v1.0.0`
+## Phase 5: Business Brief & Breadth — `v0.5.0` (planned)
 
-> Production-ready for teams
+> **Jira Epic:** GETSITREP-3. Depends on v0.4 shipping (the cost-to-outcome pipeline is the data this release's brief generator reports on). The ViitorCloud halo feature — the only tool in this lane producing a brief a non-technical stakeholder can read unassisted.
 
-| # | Feature | Description |
-|---|---------|-------------|
-| 5.1 | Multi-developer support | Merge-safe session logging |
-| 5.2 | Smart init with codebase scanning | Infer project state from code |
-| 5.3 | Plugin system | Custom commands and checks |
-| 5.4 | Multi-project unified view | Track several repos from one place |
-| 5.5 | Web dashboard (live) | Real-time progress, not static HTML |
-| 5.6 | Cursor / Copilot integration | Beyond Claude Code |
+| Planned capability | What it does |
+|---|---|
+| Business-user brief generator (`/brief`) | Session + project brief in executive language: what shipped, what it cost, what's next, risks |
+| AGENTS.md adapter for non-Claude tools | Cost side largely free (meter already covers ~14 tools); plan/command side via the AGENTS.md cross-tool standard — Cursor (`.cursor/rules`) + Copilot (`.github/instructions`) shims |
+| Pricing update (`getsitrep pricing update`) | Manual pull of a maintained pricing JSON — pull not push, zero auto-dependency |
+| HTML onboarding form | Richer intake option; CLI wizard from v0.3 remains the default |
+
+**Explicitly OUT of v0.5** (deferred to v1.0+): multi-dev concurrency, GitHub Actions integration, hosted/cloud version, true multi-agent context conflict resolution.
+
+*Titles only — Stories not yet broken into subtasks. Authoritative scope: Jira Epic GETSITREP-3.*
 
 ---
 
@@ -115,13 +151,15 @@ sitrep is the project management framework built for AI-assisted development. It
 | 8 | First-run bootstrap from CLAUDE.md | Solves blank template problem on existing projects | 2026-03-13 |
 | 9 | .sitrep-initialized flag | Prevents token waste on repeated session starts | 2026-03-13 |
 
+> Architecturally-significant decisions from v0.3 onward are recorded as ADRs in `docs/adr/` (see CLAUDE.md decision log) rather than added to this table.
+
 ---
 
 ## Risk Register
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| Complexity creep | High | 9 commands max for v0.x. New features must justify token cost. |
+| Complexity creep | High | 8 commands max for v0.x (canon locked by GETSITREP-13, in progress). New features must justify token cost. |
 | Low npm adoption | Medium | LinkedIn build-in-public, dogfood on Atlas, submit to awesome lists |
 | Competitor copies the approach | Low | Speed + community + brand. First mover in AI PM space. |
 | Dashboard HTML too large | Medium | Target under 80KB. CSS-only charts, no libraries. |
@@ -129,13 +167,20 @@ sitrep is the project management framework built for AI-assisted development. It
 
 ---
 
-## Future / Post-MVP Ideas
+## Future / Post-MVP Ideas (v1.0+, not yet in Jira)
 
-| # | Idea | Priority | Target |
-|---|------|----------|--------|
-| F.1 | Revenue model (Pro tier?) | High | v1.0+ |
-| F.2 | VS Code extension | Medium | v1.0+ |
-| F.3 | Team analytics dashboard | Medium | v1.0+ |
-| F.4 | AI model comparison (cost per model) | Low | v0.4 |
-| F.5 | Webhook notifications (Slack, email) | Low | v1.0+ |
-| F.6 | CLI dashboard (terminal UI) | Low | v0.5 |
+> Engineering ideas explicitly named as deferred to v1.0+ in the v0.5 Epic, plus marketing/growth activities not yet formalized as Jira Epics.
+
+| # | Idea | Notes |
+|---|------|-------|
+| F.1 | Revenue model (Pro tier?) | |
+| F.2 | VS Code extension | |
+| F.3 | Team analytics dashboard | |
+| F.4 | Multi-developer support (merge-safe session logging) | Explicitly OUT of v0.5, deferred to v1.0+ |
+| F.5 | GitHub Actions integration | Explicitly OUT of v0.5, deferred to v1.0+ |
+| F.6 | Hosted/cloud version, live web dashboard | Explicitly OUT of v0.5, deferred to v1.0+ |
+| F.7 | True multi-agent context conflict resolution | Explicitly OUT of v0.5, deferred to v1.0+ |
+| F.8 | Smart init with codebase scanning | |
+| F.9 | Plugin system (custom commands and checks) | |
+| F.10 | Submit to awesome-claude-code, Product Hunt, HN Show HN, Dev.to/Hashnode tutorials, community feedback loop | Marketing/growth — not yet in Jira |
+
