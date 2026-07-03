@@ -57,6 +57,7 @@ Tier 1–3 Stories (GETSITREP-8, 28, 17, 21, 25, 32) not shown — blocked on Ti
 
 ### Session 5 — 2026-07-03
 - **User:** Rohit
+- **Branch:** `main` (git hygiene commit `e014326`, pushed — pre-Story housekeeping) → `GETSITREP-13-command-md-refresh` (reconciliation commit relocated here per session-owner direction so main stays direct-push-free; not yet pushed)
 - **Focus:** Session 1 opening tasks per CLAUDE.md v0.3 — git hygiene + dogfood reconciliation, before starting GETSITREP-13
 - **Done:**
   - Fetched GETSITREP-13 (Story, subtasks, comments) and the Command MD Audit / Jira Standard / Repo & Branch Conventions Confluence pages via Atlassian MCP
@@ -73,6 +74,7 @@ Tier 1–3 Stories (GETSITREP-8, 28, 17, 21, 25, 32) not shown — blocked on Ti
 
 ### Session 4 — 2026-04-06
 - **User:** Rohit
+- **Branch:** `main` (pre-Story-branch convention)
 - **Focus:** Health check and selfheal diagnostics
 - **Done:** Ran /selfheal — fixed missing PROJECT_PLAN.md in sitrep/, created history/ directories, fixed progress header mismatch (23/36 → 23/41)
 - **Blockers:** None
@@ -82,6 +84,7 @@ Tier 1–3 Stories (GETSITREP-8, 28, 17, 21, 25, 32) not shown — blocked on Ti
 
 ### Session 3 — 2026-03-13
 - **User:** Rohit
+- **Branch:** `main` (pre-Story-branch convention)
 - **Focus:** Release v0.2 across platforms + project setup
 - **Done:** GitHub updated, npm v0.2.0 published, LinkedIn + X posts, first-run bootstrap, session awareness (pulse), project structure created
 - **Blockers:** None
@@ -91,6 +94,7 @@ Tier 1–3 Stories (GETSITREP-8, 28, 17, 21, 25, 32) not shown — blocked on Ti
 
 ### Session 2 — 2026-03-12
 - **User:** Rohit
+- **Branch:** `main` (pre-Story-branch convention)
 - **Focus:** Build new commands + competitive analysis + marketing
 - **Done:** capture, selfheal, handoff, dashboard commands. Competitive analysis. Marketing playbook. Usage guide (15 use cases).
 - **Blockers:** None
@@ -100,6 +104,7 @@ Tier 1–3 Stories (GETSITREP-8, 28, 17, 21, 25, 32) not shown — blocked on Ti
 
 ### Session 1 — 2026-03-11
 - **User:** Rohit
+- **Branch:** `main` (pre-Story-branch convention)
 - **Focus:** Extract sitrep from Atlas into standalone project
 - **Done:** Named product "sitrep". Created 5 commands. Published npm v0.1.0. Created GitHub repo. Published LinkedIn article. Purchased getsitrep.dev.
 - **Blockers:** None

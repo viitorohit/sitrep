@@ -38,6 +38,7 @@ _None yet._
 ## Session Log
 
 ### Session 1 — [date]
+- **Branch:** [active git branch this session worked on]
 - **Focus:** [what this session is about]
 - **Done:** [what was accomplished]
 - **Blockers:** None
