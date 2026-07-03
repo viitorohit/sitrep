@@ -16,7 +16,14 @@ Never write a bare number. If neither source is available, write "not tracked" i
 1. **Thin local estimate (default, zero-dependency)** — the heuristic already in `commands/session-end.md`: light ~20k / medium ~60k / heavy ~150k tokens, priced from `MANIFEST.md`'s static pricing table. Always available, no setup. Labeled `estimate`.
 2. **ccusage (when detected)** — per CLAUDE.md's existing hard law ("don't rebuild solved layers"), sitrep reads Claude Code's local usage data via ccusage instead of estimating. Gives real `input`/`output`/`cache_creation`/`cache_read` token counts and cost per session. Labeled `actual`. Wiring this in is GETSITREP-17 (onboarding wizard) / GETSITREP-8 (CLI) scope, not this ticket — this spec just defines the schema those tickets build against.
 
-No third mode planned now. A real-time per-model pricing API (instead of the static `MANIFEST.md` table) is a good future idea but explicitly out of scope for v0.3 — noted here so it isn't lost, not built.
+## Decision: pricing lookup — delegate where solved, stay static where it isn't
+
+Verified: ccusage does not maintain its own pricing table. It fetches live from [LiteLLM's community-maintained pricing feed](https://github.com/BerriAI/litellm/blob/main/model_prices_and_context_window.json) (`model_prices_and_context_window.json`, auto-synced, 100+ models, including cache/reasoning-token pricing), with offline-cache fallback. This is a "someone already solved it" case, per sitrep's own principle: replicate solved layers, don't rebuild them.
+
+- **`actual` mode (ccusage present):** sitrep does **not** build or maintain its own pricing lookup. It reads ccusage's own computed `cost_usd` as-is — ccusage already prices it from LiteLLM's live data. Building a separate LiteLLM-fetch integration here would just reinvent what ccusage already does. This is the same "don't rebuild solved layers" law already in CLAUDE.md, applied specifically to pricing (not just token metering).
+- **`estimate` mode (no meter running):** sitrep keeps its own small static pricing table in `MANIFEST.md`, used only for the rough heuristic multiply, always labeled `estimate`. This stays static and manually-maintained **on purpose** — nobody has actually solved "accurate cost with no real meter running" (it's inherently a guess), and even ccusage's own live-pricing path has an open, unresolved upstream issue on historical-pricing accuracy. Adding a live-fetch dependency for a path that's explicitly an estimate anyway would violate the zero-dependency core law for no real accuracy gain.
+
+**No real-time pricing API for sitrep to build, in either mode.** Not deferred to a future version either — the `actual` need is already met by delegating to ccusage/LiteLLM; the `estimate` need is inherently approximate everywhere, including upstream. This is a closed decision, not an open question.
 
 ## `.sitrep-data.json` schema addition
 

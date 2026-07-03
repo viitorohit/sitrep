@@ -253,11 +253,18 @@ Or paste the HANDOFF.md content directly into a Claude.ai conversation.
 **Situation:** You want to know how much your AI-assisted development is costing. Which phases are expensive? Is your spending trending up or down?
 
 **How it works:** Every `/session-end` automatically:
-- Estimates tokens used (input + output)
+- Records tokens used (input + output, plus cache when available)
+- Labels every number `actual` or `estimate` — sitrep never writes a bare cost figure
 - Calculates cost based on the model used
 - Logs the model name
 - Records session duration
 - Saves everything to `.sitrep-data.json`
+
+**Two ways sitrep gets your numbers:**
+- **Estimate (default, zero setup)** — a light/medium/heavy heuristic based on the work done this session, priced from the static table in `MANIFEST.md`. Always available, no configuration needed. Labeled `estimate`.
+- **Actual (when [ccusage](https://github.com/ryoppippi/ccusage) is installed)** — sitrep reads real token counts from ccusage, which prices them itself from a live, community-maintained pricing feed. sitrep doesn't maintain its own pricing table for this path — it just reads ccusage's numbers. Labeled `actual`.
+
+**If you're upgrading from an earlier sitrep version:** your existing `.sitrep-data.json` entries were logged before this labeling existed, so they won't have `actual`/`estimate` tags — that's expected, not a bug. Every session logged from your next `/session-end` onward will carry one.
 
 **To see your cost data:**
 
