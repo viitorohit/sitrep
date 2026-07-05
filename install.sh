@@ -18,7 +18,7 @@ mkdir -p sitrep/history/sessions
 mkdir -p sitrep/history/handoffs
 mkdir -p sitrep/history/dashboards
 
-# Download commands (9 total)
+# Download commands (8 total)
 echo "  Downloading slash commands..."
 curl -sL "$REPO/commands/session-start.md" -o .claude/commands/session-start.md
 curl -sL "$REPO/commands/session-end.md" -o .claude/commands/session-end.md
@@ -28,7 +28,6 @@ curl -sL "$REPO/commands/capture.md" -o .claude/commands/capture.md
 curl -sL "$REPO/commands/selfheal.md" -o .claude/commands/selfheal.md
 curl -sL "$REPO/commands/handoff.md" -o .claude/commands/handoff.md
 curl -sL "$REPO/commands/dashboard.md" -o .claude/commands/dashboard.md
-curl -sL "$REPO/commands/pulse.md" -o .claude/commands/pulse.md
 
 # Download templates if sitrep files don't exist
 if [ ! -f "sitrep/MANIFEST.md" ]; then
@@ -57,14 +56,14 @@ fi
 
 echo ""
 echo "  ══════════════════════════════════════"
-echo "  ✅ sitrep v0.2.0 installed!"
+echo "  ✅ sitrep installed!"
 echo ""
 echo "  Files created:"
 echo "    sitrep/MANIFEST.md"
 echo "    sitrep/PROJECT_PLAN.md"
 echo "    sitrep/STATUS_REPORT.md"
 echo "    sitrep/history/ (sessions, handoffs, dashboards)"
-echo "    .claude/commands/ (9 commands)"
+echo "    .claude/commands/ (8 commands)"
 echo ""
 echo "  Next steps:"
 echo "    1. Edit sitrep/PROJECT_PLAN.md with your project details"
@@ -80,6 +79,5 @@ echo "    /plan-update     Log scope changes"
 echo "    /selfheal        Health check + auto-fix"
 echo "    /handoff         Context package for handoff"
 echo "    /dashboard       Visual MIS report"
-echo "    /pulse           Session command status"
 echo "  ══════════════════════════════════════"
 echo ""
