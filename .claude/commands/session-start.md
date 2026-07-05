@@ -1,31 +1,26 @@
 # Session Start Protocol
 
-## Step 0: Validate sitrep location (MANDATORY)
-Before anything else, run these checks:
+> Automatic (hook-fired): this command is meant to run unattended on every session start. It must never block — file repair is /selfheal's job (see GETSITREP-28/39), not this command's.
 
-1. Verify these exact files exist:
-   - `sitrep/MANIFEST.md` (framework reference)
-   - `sitrep/PROJECT_PLAN.md` (relative to repo root)
-   - `sitrep/STATUS_REPORT.md` (relative to repo root)
+## Step 0: Check sitrep presence (fail-open)
+Look for these files, but do not search for or move anything — that's /selfheal's responsibility, not session-start's:
+- `sitrep/MANIFEST.md`
+- `sitrep/PROJECT_PLAN.md`
+- `sitrep/STATUS_REPORT.md`
 
-2. If any file is MISSING:
-   - Search the repo for the file by name
-   - If found in wrong location → move it to `sitrep/` and notify the user
-   - If MANIFEST.md is missing → print: "⚠️ Missing MANIFEST.md. Consider adding the framework reference."
-   - If PROJECT_PLAN.md or STATUS_REPORT.md missing → print: "⚠️ Missing [filename]. Run /plan-update to create it."
-   - Do NOT proceed until both core files (PROJECT_PLAN.md + STATUS_REPORT.md) are in `sitrep/`
-
-3. If a `sitrep/` directory doesn't exist → create it
+- All present → continue to Step 1.
+- Any missing → print one line ("⚠️ Missing [filename] — run /selfheal to diagnose and fix, or /plan-update to create it") and continue anyway with whatever context is available. Never block the session on missing files.
+- No `sitrep/` directory at all → same: warn, continue (first-run bootstrap handles brand-new projects — see MANIFEST.md).
 
 ---
 
 ## Step 1: Read project context
-1. Read `sitrep/MANIFEST.md` first (if exists) — understand the framework version and rules
-2. Read `sitrep/STATUS_REPORT.md` — current progress
-3. Read `sitrep/PROJECT_PLAN.md` — roadmap and context
-4. Read `sitrep/.sitrep-data.json` (if exists) — cost and session history
+1. Read `sitrep/MANIFEST.md` if it exists — understand the framework version and rules
+2. Read `sitrep/STATUS_REPORT.md` if it exists — current progress
+3. Read `sitrep/PROJECT_PLAN.md` if it exists — roadmap and context
+4. Read `sitrep/.sitrep-data.json` if it exists — cost and session history
 
-Extract the project name from PROJECT_PLAN.md. Use this as [PROJECT] in all output.
+Extract the project name from PROJECT_PLAN.md. Use this as [PROJECT] in all output. If PROJECT_PLAN.md is missing, fall back to the repo directory name.
 
 ---
 
@@ -43,4 +38,11 @@ Queued for this session: [next tasks from status report]
 =====================================
 ```
 
-Do NOT make any changes yet. Wait for instructions on what to work on this session.
+This is orientation, not a gate — nothing here should stop the developer from starting work immediately. Wait for instructions on what to work on this session before making changes.
+
+---
+
+## 2026 best-practice reminders (print once alongside orientation)
+
+- **Model routing:** default to Sonnet for this session. Reach for Opus only on genuinely hard reasoning (ambiguous architecture, tricky debugging) — not as a default. Route subagent/Task-tool work to Haiku by default; subagents multiply token cost, so cheap-by-default matters there specifically.
+- **/clear hygiene:** session-start orients you *within* the current project context — it doesn't reset it. If this session is starting genuinely unrelated work (not a continuation of the last one), run `/clear` first. Don't `/clear` mid-task.

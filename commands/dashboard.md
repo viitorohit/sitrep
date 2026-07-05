@@ -1,5 +1,7 @@
 # Dashboard — Intelligent MIS Report
 
+> Intentional (manually invoked).
+
 Generate a self-contained HTML dashboard from sitrep files. This is the management information system for the project. Opens in any browser. No server needed.
 
 ## Step 0: Validate and prepare

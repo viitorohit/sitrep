@@ -1,27 +1,20 @@
 # Session End Protocol
 
-## Step 0: Validate sitrep location (MANDATORY)
-Before anything else, run these checks:
+> Automatic (hook-fired): this command is meant to run unattended at session end. It must never block — file repair is /selfheal's job (see GETSITREP-28/39), not this command's. Once GETSITREP-8 ships, the token/cost estimation logic in Part C moves into the CLI and this MD becomes a thin wrapper; until then it stays here in prose.
 
-1. Verify these exact files exist:
-   - `sitrep/MANIFEST.md` (framework reference — warn if missing but continue)
-   - `sitrep/PROJECT_PLAN.md` (relative to repo root)
-   - `sitrep/STATUS_REPORT.md` (relative to repo root)
+## Step 0: Check sitrep presence (fail-open)
+Look for `sitrep/MANIFEST.md`, `sitrep/PROJECT_PLAN.md`, `sitrep/STATUS_REPORT.md` — but do not search for or move anything; that's /selfheal's job, not session-end's.
 
-2. If PROJECT_PLAN.md or STATUS_REPORT.md is MISSING:
-   - Search the repo for any file named `PROJECT_PLAN.md` or `STATUS_REPORT.md`
-   - If found in wrong location → move it to `sitrep/` and notify the user
-   - If not found at all → print: "⚠️ Cannot update [filename] — file not found."
-   - Do NOT proceed with updates until both files are in `sitrep/`
+- If PROJECT_PLAN.md or STATUS_REPORT.md is missing → print "⚠️ Cannot update [filename] — file not found. Run /selfheal to diagnose." and skip updates to that file only. Still complete every other part of this protocol (history record, commit) with whatever exists — a missing file narrows what session-end can update, it never stops the session from ending.
 
-3. Ensure these directories exist (create if missing):
-   - `sitrep/history/sessions/`
-   - `sitrep/history/handoffs/`
-   - `sitrep/history/dashboards/`
+Ensure these directories exist (create if missing — this is plain directory creation, not file repair):
+- `sitrep/history/sessions/`
+- `sitrep/history/handoffs/`
+- `sitrep/history/dashboards/`
 
 ---
 
-Read both `sitrep/STATUS_REPORT.md` and `sitrep/PROJECT_PLAN.md`.
+Read both `sitrep/STATUS_REPORT.md` and `sitrep/PROJECT_PLAN.md`, whichever exist.
 
 Extract the project name from the first heading or metadata in PROJECT_PLAN.md. Use this as [PROJECT] in all output.
 
@@ -49,10 +42,11 @@ Extract the project name from the first heading or metadata in PROJECT_PLAN.md. 
 ```
 ### Session N — YYYY-MM-DD
 - **User:** [who did this session]
+- **Branch:** [active git branch this session worked on]
 - **Focus:** [one-line summary]
 - **Done:** [list completed task IDs and descriptions]
 - **Blockers:** [any issues or "None"]
-- **Tokens:** ~[estimated total tokens] | Cost: ~$[estimated cost]
+- **Tokens:** ~[total] (estimate, or "actual" if the AI tool reported exact counts) | Cost: ~$[amount] (estimate|actual) — write "not tracked" instead of a number if no metering is configured; never print a cost figure without one of these two labels
 - **Model:** [which AI model was used]
 - **Next:** [what should happen next session]
 ```
@@ -109,14 +103,17 @@ Read `sitrep/.sitrep-data.json` (create if it doesn't exist with empty structure
 - **Phase:** which phase was active
 - **Model:** which AI model was used this session
 
-### 2. Estimate tokens and cost
-- Review the work done this session
-- Estimate token usage:
+### 2. Estimate tokens and cost — always label `actual` or `estimate`
+- If exact counts are available from the AI tool or a configured meter (ccusage/CCUM) → use those, label `actual`
+- Otherwise, estimate from the work done this session, label `estimate`:
   - Light (reading, planning, small edits): ~20,000 tokens
   - Medium (1-2 features built, some debugging): ~60,000 tokens
   - Heavy (large refactor, many files, extensive debugging): ~150,000 tokens
 - Calculate cost using model pricing from MANIFEST.md
-- If exact counts are available from the AI tool, use those instead
+- Never write a token/cost figure without its `actual`/`estimate` label — this is a hard law, not a style preference
+- This heuristic is slated to move into the CLI (`getsitrep cost estimate`) once GETSITREP-8 ships
+- **Subagent-cost awareness:** if this session spawned subagents (Task tool calls), count their token usage too — each subagent call carries its own input/output cost on top of the main thread. Don't undercount by tracking only the primary conversation.
+- **/compact hygiene:** if auto-compact fired during this session, note it in Part D's Notes section — a post-compact estimate is a lower bound, not exact, since pre-compact context isn't fully reconstructable. If the session ran long enough that /compact is imminent, consider running /handoff first to preserve full context before it's lost.
 
 ### 3. Add session record
 Add a new entry to the `sessions` array in `.sitrep-data.json`:
@@ -134,6 +131,7 @@ Add a new entry to the `sessions` array in `.sitrep-data.json`:
   "decisions": ["decision made"],
   "tokens": { "input": N, "output": N, "total": N },
   "cost_usd": N.NN,
+  "cost_label": "actual",
   "model": "model-name",
   "duration_minutes": N,
   "notes": "any additional notes"
@@ -205,7 +203,7 @@ Completed: [list of task IDs]
 In progress: [list or "None"]
 Blockers: [any or "None"]
 Overall: [X/total tasks — Y%]
-Tokens: ~[total] | Cost: ~$[N.NN]
+Tokens: ~[total] (estimate|actual) | Cost: ~$[N.NN] (estimate|actual|not tracked)
 Plan changes: [any or "None"]
 Next session: [queued work]
 ===================================

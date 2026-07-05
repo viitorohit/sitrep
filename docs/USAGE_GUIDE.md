@@ -37,7 +37,7 @@
 
 ```bash
 cd your-project
-npx getsitrep init
+curl -fsSL https://raw.githubusercontent.com/viitorohit/sitrep/main/install.sh | bash
 ```
 
 This creates:
@@ -103,7 +103,7 @@ That's it. Two commands minimum per session. Everything else is optional.
 ```bash
 mkdir my-new-app && cd my-new-app
 git init
-npx getsitrep init
+curl -fsSL https://raw.githubusercontent.com/viitorohit/sitrep/main/install.sh | bash
 ```
 
 When prompted, enter your project name and your name. Then open the generated files and customize them:
@@ -145,7 +145,7 @@ sitrep prints exactly where you are:
 ```
 === MyApp SESSION START ===
 sitrep: v0.2.0
-Last session: 7 — 2026-03-08 — Rohit — built auth middleware
+Last session: 7 — 2026-03-08 — Alex — built auth middleware
 Current phase: Phase 3 — 4/8 tasks done
 Overall: 22/45 — 49%
 Total cost to date: $4.20 across 7 sessions
@@ -588,7 +588,7 @@ The beauty of git-backed tracking: nothing is ever truly lost, and any damage is
 |---------|--------------|-------------|-----------------|
 | Start session | `/session-start` | Beginning of every session | No |
 | End session | `/session-end` | End of every session | Yes + commit |
-| Quick check | `/sitrep` | Anytime you want a status pulse | No |
+| Quick check | `/sitrep` | Anytime you want a status pulse, or mid-session to see what ran and what's next | No |
 | Add task | `/capture [desc] --phase N` | When new work surfaces | Yes + commit |
 | Update plan | `/plan-update` | Scope changes, decisions, risks | Yes + commit |
 | Health check | `/selfheal` or `/selfheal deep` | When things seem off | Yes + commit |
@@ -625,7 +625,7 @@ The beauty of git-backed tracking: nothing is ever truly lost, and any damage is
 
 **"sitrep files not found"**
 - Run `/selfheal`. It searches for misplaced files and moves them to `sitrep/`.
-- If files truly don't exist, run `npx getsitrep init` to recreate templates.
+- If files truly don't exist, re-run the installer to recreate templates: `curl -fsSL https://raw.githubusercontent.com/viitorohit/sitrep/main/install.sh | bash`
 
 **"Task counts don't match"**
 - Run `/selfheal`. It recalculates and syncs both files automatically.
@@ -648,7 +648,7 @@ The beauty of git-backed tracking: nothing is ever truly lost, and any damage is
 
 **"I broke the sitrep files"**
 - Restore from git: `git checkout HEAD~1 -- sitrep/`
-- Or re-init: `npx getsitrep init` (won't overwrite existing files)
+- Or re-run the installer (won't overwrite existing files): `curl -fsSL https://raw.githubusercontent.com/viitorohit/sitrep/main/install.sh | bash`
 
 ---
 
