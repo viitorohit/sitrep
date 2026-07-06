@@ -7,6 +7,9 @@
     "getsitrep": "bin/getsitrep.js"
   },
   "main": "src/cli.js",
+  "scripts": {
+    "test": "node test/byte-identical.js"
+  },
   "engines": {
     "node": ">=20"
   },
