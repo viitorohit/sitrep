@@ -113,12 +113,18 @@ Commands track their execution in `sitrep/.sitrep-active-session` (gitignored).
 ## Token & Cost Tracking
 
 At session end, the AI assistant logs:
-- Tokens used (input + output estimate)
+- Tokens used (input + output, plus cache when available)
 - Cost in USD based on model pricing
 - Model name
 - Session duration
 
-**Cost estimation reference:**
+Every number is labeled `actual` or `estimate` — never written bare (see `docs/specs/cost-schema.md`). Two sources:
+- **Estimate** (default): heuristic from the table below. No setup.
+- **Actual** (if [ccusage](https://github.com/ryoppippi/ccusage) is installed): reads ccusage's own cost figures directly — sitrep does not maintain its own pricing lookup for this path.
+
+Upgrading from an older sitrep version? Existing `.sitrep-data.json` entries predate this labeling and won't have one — that's expected. New entries from your next session onward will.
+
+**Cost estimation reference (used for `estimate` mode only):**
 | Model | Input (per 1M tokens) | Output (per 1M tokens) |
 |-------|----------------------|------------------------|
 | Claude Sonnet 4 | $3 | $15 |
