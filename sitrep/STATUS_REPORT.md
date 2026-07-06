@@ -1,23 +1,25 @@
 # sitrep — Status Report
 
-> **Last Updated:** 2026-07-03 — Session 5
-> **Current Phase:** Phase 3 (Sharper & Self-Sufficient) — v0.3.0, Tier 0 in progress
-> **Overall Progress:** 23/23 legacy tasks shipped (v0.1+v0.2). v0.3 now tracked as 9 Jira Stories (0 done, Tier 0 current) — see PROJECT_PLAN.md.
+> **Last Updated:** 2026-07-06 — Session 6
+> **Current Phase:** Phase 3 (Sharper & Self-Sufficient) — v0.3.0, Tier 0 + Tier 1 (GETSITREP-8) shipped, Tier 1 (GETSITREP-28) next
+> **Overall Progress:** 23/23 legacy tasks shipped (v0.1+v0.2). v0.3 tracked as 9 Jira Stories — 4 done (GETSITREP-4, 13, 36, 8), 5 remaining — see PROJECT_PLAN.md.
 > **Next Milestone:** `v0.3.0`
 
 ---
 
 ## Active Sprint
 
-**Phase 3: Sharper & Self-Sufficient** | Target: v0.3.0 | Tier 0 (parallel, no dependencies)
+**Phase 3: Sharper & Self-Sufficient** | Target: v0.3.0 | Tier 1 (needs Tier 0 — shipped)
 
 | Story | Task | Status | Notes |
 |---|------|--------|-------|
-| GETSITREP-4 | Confirm cost data sources & schema | 🔲 To Do | Tier 0 |
-| GETSITREP-13 | Refresh command MDs (8-command canon) | 🔲 To Do | Tier 0 — this session's focus, about to branch |
-| GETSITREP-36 | Adapter contract | 🔲 To Do | Tier 0 |
+| GETSITREP-4 | Confirm cost data sources & schema | ✅ Done | Tier 0 — merged, PR #2 |
+| GETSITREP-13 | Refresh command MDs (8-command canon) | ✅ Done | Tier 0 — merged, PR #1 |
+| GETSITREP-36 | Adapter contract | ✅ Done | Tier 0 — merged, PR #3 |
+| GETSITREP-8 | Platform-agnostic core/CLI extraction | ✅ Done | Tier 1 — merged PR #4 (subtasks GETSITREP-9/10/12 all Done); 8-angle code review found + fixed 10 issues before merge |
+| GETSITREP-28 | selfheal: MD-drift + upgrade protection | 🔲 To Do | Tier 1 — next up, needs Tier 0 (shipped) |
 
-Tier 1–3 Stories (GETSITREP-8, 28, 17, 21, 25, 32) not shown — blocked on Tier 0. Full structure in `sitrep/PROJECT_PLAN.md` Phase 3.
+Tier 2–3 Stories (GETSITREP-17, 21, 25, 32) not shown — blocked on GETSITREP-8 (now shipped) or Tier 3 gate. Full structure in `sitrep/PROJECT_PLAN.md` Phase 3.
 
 ---
 
@@ -27,10 +29,10 @@ Tier 1–3 Stories (GETSITREP-8, 28, 17, 21, 25, 32) not shown — blocked on Ti
 |-------|------|-------|------|-----|
 | 1 | Foundation | 8 | 8 | ██████████ 100% |
 | 2 | Operations Layer | 15 | 15 | ██████████ 100% |
-| 3 | Sharper & Self-Sufficient (v0.3.0) | 9 Stories | 0 | ░░░░░░░░░░ 0% |
+| 3 | Sharper & Self-Sufficient (v0.3.0) | 9 Stories | 4 | ████░░░░░░ 44% |
 | 4 | Cost-to-Outcome & Beside (v0.4.0) | Not yet broken into Stories | — | — |
 | 5 | Business Brief & Breadth (v0.5.0) | Not yet broken into Stories | — | — |
-| **TOTAL** | | **23 tasks + 9 Stories** | **23 tasks done, 0 Stories done** | |
+| **TOTAL** | | **23 tasks + 9 Stories** | **23 tasks done, 4 Stories done** | |
 
 ---
 
@@ -54,6 +56,23 @@ Tier 1–3 Stories (GETSITREP-8, 28, 17, 21, 25, 32) not shown — blocked on Ti
 ---
 
 ## Session Log
+
+### Session 6 — 2026-07-06
+- **User:** Rohit
+- **Branch:** `GETSITREP-8-cli-extraction` (review + fixes, merged via PR #4) and `docs/cli-usage-section` (README docs, PR #5 open); this session-end record itself committed on `main`
+- **Focus:** Code review of the GETSITREP-9/10/12 CLI, fix the findings, merge GETSITREP-8 to main, propose+apply Done transitions, document the CLI in README
+- **Done:**
+  - 8-angle code review of the CLI (bin/getsitrep.js, src/); found 10 issues — fail-open regressions in JSON reading, an args-parsing bug breaking free-text descriptions containing "--", an unbounded markdown-table-search regex risking silent data corruption, missing actual/estimate cost labels on the dashboard, an overwrite-without-check on session history, an NaN rendering bug, an archive-filename collision, and duplicated helpers
+  - Fixed all 10 (commit `357fa5a`), verified via the byte-identical suite (10/10) plus targeted smoke tests
+  - Cleaned up 2 accidental probe commits left on the branch by a review sub-agent
+  - Opened PR #4, user merged it to main (`d81bc33`)
+  - Transitioned GETSITREP-8, 9, 10, 12 to Done in Jira (user-approved)
+  - Added a scoped "CLI (v0.3, in development)" section to README.md documenting the 8 commands; opened PR #5 (awaiting review)
+  - Caught up this file's own drift: Active Sprint / Progress Dashboard hadn't reflected Tier 0 (GETSITREP-4/13/36) or GETSITREP-8 actually shipping — corrected above
+- **Blockers:** None
+- **Tokens:** ~350,000 (estimate — heavy session, includes 8 parallel code-review sub-agents' own token usage on top of the main thread) | Cost: ~$2.61 (estimate, priced off MANIFEST.md's Sonnet-tier table)
+- **Model:** claude-sonnet-5
+- **Next:** Open next session with the still-deferred CLI dogfood test (running `getsitrep session-end`/`handoff` for real, on its own branch) before starting GETSITREP-28 (selfheal: MD-drift + upgrade protection, next Tier 1 story). PR #5 still needs merge.
 
 ### Session 5 — 2026-07-03
 - **User:** Rohit
@@ -126,6 +145,8 @@ Tier 1–3 Stories (GETSITREP-8, 28, 17, 21, 25, 32) not shown — blocked on Ti
 
 | Date | Change | Reason |
 |------|--------|--------|
+| 2026-07-06 | Corrected Active Sprint/Progress Dashboard — Tier 0 (GETSITREP-4/13/36) and GETSITREP-8 were already merged but still showed 🔲 To Do here | This file's own tracking had drifted from real Jira state across several sessions; caught during session-end |
+| 2026-07-06 | Added README.md "CLI (v0.3, in development)" section (PR #5) | GETSITREP-8's CLI merged to main; needed accurate usage docs. Full README reconciliation (npx claim, command count) stays GETSITREP-32's scope |
 | 2026-07-03 | Flipped PROJECT_PLAN.md roadmap source of truth to Jira (GETSITREP-1/2/3); replaced Phases 3-5's aspirational content with live Epic scope | Dogfood file was stale since 2026-04-06, predated the Jira roadmap entirely — CLAUDE.md v0.3 required reconciliation before new work |
 | 2026-07-03 | Untracked marketing/ (already effectively untracked), committed CLAUDE.md v0.3 governance + ADRs 0001-0004 | Repo governance restructure for v0.3; ADRs referenced as Accepted in CLAUDE.md needed to actually exist in git history |
 | 2026-03-13 | Renamed /doctor → /selfheal, /task-add → /capture | Avoid command conflicts |

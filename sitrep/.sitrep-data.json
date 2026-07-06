@@ -69,29 +69,69 @@
       "model": "claude-opus-4-6",
       "duration_minutes": 15,
       "notes": "Ran /selfheal — fixed missing PROJECT_PLAN.md in sitrep/, created history/ dirs, fixed progress header mismatch"
+    },
+    {
+      "number": 5,
+      "date": "2026-07-03",
+      "user": "Rohit",
+      "focus": "Session 1 opening tasks per CLAUDE.md v0.3 — git hygiene + dogfood reconciliation",
+      "phase": 3,
+      "tasks_completed": [],
+      "tasks_in_progress": [],
+      "tasks_blocked": [],
+      "blockers": [],
+      "decisions": [],
+      "tokens": { "input": 0, "output": 0, "cache_creation": 0, "cache_read": 0, "total": 0 },
+      "cost_usd": null,
+      "cost_label": "estimate",
+      "cost_source": "manual_estimate",
+      "model": "claude-sonnet-5",
+      "duration_minutes": 0,
+      "notes": "Backfilled during session 6's session-end — this session's record was missing from .sitrep-data.json even though STATUS_REPORT.md's Session Log had it. Tokens not tracked at the time (no ccusage/CCUM integration configured yet); see STATUS_REPORT.md Session 5 for full detail."
+    },
+    {
+      "number": 6,
+      "date": "2026-07-06",
+      "user": "Rohit",
+      "focus": "Code review of GETSITREP-9/10/12 CLI, fix findings, merge GETSITREP-8 to main, Jira Done transitions, README CLI docs",
+      "phase": 3,
+      "tasks_completed": ["GETSITREP-8", "GETSITREP-9", "GETSITREP-10", "GETSITREP-12"],
+      "tasks_in_progress": [],
+      "tasks_blocked": [],
+      "blockers": [],
+      "decisions": [],
+      "tokens": { "input": 220000, "output": 130000, "cache_creation": 0, "cache_read": 0, "total": 350000 },
+      "cost_usd": 2.61,
+      "cost_label": "estimate",
+      "cost_source": "manual_estimate",
+      "model": "claude-sonnet-5",
+      "duration_minutes": 90,
+      "notes": "8-angle code review found + fixed 10 issues (fail-open regressions, args-parsing bug, unbounded table-search regex, missing cost labels, overwrite-without-check, NaN bug, archive collision, duplicated helpers). PR #4 merged to main. GETSITREP-8/9/10/12 transitioned to Done. README PR #5 open, awaiting merge."
     }
   ],
   "users": [
     {
       "name": "Rohit",
-      "sessions": [1, 2, 3, 4],
-      "total_tokens": 470000,
-      "total_cost_usd": 15.00
+      "sessions": [1, 2, 3, 4, 5, 6],
+      "total_tokens": 820000,
+      "total_cost_usd": 17.61
     }
   ],
   "phases": [
     { "number": 1, "name": "Foundation", "status": "complete", "tokens": 100000, "cost_usd": 3.00 },
     { "number": 2, "name": "Operations Layer", "status": "complete", "tokens": 350000, "cost_usd": 10.50 },
-    { "number": 3, "name": "Onboarding & Polish", "status": "active", "tokens": 20000, "cost_usd": 1.50 },
-    { "number": 4, "name": "Community & Growth", "status": "planned", "tokens": 0, "cost_usd": 0 },
-    { "number": 5, "name": "Scale", "status": "planned", "tokens": 0, "cost_usd": 0 }
+    { "number": 3, "name": "Sharper & Self-Sufficient", "status": "active", "tokens": 370000, "cost_usd": 4.11 },
+    { "number": 4, "name": "Cost-to-Outcome & Beside", "status": "planned", "tokens": 0, "cost_usd": 0 },
+    { "number": 5, "name": "Business Brief & Breadth", "status": "planned", "tokens": 0, "cost_usd": 0 }
   ],
   "totals": {
-    "sessions": 4,
+    "sessions": 6,
     "tasks_done": 23,
     "tasks_total": 41,
-    "tokens": 470000,
-    "cost_usd": 15.00,
-    "hours": 5.25
+    "stories_done": 4,
+    "stories_total": 9,
+    "tokens": 820000,
+    "cost_usd": 17.61,
+    "hours": 6.75
   }
 }
