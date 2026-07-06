@@ -28,6 +28,13 @@ function parseArgs(argv, spec = {}) {
       const flagSpec = spec.flags && spec.flags[flagName];
 
       if (!flagSpec) {
+        // A free-text command (e.g. capture's description) can legitimately
+        // contain a "--"-prefixed word ("fix --verbose flag"); only commands
+        // without free text treat an unrecognized flag as a hard error.
+        if (spec.freeText) {
+          freeTextParts.push(token);
+          continue;
+        }
         errors.push(`Unknown flag: --${flagName}`);
         continue;
       }

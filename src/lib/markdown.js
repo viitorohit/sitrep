@@ -58,6 +58,17 @@ function extractLatestSessionLogEntry(statusReportContent) {
   };
 }
 
+// Splits a "| a | b | c |" markdown table row into ["a", "b", "c"], dropping
+// only the empty strings produced by the leading/trailing pipes — NOT every
+// empty cell, since a legitimately blank column (e.g. no owner assigned yet)
+// must still occupy its position or every cell after it shifts left.
+function splitRowCells(row) {
+  const parts = row.split('|').map((c) => c.trim());
+  if (parts.length > 0 && parts[0] === '') parts.shift();
+  if (parts.length > 0 && parts[parts.length - 1] === '') parts.pop();
+  return parts;
+}
+
 // Rows from the "## Blockers & Risks" table, excluding the "None currently"
 // placeholder row. Returns [] when there are no active blockers.
 function extractBlockers(statusReportContent) {
@@ -73,8 +84,8 @@ function extractBlockers(statusReportContent) {
 
   const blockers = [];
   for (const row of rows) {
-    const cells = row.split('|').map((c) => c.trim()).filter(Boolean);
-    if (cells.length === 0) continue;
+    const cells = splitRowCells(row);
+    if (cells.length === 0 || cells.every((c) => c === '')) continue;
     if (/none currently/i.test(cells.join(' '))) continue;
     blockers.push(cells.join(' — '));
   }
@@ -83,12 +94,20 @@ function extractBlockers(statusReportContent) {
 
 // Shared primitive: finds the markdown table immediately following a given
 // heading regex. Returns { tableEnd, rows, headerLine } or null.
+//
+// The search is bounded to the text between this heading and the next "##"
+// heading (or end of file) — without this bound, a section with no table of
+// its own (e.g. a placeholder "_None yet._") would silently match the FIRST
+// table found anywhere further down the file, in a completely different
+// section, and callers would insert rows into the wrong table.
 function findTableAfterHeading(content, headingRe) {
   if (!content) return null;
   const headingMatch = content.match(headingRe);
   if (!headingMatch) return null;
 
-  const afterHeading = content.slice(headingMatch.index + headingMatch[0].length);
+  const afterHeadingFull = content.slice(headingMatch.index + headingMatch[0].length);
+  const nextHeadingMatch = afterHeadingFull.match(/\n##\s/);
+  const afterHeading = nextHeadingMatch ? afterHeadingFull.slice(0, nextHeadingMatch.index) : afterHeadingFull;
   const tableMatch = afterHeading.match(/\|[^\n]*\|\n\|[-\s|]+\|\n((?:\|.*\|\n?)*)/);
   if (!tableMatch) return null;
 
@@ -206,10 +225,26 @@ function insertSessionLogEntry(content, entryMarkdown) {
   return content.slice(0, insertAt) + '\n' + entryMarkdown.trim() + '\n' + content.slice(insertAt);
 }
 
+// Appends a row to the "## Changes & Scope Updates" table in STATUS_REPORT.md.
+// `cells` is the ordered list of already-formatted column values. Returns
+// content unchanged if the section/table isn't found — skip logging rather
+// than guess a location. Shared by capture.js and plan-update.js, the two
+// commands that log entries here.
+function insertChangeLogRow(statusContent, cells) {
+  if (!statusContent) return statusContent;
+  const rowText = `| ${cells.join(' | ')} |`;
+  const sectionMatch = statusContent.match(/##\s*Changes\s*&\s*Scope Updates([\s\S]*?)\n\|[^\n]*\|\n\|[-\s|]+\|\n/);
+  if (!sectionMatch) return statusContent;
+  const insertAt = sectionMatch.index + sectionMatch[0].length;
+  return statusContent.slice(0, insertAt) + rowText + '\n' + statusContent.slice(insertAt);
+}
+
 module.exports = {
   extractSection,
   replaceHeaderField,
   insertSessionLogEntry,
+  insertChangeLogRow,
+  splitRowCells,
   extractProjectName,
   extractVersion,
   extractHeaderField,

@@ -35,7 +35,14 @@ function appendLine(filePath, line) {
 function readJsonIfExists(filePath) {
   const raw = readIfExists(filePath);
   if (raw === null) return null;
-  return JSON.parse(raw);
+  try {
+    return JSON.parse(raw);
+  } catch {
+    // Malformed JSON is treated the same as "not found" — every caller
+    // already has a fallback for null, and this helper must never throw
+    // (Hard Law #5: fail-open, never block a developer's workflow).
+    return null;
+  }
 }
 
 function writeJson(filePath, data) {

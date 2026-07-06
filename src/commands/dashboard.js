@@ -19,6 +19,7 @@ const {
   extractHeaderField,
   findKeyDecisionsTable,
   findRiskRegisterTable,
+  splitRowCells,
 } = require('../lib/markdown');
 const paths = require('../lib/paths');
 const { commit } = require('../lib/git');
@@ -35,10 +36,19 @@ function tableRowsToHtml(rows, columnCount) {
   if (!rows.length) return `<tr><td colspan="${columnCount}">None recorded</td></tr>`;
   return rows
     .map((row) => {
-      const cells = row.split('|').map((c) => c.trim()).filter((c, i, arr) => !(i === 0 && c === '') && !(i === arr.length - 1 && c === ''));
+      const cells = splitRowCells(row);
       return `<tr>${cells.map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`;
     })
     .join('\n');
+}
+
+// 'actual' only if every recorded session's cost is actual; otherwise the
+// aggregate total is a blend and must be labeled 'estimate' rather than
+// presented as a bare, unlabeled number (docs/specs/cost-schema.md).
+function costLabelForSessions(sessions) {
+  if (!sessions.length) return null;
+  const allActual = sessions.every((s) => s.cost_label === 'actual');
+  return allActual ? 'actual' : 'estimate';
 }
 
 function buildHtml({ projectName, version, lastUpdated, currentPhase, overall, dataJson, decisionsRows, riskRows }) {
@@ -56,6 +66,7 @@ function buildHtml({ projectName, version, lastUpdated, currentPhase, overall, d
   const mostExpensive = sessions.length
     ? sessions.reduce((a, b) => ((b.cost_usd || 0) > (a.cost_usd || 0) ? b : a))
     : null;
+  const costLabel = costLabelForSessions(sessions) || 'estimate';
 
   return `<!doctype html>
 <html>
@@ -90,7 +101,7 @@ function buildHtml({ projectName, version, lastUpdated, currentPhase, overall, d
     <div class="metrics">
       <div class="metric"><div class="value">${totals.sessions || 0}</div><div class="label">Sessions</div></div>
       <div class="metric"><div class="value">${(totals.hours || 0).toFixed(1)}h</div><div class="label">Time invested</div></div>
-      <div class="metric"><div class="value">$${(totals.cost_usd || 0).toFixed(2)}</div><div class="label">Total cost to date</div></div>
+      <div class="metric"><div class="value">$${(totals.cost_usd || 0).toFixed(2)}</div><div class="label">Total cost to date (${costLabel})</div></div>
       <div class="metric"><div class="value">${totals.tasks_done || 0}${totals.tasks_total ? ` / ${totals.tasks_total}` : ''}</div><div class="label">Tasks done</div></div>
     </div>
   </section>
@@ -106,9 +117,9 @@ function buildHtml({ projectName, version, lastUpdated, currentPhase, overall, d
   <section id="costs">
     <h2>Costs</h2>
     <div class="metrics">
-      <div class="metric"><div class="value">$${(totals.cost_usd || 0).toFixed(2)}</div><div class="label">Total project cost</div></div>
-      <div class="metric"><div class="value">$${sessions.length ? (totals.cost_usd / sessions.length).toFixed(2) : '0.00'}</div><div class="label">Average per session</div></div>
-      <div class="metric"><div class="value">${mostExpensive ? `Session ${mostExpensive.number}` : '—'}</div><div class="label">Most expensive${mostExpensive ? ` ($${(mostExpensive.cost_usd || 0).toFixed(2)})` : ''}</div></div>
+      <div class="metric"><div class="value">$${(totals.cost_usd || 0).toFixed(2)}</div><div class="label">Total project cost (${costLabel})</div></div>
+      <div class="metric"><div class="value">$${sessions.length ? ((totals.cost_usd || 0) / sessions.length).toFixed(2) : '0.00'}</div><div class="label">Average per session (${costLabel})</div></div>
+      <div class="metric"><div class="value">${mostExpensive ? `Session ${mostExpensive.number}` : '—'}</div><div class="label">Most expensive${mostExpensive ? ` ($${(mostExpensive.cost_usd || 0).toFixed(2)} — ${mostExpensive.cost_label || 'estimate'})` : ''}</div></div>
     </div>
   </section>
 
@@ -140,7 +151,11 @@ function archivePreviousDashboard(sessionNumber) {
   const dashboardPath = paths.DASHBOARD_HTML();
   if (!exists(dashboardPath)) return null;
   ensureDir(paths.HISTORY_DASHBOARDS());
-  const archivePath = path.join(paths.HISTORY_DASHBOARDS(), `dashboard-session-${sessionNumber}.html`);
+  // Keyed on session number + a timestamp, not session number alone — the
+  // session number doesn't change between two dashboard runs in the same
+  // session, so a bare "dashboard-session-N.html" name would let a third run
+  // silently overwrite the archive a second run just created.
+  const archivePath = path.join(paths.HISTORY_DASHBOARDS(), `dashboard-session-${sessionNumber}-${Date.now()}.html`);
   fs.copyFileSync(dashboardPath, archivePath);
   return archivePath;
 }

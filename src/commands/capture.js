@@ -23,9 +23,11 @@ const {
   findFutureTable,
   nextFutureId,
   insertRowAt,
+  insertChangeLogRow,
 } = require('../lib/markdown');
 const paths = require('../lib/paths');
 const { commit } = require('../lib/git');
+const { today } = require('../lib/dates');
 
 const SPEC = {
   freeText: true,
@@ -35,18 +37,6 @@ const SPEC = {
   },
   mutuallyExclusive: [['phase', 'future']],
 };
-
-function today() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function appendChangeLogRow(statusContent, description, target) {
-  const rowText = `| ${today()} | Captured task ${target.id}: ${description} to ${target.label} | Mid-session capture |`;
-  const sectionMatch = statusContent.match(/##\s*Changes\s*&\s*Scope Updates([\s\S]*?)\n\|[^\n]*\|\n\|[-\s|]+\|\n/);
-  if (!sectionMatch) return statusContent; // no such section — skip logging rather than guess a location
-  const insertAt = sectionMatch.index + sectionMatch[0].length;
-  return statusContent.slice(0, insertAt) + rowText + '\n' + statusContent.slice(insertAt);
-}
 
 function execute(argv) {
   const parsed = parseArgs(argv, SPEC);
@@ -103,7 +93,11 @@ function execute(argv) {
     target = { id, label: `Phase ${phaseNumber}` };
   }
 
-  const updatedStatus = appendChangeLogRow(statusContent, description, target);
+  const updatedStatus = insertChangeLogRow(statusContent, [
+    today(),
+    `Captured task ${target.id}: ${description} to ${target.label}`,
+    'Mid-session capture',
+  ]);
 
   writeFile(paths.PROJECT_PLAN(), updatedPlan);
   writeFile(paths.STATUS_REPORT(), updatedStatus);

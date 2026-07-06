@@ -24,20 +24,18 @@
 
 const { parseArgs } = require('../lib/args');
 const { ok } = require('../lib/result');
-const { readIfExists, writeFile, readJsonIfExists, writeJson, ensureDir } = require('../lib/fs-helpers');
+const { readIfExists, writeFile, readJsonIfExists, writeJson, ensureDir, exists } = require('../lib/fs-helpers');
 const { readJsonInput } = require('../lib/input');
 const { extractProjectName, replaceHeaderField, insertSessionLogEntry } = require('../lib/markdown');
 const paths = require('../lib/paths');
 const { commit, userName, currentBranch } = require('../lib/git');
+const { today } = require('../lib/dates');
 const path = require('path');
+const fs = require('fs');
 
 const SPEC = {
   flags: { data: { type: 'value' } },
 };
-
-function today() {
-  return new Date().toISOString().slice(0, 10);
-}
 
 function round2(n) {
   return Math.round(n * 100) / 100;
@@ -96,6 +94,12 @@ function buildSessionLogEntry(number, summary, branch) {
 
 function updateDataJson(dataJson, projectName, number, summary) {
   const data = dataJson || { project: projectName, version: 'unknown', sessions: [], users: [], phases: [], totals: {} };
+  // A .sitrep-data.json that exists but predates this schema (or was hand
+  // edited) may be missing these arrays even though it parsed as valid JSON
+  // — normalize regardless of where `data` came from, rather than only when
+  // the whole file was absent.
+  if (!Array.isArray(data.sessions)) data.sessions = [];
+  if (!Array.isArray(data.users)) data.users = [];
 
   data.sessions.push({
     number,
@@ -170,6 +174,12 @@ function writeHistoryRecord(number, projectName, summary, branch) {
   ].join('\n');
 
   ensureDir(paths.HISTORY_SESSIONS());
+  if (exists(filePath)) {
+    // nextSessionNumber() can drift from what's already on disk (a hand-
+    // edited/reset .sitrep-data.json, a branch switch, a restored backup) —
+    // never silently overwrite an existing session record; move it aside.
+    fs.renameSync(filePath, `${filePath}.bak-${Date.now()}`);
+  }
   writeFile(filePath, content);
   return filePath;
 }

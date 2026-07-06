@@ -21,27 +21,17 @@ const {
   nextDecisionNumber,
   findRiskRegisterTable,
   insertRowAt,
+  insertChangeLogRow,
 } = require('../lib/markdown');
 const paths = require('../lib/paths');
 const { commit } = require('../lib/git');
+const { today } = require('../lib/dates');
 
 const SPEC = {
   flags: {
     data: { type: 'value' },
   },
 };
-
-function today() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-function appendChangeLogRow(statusContent, change, reason) {
-  const rowText = `| ${today()} | ${change} | ${reason} |`;
-  const sectionMatch = statusContent.match(/##\s*Changes\s*&\s*Scope Updates([\s\S]*?)\n\|[^\n]*\|\n\|[-\s|]+\|\n/);
-  if (!sectionMatch) return statusContent;
-  const insertAt = sectionMatch.index + sectionMatch[0].length;
-  return statusContent.slice(0, insertAt) + rowText + '\n' + statusContent.slice(insertAt);
-}
 
 function applyDecision(planContent, data) {
   if (!data.decision || !data.rationale) {
@@ -108,7 +98,7 @@ function execute(argv) {
     return fail('plan-update', parsed.values, applied.error);
   }
 
-  const updatedStatus = appendChangeLogRow(statusContent, applied.summary, 'plan-update');
+  const updatedStatus = insertChangeLogRow(statusContent, [today(), applied.summary, 'plan-update']);
 
   writeFile(paths.PROJECT_PLAN(), applied.updatedPlan);
   writeFile(paths.STATUS_REPORT(), updatedStatus);
