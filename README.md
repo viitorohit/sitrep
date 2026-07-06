@@ -70,6 +70,50 @@ Two commands minimum. Everything else is optional but compounds in value.
 
 ---
 
+## CLI (v0.3, in development)
+
+Alongside the slash-command files above, sitrep now also ships a real,
+dependency-free Node.js CLI (GETSITREP-8) that implements the same 8 commands
+as callable functions — usable from a bare terminal, a CI job, or any AI
+coding tool that can run a shell command, not just Claude Code.
+
+**Not yet published to npm** — run it from a clone of this repo:
+
+```bash
+git clone https://github.com/viitorohit/sitrep.git
+cd sitrep
+node bin/getsitrep.js session-start
+```
+
+Or link it as a global `getsitrep` command:
+
+```bash
+npm link
+getsitrep session-start
+```
+
+| Command | Usage | What it does |
+|---|---|---|
+| `session-start` | `getsitrep session-start` | Orientation banner — phase, progress, cost, blockers |
+| `session-end` | `getsitrep session-end --data '<json>'` | Logs the session, updates cost/token totals, commits |
+| `sitrep` | `getsitrep sitrep` | Quick read-only status check |
+| `capture` | `getsitrep capture "<description>" --phase N` | Adds a task to a phase (or `--future` for the backlog) |
+| `plan-update` | `getsitrep plan-update --data '<json>'` | Records a decision or risk in PROJECT_PLAN.md |
+| `selfheal` | `getsitrep selfheal` | File-structure/integrity health check, auto-fixes what it safely can |
+| `handoff` | `getsitrep handoff [human\|ai]` | Generates a context handoff document |
+| `dashboard` | `getsitrep dashboard` | Regenerates the self-contained HTML dashboard |
+
+`session-end` and `plan-update` take structured JSON (via `--data` or piped
+stdin) rather than free-form prose — see
+[docs/specs/adapter-contract.md](docs/specs/adapter-contract.md) for the
+exact schema and how an AI assistant is expected to produce it.
+
+Every command returns the same result whether it's invoked from a terminal
+or in-process by a platform adapter — see
+[docs/specs/command-canon.md](docs/specs/command-canon.md).
+
+---
+
 ## The Dashboard
 
 `/dashboard` generates a self-contained HTML report you open in any browser:
