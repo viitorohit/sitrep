@@ -1,0 +1,38 @@
+{
+  "project": "testproj",
+  "version": "1.0.0",
+  "sessions": [
+    {
+      "number": 1,
+      "date": "2026-01-02",
+      "user": "Test Owner",
+      "focus": "Initial fixture setup",
+      "tasks_completed": ["1.1"],
+      "tasks_in_progress": [],
+      "tasks_blocked": [],
+      "blockers": [],
+      "decisions": [],
+      "tokens": { "input": 6000, "output": 4000, "cacheCreation": 0, "cacheRead": 0, "total": 10000 },
+      "cost_usd": 0.2,
+      "cost_label": "estimate",
+      "cost_source": "manual_estimate",
+      "model": "claude-sonnet-5",
+      "duration_minutes": 15,
+      "notes": "Build CI pipeline"
+    }
+  ],
+  "users": [
+    { "name": "Test Owner", "sessions": [1], "total_tokens": 10000, "total_cost_usd": 0.2 }
+  ],
+  "phases": [
+    { "number": 1, "name": "Foundation", "status": "active", "tokens": 10000, "cost_usd": 0.2 }
+  ],
+  "totals": {
+    "sessions": 1,
+    "tasks_done": 1,
+    "tasks_total": 2,
+    "tokens": 10000,
+    "cost_usd": 0.2,
+    "hours": 0.25
+  }
+}
