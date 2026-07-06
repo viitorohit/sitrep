@@ -15,8 +15,7 @@ const {
   findRiskRegisterTable,
 } = require('../lib/markdown');
 const paths = require('../lib/paths');
-const { commit } = require('../lib/git');
-const { execFileSync } = require('child_process');
+const { commit, recentLog } = require('../lib/git');
 const fs = require('fs');
 const path = require('path');
 
@@ -64,14 +63,6 @@ function repoStructureTopTwo() {
     return lines.join('\n');
   } catch {
     return '(could not read repo structure)';
-  }
-}
-
-function recentGitLog(n) {
-  try {
-    return execFileSync('git', ['log', '--oneline', `-${n}`], { encoding: 'utf8' }).trim();
-  } catch {
-    return '(not a git repository, or no commits)';
   }
 }
 
@@ -143,7 +134,7 @@ function buildHandoff(target) {
     '',
     'Recent commits:',
     '```',
-    recentGitLog(10),
+    recentLog(10),
     '```',
     '',
     '## Blockers',

@@ -46,4 +46,34 @@ function commit(paths, message) {
   }
 }
 
-module.exports = { commit, isGitRepo };
+// Best-effort read helpers, all routed through the same run() so every git
+// invocation in the codebase consistently sets stdio:'pipe' — without it,
+// execFileSync's default stdio still captures stderr into err.stderr but
+// ALSO leaks it straight to the parent process's real terminal, which is
+// exactly the kind of confusing "fatal: not a git repository" noise a
+// fail-open helper must never let through.
+function recentLog(n) {
+  try {
+    return run(['log', '--oneline', `-${n}`]).trim();
+  } catch {
+    return '(not a git repository, or no commits)';
+  }
+}
+
+function userName() {
+  try {
+    return run(['config', 'user.name']).trim() || 'unknown';
+  } catch {
+    return 'unknown';
+  }
+}
+
+function currentBranch() {
+  try {
+    return run(['rev-parse', '--abbrev-ref', 'HEAD']).trim();
+  } catch {
+    return 'unknown';
+  }
+}
+
+module.exports = { commit, isGitRepo, recentLog, userName, currentBranch };

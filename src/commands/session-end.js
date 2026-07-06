@@ -28,21 +28,12 @@ const { readIfExists, writeFile, readJsonIfExists, writeJson, ensureDir } = requ
 const { readJsonInput } = require('../lib/input');
 const { extractProjectName, replaceHeaderField, insertSessionLogEntry } = require('../lib/markdown');
 const paths = require('../lib/paths');
-const { commit } = require('../lib/git');
-const { execFileSync } = require('child_process');
+const { commit, userName, currentBranch } = require('../lib/git');
 const path = require('path');
 
 const SPEC = {
   flags: { data: { type: 'value' } },
 };
-
-function gitUserName() {
-  try {
-    return execFileSync('git', ['config', 'user.name'], { encoding: 'utf8' }).trim() || 'unknown';
-  } catch {
-    return 'unknown';
-  }
-}
 
 function today() {
   return new Date().toISOString().slice(0, 10);
@@ -101,14 +92,6 @@ function buildSessionLogEntry(number, summary, branch) {
     `- **Next:** ${summary.notes || '(not provided)'}`,
   ];
   return lines.join('\n');
-}
-
-function currentBranch() {
-  try {
-    return execFileSync('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { encoding: 'utf8' }).trim();
-  } catch {
-    return 'unknown';
-  }
 }
 
 function updateDataJson(dataJson, projectName, number, summary) {
@@ -208,7 +191,7 @@ function execute(argv) {
   const dataJson = readJsonIfExists(paths.DATA_JSON());
 
   const projectName = extractProjectName(planContent, path.basename(process.cwd()));
-  const summary = normalizeSummary(input.ok ? input.data : null, gitUserName());
+  const summary = normalizeSummary(input.ok ? input.data : null, userName());
   const number = nextSessionNumber(dataJson);
   const branch = currentBranch();
 
