@@ -7,6 +7,13 @@
     "getsitrep": "bin/getsitrep.js"
   },
   "main": "src/cli.js",
+  "files": [
+    "bin",
+    "src",
+    "commands",
+    "templates",
+    "MANIFEST.md"
+  ],
   "scripts": {
     "test": "node test/byte-identical.js"
   },
