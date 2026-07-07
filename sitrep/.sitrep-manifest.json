@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "generatedAt": "2026-07-07T06:29:47.251Z",
+  "commandDir": ".claude/commands",
+  "files": {
+    ".claude/commands/session-start.md": "29c5c5c0ab48cfbea445fabfdcb95d0298387b6196f973ef149124f768888037",
+    ".claude/commands/session-end.md": "f03bfd614c1441ae5798a3f28bf619d49e1d67253478a20ed0bdca61487dfd86",
+    ".claude/commands/sitrep.md": "5fac51157c328d03b148a8f9a35336de813bc70a852cda39907d0f22325b0acb",
+    ".claude/commands/capture.md": "7adf69cc041fa40bd0ae11ceafa22284ff989218b55c0bd295a652b02a534f8b",
+    ".claude/commands/plan-update.md": "06891830a0c632e1d8aa89fbd1efb0e917f31fd08325e77be1b0fc4ef4c72033",
+    ".claude/commands/selfheal.md": "dd051f97ffd8ac589b8be8aac0c6ea365099ca8293b5c549403e0f6495ac6f3f",
+    ".claude/commands/handoff.md": "af3f4dc560542316662a84cac03c6cbf656091f48e08734a4f943fe5fd295ff0",
+    ".claude/commands/dashboard.md": "d6dc93169d1ae543ec9b3acf6100d691b79a91d4a53597fd9e44a52ef5cd28b9",
+    "sitrep/MANIFEST.md": "e90c7ef0bac4310381a14091bb7fe53c84d9441a5e9af73805fe8c2e2b9f0827"
+  }
+}
