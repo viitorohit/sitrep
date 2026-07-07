@@ -24,6 +24,7 @@ function helpResult() {
     '  selfheal lock|unlock|diff|restore --file <name> [--force]   Act on a drifted command MD',
     '  handoff [human|ai]         Generate a context package (default: ai)',
     '  dashboard                  Generate the visual MIS report',
+    '  init [--yes] [--plan <native|jira|openspec|speckit|none>] [--cost <manual|ccusage|none>] [--tools <list>] [--force]   One-time onboarding wizard (not a slash command)',
   ].join('\n');
   return ok('help', {}, lines);
 }
@@ -36,7 +37,13 @@ function unknownCommandResult(commandName) {
   );
 }
 
-function run(argv) {
+// async: the only command that needs it today is `init` (GETSITREP-17's
+// readline wizard prompts, a builtin Node module that's inherently
+// callback/promise-based) — every other command's execute() still returns
+// a plain object, and `await`-ing a non-Promise value just resolves to it
+// immediately, so this is a backward-compatible generalization, not a
+// behavior change for the 8 canon commands.
+async function run(argv) {
   const [commandName, ...rest] = argv;
 
   if (!commandName || commandName === '--help' || commandName === '-h' || commandName === 'help') {
@@ -56,7 +63,7 @@ function run(argv) {
 
   let result;
   try {
-    result = command.execute(rest);
+    result = await command.execute(rest);
   } catch (err) {
     if (process.env.GETSITREP_DEBUG === '1') {
       console.error(err.stack);

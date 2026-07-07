@@ -1,21 +1,22 @@
 # [PROJECT NAME] — Status Report
 
 > **Last Updated:** [date] — Session 1
-> **Current Phase:** Phase 1 ([phase name])
-> **Overall Progress:** 0/[total] tasks (0%)
-> **Next Milestone:** `v0.1.0-[tag]`
+> **Current Phase:** Phase 1 (Foundation)
+> **Overall Progress:** 0/12 tasks (0%)
+> **Next Milestone:** `v0.1.0`
 
 ---
 
 ## Active Sprint
 
-**Phase 1: [Phase Name]** | Target: Session 1–2
+**Phase 1: Foundation** | Target: Session 1–2
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| 1.1 | [task] | 🔲 Todo | |
-| 1.2 | [task] | 🔲 Todo | |
-| 1.3 | [task] | 🔲 Todo | |
+| 1.1 | Project setup | 🔲 Todo | |
+| 1.2 | Database schema | 🔲 Todo | |
+| 1.3 | API endpoints | 🔲 Todo | |
+| 1.4 | Tests | 🔲 Todo | |
 
 ---
 
@@ -23,9 +24,10 @@
 
 | Phase | Name | Tasks | Done | Bar |
 |-------|------|-------|------|-----|
-| 1 | [Phase Name] | 3 | 0 | ░░░░░░░░░░ 0% |
-| 2 | [Phase Name] | 2 | 0 | ░░░░░░░░░░ 0% |
-| **TOTAL** | | **5** | **0** | **░░░░░░░░░░ 0%** |
+| 1 | Foundation | 4 | 0 | ░░░░░░░░░░ 0% |
+| 2 | Core Features | 4 | 0 | ░░░░░░░░░░ 0% |
+| 3 | Polish & Ship | 4 | 0 | ░░░░░░░░░░ 0% |
+| **TOTAL** | | **12** | **0** | **░░░░░░░░░░ 0%** |
 
 ---
 

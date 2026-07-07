@@ -35,7 +35,7 @@ function runViaSubprocess(cwd, argv) {
   return { stdout: combined.trimEnd(), exitCode: result.status ?? 1 };
 }
 
-function runInProcess(cwd, argv) {
+async function runInProcess(cwd, argv) {
   const originalCwd = process.cwd();
   const originalLog = console.log;
   const originalError = console.error;
@@ -48,7 +48,7 @@ function runInProcess(cwd, argv) {
 
   try {
     delete require.cache[require.resolve('../src/cli')];
-    require('../src/cli').run(argv);
+    await require('../src/cli').run(argv);
     const exitCode = process.exitCode ?? 0;
     return { stdout: captured.join('\n').trimEnd(), exitCode };
   } finally {
@@ -73,9 +73,10 @@ const CASES = [
   { name: 'selfheal lock missing --file', argv: ['selfheal', 'lock'] },
   { name: 'selfheal diff unknown command name', argv: ['selfheal', 'diff', '--file', 'bogus'] },
   { name: 'selfheal diff --file with no command dir in fixture', argv: ['selfheal', 'diff', '--file', 'selfheal'] },
+  { name: 'init on existing project (residue stop)', argv: ['init', '--yes'] },
 ];
 
-function run() {
+async function run() {
   let passed = 0;
   const failures = [];
 
@@ -84,7 +85,7 @@ function run() {
     const dirB = copyFixtureToTmp();
 
     const viaSubprocess = runViaSubprocess(dirA, testCase.argv);
-    const viaInProcess = runInProcess(dirB, testCase.argv);
+    const viaInProcess = await runInProcess(dirB, testCase.argv);
 
     fs.rmSync(dirA, { recursive: true, force: true });
     fs.rmSync(dirB, { recursive: true, force: true });
@@ -118,4 +119,7 @@ function run() {
   }
 }
 
-run();
+run().catch((err) => {
+  console.error(err.stack || err.message);
+  process.exitCode = 1;
+});
