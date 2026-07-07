@@ -8,13 +8,30 @@
       "user": "Rohit",
       "focus": "Extract sitrep from Atlas into standalone project",
       "phase": 1,
-      "tasks_completed": ["1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8"],
+      "tasks_completed": [
+        "1.1",
+        "1.2",
+        "1.3",
+        "1.4",
+        "1.5",
+        "1.6",
+        "1.7",
+        "1.8"
+      ],
       "tasks_in_progress": [],
       "tasks_blocked": [],
       "blockers": [],
-      "decisions": ["Named product sitrep", "Zero dependencies", "Markdown-first"],
-      "tokens": { "input": 60000, "output": 40000, "total": 100000 },
-      "cost_usd": 3.00,
+      "decisions": [
+        "Named product sitrep",
+        "Zero dependencies",
+        "Markdown-first"
+      ],
+      "tokens": {
+        "input": 60000,
+        "output": 40000,
+        "total": 100000
+      },
+      "cost_usd": 3,
       "model": "claude-opus-4-6",
       "duration_minutes": 90,
       "notes": "Created 5 commands, published npm v0.1.0, GitHub repo, LinkedIn article, purchased getsitrep.dev"
@@ -25,13 +42,39 @@
       "user": "Rohit",
       "focus": "Build new commands + competitive analysis + marketing",
       "phase": 2,
-      "tasks_completed": ["2.1", "2.2", "2.3", "2.4", "2.6", "2.7", "2.8", "2.9", "2.10", "2.13"],
-      "tasks_in_progress": ["2.5", "2.11", "2.12", "2.14", "2.15"],
+      "tasks_completed": [
+        "2.1",
+        "2.2",
+        "2.3",
+        "2.4",
+        "2.6",
+        "2.7",
+        "2.8",
+        "2.9",
+        "2.10",
+        "2.13"
+      ],
+      "tasks_in_progress": [
+        "2.5",
+        "2.11",
+        "2.12",
+        "2.14",
+        "2.15"
+      ],
       "tasks_blocked": [],
       "blockers": [],
-      "decisions": ["Personal GitHub not org", "MIT license", "/doctor → /selfheal", "/task-add → /capture"],
-      "tokens": { "input": 120000, "output": 80000, "total": 200000 },
-      "cost_usd": 6.00,
+      "decisions": [
+        "Personal GitHub not org",
+        "MIT license",
+        "/doctor → /selfheal",
+        "/task-add → /capture"
+      ],
+      "tokens": {
+        "input": 120000,
+        "output": 80000,
+        "total": 200000
+      },
+      "cost_usd": 6,
       "model": "claude-opus-4-6",
       "duration_minutes": 120,
       "notes": "capture, selfheal, handoff, dashboard commands. Competitive analysis. Marketing playbook. Usage guide."
@@ -42,13 +85,28 @@
       "user": "Rohit",
       "focus": "Release v0.2 across platforms + project setup",
       "phase": 2,
-      "tasks_completed": ["2.5", "2.11", "2.12", "2.14", "2.15"],
-      "tasks_in_progress": ["3.3"],
+      "tasks_completed": [
+        "2.5",
+        "2.11",
+        "2.12",
+        "2.14",
+        "2.15"
+      ],
+      "tasks_in_progress": [
+        "3.3"
+      ],
       "tasks_blocked": [],
       "blockers": [],
-      "decisions": ["First-run bootstrap from CLAUDE.md", ".sitrep-initialized flag"],
-      "tokens": { "input": 90000, "output": 60000, "total": 150000 },
-      "cost_usd": 4.50,
+      "decisions": [
+        "First-run bootstrap from CLAUDE.md",
+        ".sitrep-initialized flag"
+      ],
+      "tokens": {
+        "input": 90000,
+        "output": 60000,
+        "total": 150000
+      },
+      "cost_usd": 4.5,
       "model": "claude-opus-4-6",
       "duration_minutes": 90,
       "notes": "GitHub updated, npm v0.2.0 published, LinkedIn + X posts, first-run bootstrap, session awareness (pulse), project structure created"
@@ -60,12 +118,18 @@
       "focus": "Health check and selfheal diagnostics",
       "phase": 3,
       "tasks_completed": [],
-      "tasks_in_progress": ["3.3"],
+      "tasks_in_progress": [
+        "3.3"
+      ],
       "tasks_blocked": [],
       "blockers": [],
       "decisions": [],
-      "tokens": { "input": 12000, "output": 8000, "total": 20000 },
-      "cost_usd": 1.50,
+      "tokens": {
+        "input": 12000,
+        "output": 8000,
+        "total": 20000
+      },
+      "cost_usd": 1.5,
       "model": "claude-opus-4-6",
       "duration_minutes": 15,
       "notes": "Ran /selfheal — fixed missing PROJECT_PLAN.md in sitrep/, created history/ dirs, fixed progress header mismatch"
@@ -81,7 +145,13 @@
       "tasks_blocked": [],
       "blockers": [],
       "decisions": [],
-      "tokens": { "input": 0, "output": 0, "cache_creation": 0, "cache_read": 0, "total": 0 },
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "total": 0
+      },
       "cost_usd": null,
       "cost_label": "estimate",
       "cost_source": "manual_estimate",
@@ -95,43 +165,130 @@
       "user": "Rohit",
       "focus": "Code review of GETSITREP-9/10/12 CLI, fix findings, merge GETSITREP-8 to main, Jira Done transitions, README CLI docs",
       "phase": 3,
-      "tasks_completed": ["GETSITREP-8", "GETSITREP-9", "GETSITREP-10", "GETSITREP-12"],
+      "tasks_completed": [
+        "GETSITREP-8",
+        "GETSITREP-9",
+        "GETSITREP-10",
+        "GETSITREP-12"
+      ],
       "tasks_in_progress": [],
       "tasks_blocked": [],
       "blockers": [],
       "decisions": [],
-      "tokens": { "input": 220000, "output": 130000, "cache_creation": 0, "cache_read": 0, "total": 350000 },
+      "tokens": {
+        "input": 220000,
+        "output": 130000,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "total": 350000
+      },
       "cost_usd": 2.61,
       "cost_label": "estimate",
       "cost_source": "manual_estimate",
       "model": "claude-sonnet-5",
       "duration_minutes": 90,
       "notes": "8-angle code review found + fixed 10 issues (fail-open regressions, args-parsing bug, unbounded table-search regex, missing cost labels, overwrite-without-check, NaN bug, archive collision, duplicated helpers). PR #4 merged to main. GETSITREP-8/9/10/12 transitioned to Done. README PR #5 open, awaiting merge."
+    },
+    {
+      "number": 7,
+      "date": "2026-07-07",
+      "user": "unknown",
+      "focus": "GETSITREP-28 (hash manifest, drift, lock/diff/restore) + GETSITREP-10 reopened and resolved (all 8 command MDs converted to thin wrappers, CLI gaps closed first) + PR merged to main + marketing ContentOps brief filed",
+      "tasks_completed": [
+        "GETSITREP-29",
+        "GETSITREP-30",
+        "GETSITREP-31",
+        "GETSITREP-10"
+      ],
+      "tasks_in_progress": [],
+      "tasks_blocked": [],
+      "blockers": [],
+      "decisions": [
+        "ADR-0005: command MDs are permanent thin wrappers, CLI is sole source of truth for command behavior"
+      ],
+      "tokens": {
+        "input": 380000,
+        "output": 220000,
+        "cacheCreation": 0,
+        "cacheRead": 0,
+        "total": 600000
+      },
+      "cost_usd": 4.5,
+      "cost_label": "estimate",
+      "cost_source": "manual_estimate",
+      "model": "claude-sonnet-5",
+      "duration_minutes": 240,
+      "notes": "Very heavy session: selfheal Check 3-5 + dashboard full implementation (all 10 sections) closed before flipping MDs, per session-owner decision to avoid regression. Reopened GETSITREP-10 (was Done with unmet thin-wrapper acceptance criterion) and completed it. Caught 3 real bugs during verification (table-offset corruption risk, git commit() nothing-to-commit regex gap, toLocaleString() locale bug). PR #6 merged to main. Confluence Command MD Audit page synced. Marketing: prepared v0.3 CLI upgrade announcement, discovered existing ContentOps automation pipeline, filed brief 015 under T04 (Ready for Review, not auto-approved). ADR-0005 written for the thin-wrapper decision. Flagging for next session: PROJECT_PLAN.md/STATUS_REPORT.md still show Phase 3-5 name mismatches (cosmetic, selfheal reports them every run) and CLAUDE.md Verified Repo Facts section predates GETSITREP-8/13 merges (package.json/index.js now exist, 8-command canon already shipped) — worth a fresh repo audit next session."
     }
   ],
   "users": [
     {
       "name": "Rohit",
-      "sessions": [1, 2, 3, 4, 5, 6],
+      "sessions": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
       "total_tokens": 820000,
       "total_cost_usd": 17.61
+    },
+    {
+      "name": "unknown",
+      "sessions": [
+        7
+      ],
+      "total_tokens": 600000,
+      "total_cost_usd": 4.5
     }
   ],
   "phases": [
-    { "number": 1, "name": "Foundation", "status": "complete", "tokens": 100000, "cost_usd": 3.00 },
-    { "number": 2, "name": "Operations Layer", "status": "complete", "tokens": 350000, "cost_usd": 10.50 },
-    { "number": 3, "name": "Sharper & Self-Sufficient", "status": "active", "tokens": 370000, "cost_usd": 4.11 },
-    { "number": 4, "name": "Cost-to-Outcome & Beside", "status": "planned", "tokens": 0, "cost_usd": 0 },
-    { "number": 5, "name": "Business Brief & Breadth", "status": "planned", "tokens": 0, "cost_usd": 0 }
+    {
+      "number": 1,
+      "name": "Foundation",
+      "status": "complete",
+      "tokens": 100000,
+      "cost_usd": 3
+    },
+    {
+      "number": 2,
+      "name": "Operations Layer",
+      "status": "complete",
+      "tokens": 350000,
+      "cost_usd": 10.5
+    },
+    {
+      "number": 3,
+      "name": "Sharper & Self-Sufficient",
+      "status": "active",
+      "tokens": 370000,
+      "cost_usd": 4.11
+    },
+    {
+      "number": 4,
+      "name": "Cost-to-Outcome & Beside",
+      "status": "planned",
+      "tokens": 0,
+      "cost_usd": 0
+    },
+    {
+      "number": 5,
+      "name": "Business Brief & Breadth",
+      "status": "planned",
+      "tokens": 0,
+      "cost_usd": 0
+    }
   ],
   "totals": {
-    "sessions": 6,
-    "tasks_done": 23,
+    "sessions": 7,
+    "tasks_done": 27,
     "tasks_total": 41,
     "stories_done": 4,
     "stories_total": 9,
-    "tokens": 820000,
-    "cost_usd": 17.61,
-    "hours": 6.75
+    "tokens": 1420000,
+    "cost_usd": 22.11,
+    "hours": 10.75
   }
 }
