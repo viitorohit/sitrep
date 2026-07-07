@@ -1,0 +1,530 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sitrep — Dashboard</title>
+<style>
+  :root { color-scheme: dark; }
+  html { scroll-behavior: smooth; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f0f1a; color: #e0e0e0; margin: 0; padding: 0 24px 24px; }
+  body.light { background: #f7f7fb; color: #1a1a2e; }
+  h1, h2, h3 { color: #fff; }
+  body.light h1, body.light h2, body.light h3 { color: #111; }
+  section { margin-bottom: 32px; scroll-margin-top: 60px; }
+  table { width: 100%; border-collapse: collapse; background: #1a1a2e; }
+  body.light table { background: #fff; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid #333; font-size: 14px; }
+  body.light th, body.light td { border-bottom: 1px solid #ddd; }
+  th { color: #4361ee; }
+  .metrics { display: flex; gap: 24px; flex-wrap: wrap; }
+  .metric { background: #1a1a2e; padding: 16px 24px; border-radius: 8px; min-width: 160px; }
+  body.light .metric { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .metric .value { font-size: 28px; font-weight: bold; color: #06d6a0; }
+  .metric .label { font-size: 12px; color: #999; }
+  .status-done { background: rgba(6, 214, 160, 0.1); }
+  .status-progress { background: rgba(255, 209, 102, 0.1); }
+  .status-blocked { background: rgba(239, 71, 111, 0.1); }
+  .status-deferred { background: rgba(108, 117, 125, 0.15); }
+  .phase-row { margin-bottom: 14px; }
+  .phase-label { font-size: 14px; margin-bottom: 4px; }
+  .phase-bar-track { background: #1a1a2e; border-radius: 4px; height: 10px; overflow: hidden; }
+  body.light .phase-bar-track { background: #e5e5ef; }
+  .phase-bar-fill { background: #06d6a0; height: 100%; }
+  .topnav { position: sticky; top: 0; z-index: 10; display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 12px 0; background: #0f0f1a; border-bottom: 1px solid #333; margin-bottom: 24px; }
+  body.light .topnav { background: #f7f7fb; border-bottom: 1px solid #ddd; }
+  .topnav .brand { font-weight: bold; margin-right: 8px; }
+  .topnav a { color: #999; text-decoration: none; font-size: 13px; }
+  .topnav a:hover { color: #4361ee; }
+  .topnav button { margin-left: auto; background: none; border: 1px solid #333; color: inherit; border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+  details { background: #1a1a2e; border-radius: 8px; padding: 12px 16px; margin-bottom: 12px; }
+  body.light details { background: #fff; }
+  summary { cursor: pointer; font-weight: bold; }
+  @media print { .topnav { display: none; } body { background: #fff; color: #000; } .metric, table { background: #fff; } }
+  @media (max-width: 600px) { .metrics { flex-direction: column; } .topnav { position: static; } }
+</style>
+</head>
+<body>
+  <nav class="topnav">
+    <span class="brand">sitrep</span>
+    <a href="#summary">Summary</a>
+    <a href="#progress">Progress</a>
+    <a href="#sprint">Sprint</a>
+    <a href="#sessions">Sessions</a>
+    <a href="#costs">Costs</a>
+    <a href="#users">Users</a>
+    <a href="#decisions">Decisions</a>
+    <a href="#risks">Risks</a>
+    <a href="#documents">Documents</a>
+    <a href="#history">History</a>
+    <button onclick="document.body.classList.toggle('light')" aria-label="Toggle light/dark theme">☾/☀</button>
+  </nav>
+
+  <section id="summary">
+    <h2>Summary</h2>
+    <p><strong>Phase:</strong> Phase 3 (Sharper &amp; Self-Sufficient) — v0.3.0, Tier 0 + Tier 1 (GETSITREP-8) shipped, Tier 1 (GETSITREP-28) next</p>
+    <p><strong>Overall:</strong> 23/23 legacy tasks shipped (v0.1+v0.2). v0.3 tracked as 9 Jira Stories — 4 done (GETSITREP-4, 13, 36, 8), 5 remaining — see PROJECT_PLAN.md.</p>
+    <div class="metrics">
+      <div class="metric"><div class="value">7</div><div class="label">Sessions</div></div>
+      <div class="metric"><div class="value">10.8h</div><div class="label">Time invested</div></div>
+      <div class="metric"><div class="value">$22.11</div><div class="label">Total cost to date (estimate)</div></div>
+      <div class="metric"><div class="value">27 / 41</div><div class="label">Tasks done</div></div>
+    </div>
+  </section>
+
+  <section id="progress">
+    <h2>Progress</h2>
+    <div class="phase-row">
+        <div class="phase-label"><strong>Phase 1: Foundation</strong> — 8/8</div>
+        <div class="phase-bar-track"><div class="phase-bar-fill" style="width:100%"></div></div>
+      </div>
+<div class="phase-row">
+        <div class="phase-label"><strong>Phase 2: Operations Layer</strong> — 15/15</div>
+        <div class="phase-bar-track"><div class="phase-bar-fill" style="width:100%"></div></div>
+      </div>
+<div class="phase-row">
+        <div class="phase-label"><strong>Phase 3: Sharper &amp; Self-Sufficient (v0.3.0)</strong> — 4/9 Stories</div>
+        <div class="phase-bar-track"><div class="phase-bar-fill" style="width:44%"></div></div>
+      </div>
+<div class="phase-row">
+        <div class="phase-label"><strong>Phase 4: Cost-to-Outcome &amp; Beside (v0.4.0)</strong> — —/Not yet broken into Stories</div>
+        <div class="phase-bar-track"><div class="phase-bar-fill" style="width:0%"></div></div>
+      </div>
+<div class="phase-row">
+        <div class="phase-label"><strong>Phase 5: Business Brief &amp; Breadth (v0.5.0)</strong> — —/Not yet broken into Stories</div>
+        <div class="phase-bar-track"><div class="phase-bar-fill" style="width:0%"></div></div>
+      </div>
+  </section>
+
+  <section id="sprint">
+    <h2>Active Sprint</h2>
+    <table>
+      <thead><tr><th>ID</th><th>Task</th><th>Status</th><th>Notes</th></tr></thead>
+      <tbody><tr class="status-done"><td>GETSITREP-4</td><td>Confirm cost data sources &amp; schema</td><td>✅ Done</td><td>Tier 0 — merged, PR #2</td></tr>
+<tr class="status-done"><td>GETSITREP-13</td><td>Refresh command MDs (8-command canon)</td><td>✅ Done</td><td>Tier 0 — merged, PR #1</td></tr>
+<tr class="status-done"><td>GETSITREP-36</td><td>Adapter contract</td><td>✅ Done</td><td>Tier 0 — merged, PR #3</td></tr>
+<tr class="status-done"><td>GETSITREP-8</td><td>Platform-agnostic core/CLI extraction</td><td>✅ Done</td><td>Tier 1 — merged PR #4 (subtasks GETSITREP-9/10/12 all Done); 8-angle code review found + fixed 10 issues before merge</td></tr>
+<tr class="status-todo"><td>GETSITREP-28</td><td>selfheal: MD-drift + upgrade protection</td><td>🔲 To Do</td><td>Tier 1 — next up, needs Tier 0 (shipped)</td></tr></tbody>
+    </table>
+  </section>
+
+  <section id="sessions">
+    <h2>Sessions</h2>
+    <table>
+      <thead><tr><th>#</th><th>Date</th><th>User</th><th>Focus</th><th>Tokens</th><th>Cost</th><th>Model</th></tr></thead>
+      <tbody><tr><td>7</td><td>2026-07-07</td><td>Rohit</td><td>GETSITREP-28 (hash manifest, drift, lock/diff/restore) + GETSITREP-10 reopened and resolved (all 8 command MDs converted to thin wrappers, CLI gaps closed first) + PR merged to main + marketing ContentOps brief filed</td><td>600000</td><td>$4.50 (estimate)</td><td>claude-sonnet-5</td></tr>
+<tr><td>6</td><td>2026-07-06</td><td>Rohit</td><td>Code review of GETSITREP-9/10/12 CLI, fix findings, merge GETSITREP-8 to main, Jira Done transitions, README CLI docs</td><td>350000</td><td>$2.61 (estimate)</td><td>claude-sonnet-5</td></tr>
+<tr><td>5</td><td>2026-07-03</td><td>Rohit</td><td>Session 1 opening tasks per CLAUDE.md v0.3 — git hygiene + dogfood reconciliation</td><td>0</td><td>$0.00 (estimate)</td><td>claude-sonnet-5</td></tr>
+<tr><td>4</td><td>2026-04-06</td><td>Rohit</td><td>Health check and selfheal diagnostics</td><td>20000</td><td>$1.50 (estimate)</td><td>claude-opus-4-6</td></tr>
+<tr><td>3</td><td>2026-03-13</td><td>Rohit</td><td>Release v0.2 across platforms + project setup</td><td>150000</td><td>$4.50 (estimate)</td><td>claude-opus-4-6</td></tr>
+<tr><td>2</td><td>2026-03-12</td><td>Rohit</td><td>Build new commands + competitive analysis + marketing</td><td>200000</td><td>$6.00 (estimate)</td><td>claude-opus-4-6</td></tr>
+<tr><td>1</td><td>2026-03-11</td><td>Rohit</td><td>Extract sitrep from Atlas into standalone project</td><td>100000</td><td>$3.00 (estimate)</td><td>claude-opus-4-6</td></tr></tbody>
+    </table>
+  </section>
+
+  <section id="costs">
+    <h2>Costs &amp; Tokens</h2>
+    <div class="metrics">
+      <div class="metric"><div class="value">$22.11</div><div class="label">Total project cost (estimate)</div></div>
+      <div class="metric"><div class="value">$3.16</div><div class="label">Average per session (estimate)</div></div>
+      <div class="metric"><div class="value">Session 2</div><div class="label">Most expensive ($6.00)</div></div>
+      <div class="metric"><div class="value">Session 5</div><div class="label">Cheapest ($0.00)</div></div>
+    </div>
+    <h3>Cost per session</h3>
+    <svg viewBox="0 0 640 160" width="100%" height="160" role="img" aria-label="bar chart"><rect x="13.7" y="72.0" width="64.0" height="68.0" fill="#06d6a0" />
+<text x="45.7" y="154" font-size="9" fill="#999" text-anchor="middle">#1</text>
+<rect x="105.1" y="4.0" width="64.0" height="136.0" fill="#06d6a0" />
+<text x="137.1" y="154" font-size="9" fill="#999" text-anchor="middle">#2</text>
+<rect x="196.6" y="38.0" width="64.0" height="102.0" fill="#06d6a0" />
+<text x="228.6" y="154" font-size="9" fill="#999" text-anchor="middle">#3</text>
+<rect x="288.0" y="106.0" width="64.0" height="34.0" fill="#06d6a0" />
+<text x="320.0" y="154" font-size="9" fill="#999" text-anchor="middle">#4</text>
+<rect x="379.4" y="140.0" width="64.0" height="0.0" fill="#06d6a0" />
+<text x="411.4" y="154" font-size="9" fill="#999" text-anchor="middle">#5</text>
+<rect x="470.9" y="80.8" width="64.0" height="59.2" fill="#06d6a0" />
+<text x="502.9" y="154" font-size="9" fill="#999" text-anchor="middle">#6</text>
+<rect x="562.3" y="38.0" width="64.0" height="102.0" fill="#06d6a0" />
+<text x="594.3" y="154" font-size="9" fill="#999" text-anchor="middle">#7</text></svg>
+    <h3>Tokens per session (input + output)</h3>
+    <svg viewBox="0 0 640 160" width="100%" height="160" role="img" aria-label="stacked bar chart"><rect x="13.7" y="126.4" width="64.0" height="13.6" fill="#4361ee" />
+<rect x="13.7" y="117.3" width="64.0" height="9.1" fill="#ffd166" />
+<text x="45.7" y="154" font-size="9" fill="#999" text-anchor="middle">#1</text>
+<rect x="105.1" y="112.8" width="64.0" height="27.2" fill="#4361ee" />
+<rect x="105.1" y="94.7" width="64.0" height="18.1" fill="#ffd166" />
+<text x="137.1" y="154" font-size="9" fill="#999" text-anchor="middle">#2</text>
+<rect x="196.6" y="119.6" width="64.0" height="20.4" fill="#4361ee" />
+<rect x="196.6" y="106.0" width="64.0" height="13.6" fill="#ffd166" />
+<text x="228.6" y="154" font-size="9" fill="#999" text-anchor="middle">#3</text>
+<rect x="288.0" y="137.3" width="64.0" height="2.7" fill="#4361ee" />
+<rect x="288.0" y="135.5" width="64.0" height="1.8" fill="#ffd166" />
+<text x="320.0" y="154" font-size="9" fill="#999" text-anchor="middle">#4</text>
+<rect x="379.4" y="140.0" width="64.0" height="0.0" fill="#4361ee" />
+<rect x="379.4" y="140.0" width="64.0" height="0.0" fill="#ffd166" />
+<text x="411.4" y="154" font-size="9" fill="#999" text-anchor="middle">#5</text>
+<rect x="470.9" y="90.1" width="64.0" height="49.9" fill="#4361ee" />
+<rect x="470.9" y="60.7" width="64.0" height="29.5" fill="#ffd166" />
+<text x="502.9" y="154" font-size="9" fill="#999" text-anchor="middle">#6</text>
+<rect x="562.3" y="53.9" width="64.0" height="86.1" fill="#4361ee" />
+<rect x="562.3" y="4.0" width="64.0" height="49.9" fill="#ffd166" />
+<text x="594.3" y="154" font-size="9" fill="#999" text-anchor="middle">#7</text></svg>
+    <h3>Cost by phase</h3>
+    <svg viewBox="0 0 640 170" width="100%" height="170" role="img" aria-label="horizontal bar chart"><text x="0" y="25.4" font-size="11" fill="#e0e0e0">Foundation</text>
+<rect x="180" y="10.0" width="111.4" height="22" fill="#ef476f" />
+<text x="299.4" y="25.4" font-size="11" fill="#999">$3.00</text>
+<text x="0" y="57.4" font-size="11" fill="#e0e0e0">Operations Layer</text>
+<rect x="180" y="42.0" width="390.0" height="22" fill="#ef476f" />
+<text x="578.0" y="57.4" font-size="11" fill="#999">$10.50</text>
+<text x="0" y="89.4" font-size="11" fill="#e0e0e0">Sharper &amp; Self-Sufficient</text>
+<rect x="180" y="74.0" width="152.7" height="22" fill="#ef476f" />
+<text x="340.7" y="89.4" font-size="11" fill="#999">$4.11</text>
+<text x="0" y="121.4" font-size="11" fill="#e0e0e0">Cost-to-Outcome &amp; Beside</text>
+<rect x="180" y="106.0" width="0.0" height="22" fill="#ef476f" />
+<text x="188.0" y="121.4" font-size="11" fill="#999">$0.00</text>
+<text x="0" y="153.4" font-size="11" fill="#e0e0e0">Business Brief &amp; Breadth</text>
+<rect x="180" y="138.0" width="0.0" height="22" fill="#ef476f" />
+<text x="188.0" y="153.4" font-size="11" fill="#999">$0.00</text></svg>
+  </section>
+
+  <section id="users">
+    <h2>Users</h2>
+    <div class="metrics"><div class="metric">
+      <div class="value">7</div>
+      <div class="label">Rohit — sessions</div>
+      <div class="label">1,420,000 tokens · $22.11</div>
+    </div></div>
+  </section>
+
+  <section id="decisions">
+    <h2>Decisions</h2>
+    <table>
+      <thead><tr><th>#</th><th>Decision</th><th>Rationale</th><th>Date</th></tr></thead>
+      <tbody><tr><td>1</td><td>Zero dependencies</td><td>Simplicity, trust, no supply chain risk</td><td>2026-03-11</td></tr>
+<tr><td>2</td><td>Markdown-first</td><td>AI tools read/write markdown natively</td><td>2026-03-11</td></tr>
+<tr><td>3</td><td>Named &quot;sitrep&quot;</td><td>Military precision, memorable, unique in AI PM space</td><td>2026-03-12</td></tr>
+<tr><td>4</td><td>Personal GitHub (viitorohit) not org</td><td>Solo builder, ties to personal brand</td><td>2026-03-12</td></tr>
+<tr><td>5</td><td>MIT license</td><td>Maximum adoption</td><td>2026-03-12</td></tr>
+<tr><td>6</td><td>/doctor → /selfheal rename</td><td>Avoid conflict with system tools</td><td>2026-03-13</td></tr>
+<tr><td>7</td><td>/task-add → /capture rename</td><td>Avoid conflict with generic task commands</td><td>2026-03-13</td></tr>
+<tr><td>8</td><td>First-run bootstrap from CLAUDE.md</td><td>Solves blank template problem on existing projects</td><td>2026-03-13</td></tr>
+<tr><td>9</td><td>.sitrep-initialized flag</td><td>Prevents token waste on repeated session starts</td><td>2026-03-13</td></tr></tbody>
+    </table>
+  </section>
+
+  <section id="risks">
+    <h2>Risks</h2>
+    <table>
+      <thead><tr><th>Risk</th><th>Impact</th><th>Mitigation</th></tr></thead>
+      <tbody><tr><td>Complexity creep</td><td>High</td><td>8 commands max for v0.x (canon locked by GETSITREP-13, shipped). New features must justify token cost.</td></tr>
+<tr><td>Low npm adoption</td><td>Medium</td><td>LinkedIn build-in-public, dogfood on Atlas, submit to awesome lists</td></tr>
+<tr><td>Competitor copies the approach</td><td>Low</td><td>Speed + community + brand. First mover in AI PM space.</td></tr>
+<tr><td>Dashboard HTML too large</td><td>Medium</td><td>Target under 80KB. CSS-only charts, no libraries.</td></tr>
+<tr><td>CLAUDE.md format changes</td><td>Low</td><td>Bootstrap reads generically, not format-specific</td></tr></tbody>
+    </table>
+  </section>
+
+  <section id="documents">
+    <h2>Full Documents</h2>
+    <details>
+      <summary>Project Plan</summary>
+      <h1>sitrep — Master Project Plan</h1>
+<blockquote><strong>Project:</strong> sitrep</blockquote>
+<blockquote><strong>Owner:</strong> Rohit</blockquote>
+<blockquote><strong>Started:</strong> 2026-03-11</blockquote>
+<blockquote><strong>Last Updated:</strong> 2026-07-06</blockquote>
+<blockquote><strong>Roadmap source of truth:</strong> Jira project GETSITREP (Epics GETSITREP-1/2/3 = v0.3/v0.4/v0.5). This file mirrors Jira — if they diverge, Jira wins. See CLAUDE.md Sources of Truth.</blockquote>
+<h2>Product Vision</h2>
+<p>sitrep is the operations, cost, and continuity layer for AI-assisted development. It sits <strong>beside</strong> existing planning tools (Jira, OpenSpec, Spec Kit) — never replaces them. It gives solo developers and vibe coders session continuity, cost visibility, and progress tracking — all inside their repo, with zero dependencies.</p>
+<p><strong>Tech Stack:</strong> Node.js (CLI) · Markdown (commands + data) · HTML (dashboard) · Git (versioning)</p>
+<h2>Phase 1: Foundation — <code>v0.1.0</code> ✅</h2>
+<blockquote>Core commands and npm package</blockquote>
+<table><thead><tr><th>#</th><th>Feature</th><th>Description</th></tr></thead><tbody>
+<tr><td>1.1</td><td>5 slash commands</td><td>session-start, session-end, sitrep, plan-update, doctor</td></tr>
+<tr><td>1.2</td><td>PROJECT_PLAN.md template</td><td>Blank template for new projects</td></tr>
+<tr><td>1.3</td><td>STATUS_REPORT.md template</td><td>Blank template for new projects</td></tr>
+<tr><td>1.4</td><td>install.sh</td><td>curl-based installer</td></tr>
+<tr><td>1.5</td><td>npm package (getsitrep)</td><td>npx getsitrep init</td></tr>
+<tr><td>1.6</td><td>GitHub repo</td><td>viitorohit/sitrep</td></tr>
+<tr><td>1.7</td><td>README.md</td><td>Public-facing documentation</td></tr>
+<tr><td>1.8</td><td>MIT License</td><td>Open source</td></tr>
+</tbody></table>
+<h2>Phase 2: Operations Layer — <code>v0.2.0</code> ✅</h2>
+<blockquote>Cost tracking, dashboard, handoffs, session awareness</blockquote>
+<table><thead><tr><th>#</th><th>Feature</th><th>Description</th></tr></thead><tbody>
+<tr><td>2.1</td><td>/capture command</td><td>Add tasks mid-session (replaced /task-add)</td></tr>
+<tr><td>2.2</td><td>/selfheal command</td><td>Health check + auto-fix (replaced /doctor)</td></tr>
+<tr><td>2.3</td><td>/handoff command</td><td>Context package with auto-archiving</td></tr>
+<tr><td>2.4</td><td>/dashboard command</td><td>Visual MIS HTML report (10 sections)</td></tr>
+<tr><td>2.5</td><td>/pulse command</td><td>Session command status + next suggestion</td></tr>
+<tr><td>2.6</td><td>MANIFEST.md</td><td>Self-documenting framework reference</td></tr>
+<tr><td>2.7</td><td>.sitrep-data.json</td><td>Machine-readable cost/token/user data</td></tr>
+<tr><td>2.8</td><td>history/ folder</td><td>Archived sessions, handoffs, dashboards</td></tr>
+<tr><td>2.9</td><td>Cost tracking</td><td>Per-session token + cost logging</td></tr>
+<tr><td>2.10</td><td>User tracking</td><td>Who did what, when</td></tr>
+<tr><td>2.11</td><td>First-run bootstrap</td><td>Reads CLAUDE.md to auto-populate on fresh install</td></tr>
+<tr><td>2.12</td><td>npm v0.2.0 publish</td><td>Updated package with 9 commands</td></tr>
+<tr><td>2.13</td><td>USAGE_GUIDE.md</td><td>15 use cases documented</td></tr>
+<tr><td>2.14</td><td>LinkedIn Article 1</td><td>&quot;I Replaced My Entire Dev Team With 3 AI Tools&quot;</td></tr>
+<tr><td>2.15</td><td>Domain: getsitrep.dev</td><td>Purchased</td></tr>
+</tbody></table>
+<h2>Phase 3: Sharper &amp; Self-Sufficient — <code>v0.3.0</code> 🟡 In Progress</h2>
+<blockquote><strong>Jira Epic:</strong> GETSITREP-1. Make sitrep platform-agnostic, self-sufficient, and honest about what it measures — before any traffic-driving content ships.</blockquote>
+<p><strong>Hard architectural laws (apply to all releases, not just this one):</strong> no agentic-platform lock-in · every cost figure labeled <code>actual</code>/<code>estimate</code> · zero-dependency core is sacred · CLAUDE.md/AGENTS.md are factual context only, never imperative · sitrep never blocks a workflow (fail-open, idempotent, non-interactive hooks).</p>
+<p><strong>Multi-platform commitment (2026-07-02):</strong> Claude Code, Codex, Cursor adapters from day one; Copilot/VS Code conditional on GETSITREP-38.</p>
+<h3>Tier 0 — parallel, no dependencies ✅ shipped</h3>
+<table><thead><tr><th>Story</th><th>Component</th><th>Goal</th><th>Status</th></tr></thead><tbody>
+<tr><td>GETSITREP-4 — Confirm cost data sources &amp; schema</td><td><code>cost</code></td><td>Define schema before any cost code is written; actual vs estimate labeling</td><td>✅ Done (PR #2)</td></tr>
+<tr><td>GETSITREP-13 — Refresh command MDs, canon per signed audit</td><td><code>commands</code></td><td>9 − pulse − doctor + dashboard (relocated from root) = 8. Audit (2026-07-02) found doctor≈selfheal duplicate + misplaced dashboard.md. Binding spec: Command MD Audit (Confluence) → mirrored to <code>docs/specs/command-canon.md</code>.</td><td>✅ Done (PR #1)</td></tr>
+<tr><td>GETSITREP-36 — Adapter contract</td><td><code>cli-core</code></td><td>Plan/cost/auto-run interfaces, all optional; 3 committed platforms + Copilot conditional</td><td>✅ Done (PR #3)</td></tr>
+</tbody></table>
+<h3>Tier 1 — needs Tier 0 (shipped) 🟡 in progress</h3>
+<table><thead><tr><th>Story</th><th>Component</th><th>Goal</th><th>Status</th></tr></thead><tbody>
+<tr><td>GETSITREP-8 — Platform-agnostic core/CLI extraction</td><td><code>cli-core</code></td><td>Move all logic into a real CLI; slash commands become thin wrappers</td><td>✅ Done (PR #4; subtasks GETSITREP-9/10/12 all Done)</td></tr>
+<tr><td>GETSITREP-28 — selfheal: MD-drift + upgrade protection</td><td><code>selfheal</code></td><td>Hash manifest, drift report, lock/diff/restore; absorbs doctor&#39;s role</td><td>🔲 To Do — next up</td></tr>
+</tbody></table>
+<h3>Tier 2 — needs GETSITREP-8 (shipped) — unblocked</h3>
+<table><thead><tr><th>Story</th><th>Component</th><th>Goal</th><th>Status</th></tr></thead><tbody>
+<tr><td>GETSITREP-17 — CLI onboarding wizard + config</td><td><code>onboarding</code></td><td><code>getsitrep init</code>: plan source + cost source + tools in use; residue-detection/restore (GETSITREP-39)</td><td>🔲 To Do</td></tr>
+<tr><td>GETSITREP-21 — Auto-run adapters</td><td><code>onboarding</code></td><td>SessionStart + SessionEnd hook writers per platform + AGENTS.md factual nudge; Codex spike</td><td>🔲 To Do</td></tr>
+<tr><td>GETSITREP-25 — Plan-presence guard</td><td><code>cli-core</code></td><td>If no plan found, offer to generate one from repo introspection</td><td>🔲 To Do</td></tr>
+</tbody></table>
+<h3>Tier 3 — pre-launch gate</h3>
+<table><thead><tr><th>Story</th><th>Component</th><th>Goal</th><th>Status</th></tr></thead><tbody>
+<tr><td>GETSITREP-32 — Housekeeping</td><td><code>docs</code></td><td>README says &quot;eight&quot; commands, publish v0.2 GitHub release, npm source visible in public repo</td><td>🔲 To Do</td></tr>
+</tbody></table>
+<p><strong>Explicitly OUT of v0.3</strong> (deferred to v0.4+): cost-to-outcome pipeline, Jira read-adapter, activity attribution, business brief, nudge engine (GETSITREP-35), adoption nudge (GETSITREP-40).</p>
+<p><strong>Definition of Done:</strong> fresh <code>getsitrep init</code> on a bare repo → working config + hooks in under 2 minutes; all 8 command MDs pass the audit&#39;s cross-cutting rules; <code>selfheal --verify</code> flags manual edits; SessionStart/SessionEnd auto-fire with zero typing on Claude Code, Codex, Cursor; no hook ever blocks a session; public repo is traffic-ready.</p>
+<h2>Phase 4: Cost-to-Outcome &amp; Beside — <code>v0.4.0</code> (planned)</h2>
+<blockquote><strong>Jira Epic:</strong> GETSITREP-2. Depends on v0.3 shipping (needs the platform-agnostic CLI + confirmed cost schema). The category-flag release — no other SDD tool or meter maps spend to shipped outcome.</blockquote>
+<table><thead><tr><th>Planned capability</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Cost-to-outcome pipeline</td><td>Ingest ccusage/CCUM JSON or thin local-log fallback; attribute spend to plan phase / ticket / feature</td></tr>
+<tr><td>Jira adapter (read)</td><td>Pull epics/stories/status from the configured Jira project; overlay cost + progress — enables sitrep to self-report on its own GETSITREP board</td></tr>
+<tr><td>Native + file-based adapter</td><td>Read <code>PROJECT_PLAN.md</code> or an OpenSpec/Spec Kit folder as plan source; not hardcoded to Jira</td></tr>
+<tr><td>Scoped conflict check</td><td>Plan-vs-reality divergence + contradicted-decision flags (extension of selfheal) — not full multi-agent conflict resolution</td></tr>
+<tr><td>Read/report commands</td><td><code>getsitrep report</code>, <code>plan --phase N</code>, <code>progress</code></td></tr>
+<tr><td>Cost optimization advisory</td><td>e.g. &quot;Phase 3 cost 3× Phase 2 for similar scope,&quot; tied to outcome data</td></tr>
+<tr><td>Tier-B / Tier-C cost separation</td><td>Tier-B (input/output/thinking/cache) = <code>actual</code>; Tier-C (activity attribution) = <code>attributed (estimate)</code> — never blurred</td></tr>
+</tbody></table>
+<p><strong>Explicitly OUT of v0.4:</strong> business brief, nudge engine, adoption nudge (deferred to v0.5+).</p>
+<p>*Titles only — Stories not yet broken into subtasks per Jira (&quot;detailed once v0.3 ships&quot;). Authoritative scope: Jira Epic GETSITREP-2.*</p>
+<h2>Phase 5: Business Brief &amp; Breadth — <code>v0.5.0</code> (planned)</h2>
+<blockquote><strong>Jira Epic:</strong> GETSITREP-3. Depends on v0.4 shipping (the cost-to-outcome pipeline is the data this release&#39;s brief generator reports on). The ViitorCloud halo feature — the only tool in this lane producing a brief a non-technical stakeholder can read unassisted.</blockquote>
+<table><thead><tr><th>Planned capability</th><th>What it does</th></tr></thead><tbody>
+<tr><td>Business-user brief generator (<code>/brief</code>)</td><td>Session + project brief in executive language: what shipped, what it cost, what&#39;s next, risks</td></tr>
+<tr><td>AGENTS.md adapter for non-Claude tools</td><td>Cost side largely free (meter already covers ~14 tools); plan/command side via the AGENTS.md cross-tool standard — Cursor (<code>.cursor/rules</code>) + Copilot (<code>.github/instructions</code>) shims</td></tr>
+<tr><td>Pricing update (<code>getsitrep pricing update</code>)</td><td>Manual pull of a maintained pricing JSON — pull not push, zero auto-dependency</td></tr>
+<tr><td>HTML onboarding form</td><td>Richer intake option; CLI wizard from v0.3 remains the default</td></tr>
+</tbody></table>
+<p><strong>Explicitly OUT of v0.5</strong> (deferred to v1.0+): multi-dev concurrency, GitHub Actions integration, hosted/cloud version, true multi-agent context conflict resolution.</p>
+<p>*Titles only — Stories not yet broken into subtasks. Authoritative scope: Jira Epic GETSITREP-3.*</p>
+<h2>Key Decisions</h2>
+<table><thead><tr><th>#</th><th>Decision</th><th>Rationale</th><th>Date</th></tr></thead><tbody>
+<tr><td>1</td><td>Zero dependencies</td><td>Simplicity, trust, no supply chain risk</td><td>2026-03-11</td></tr>
+<tr><td>2</td><td>Markdown-first</td><td>AI tools read/write markdown natively</td><td>2026-03-11</td></tr>
+<tr><td>3</td><td>Named &quot;sitrep&quot;</td><td>Military precision, memorable, unique in AI PM space</td><td>2026-03-12</td></tr>
+<tr><td>4</td><td>Personal GitHub (viitorohit) not org</td><td>Solo builder, ties to personal brand</td><td>2026-03-12</td></tr>
+<tr><td>5</td><td>MIT license</td><td>Maximum adoption</td><td>2026-03-12</td></tr>
+<tr><td>6</td><td>/doctor → /selfheal rename</td><td>Avoid conflict with system tools</td><td>2026-03-13</td></tr>
+<tr><td>7</td><td>/task-add → /capture rename</td><td>Avoid conflict with generic task commands</td><td>2026-03-13</td></tr>
+<tr><td>8</td><td>First-run bootstrap from CLAUDE.md</td><td>Solves blank template problem on existing projects</td><td>2026-03-13</td></tr>
+<tr><td>9</td><td>.sitrep-initialized flag</td><td>Prevents token waste on repeated session starts</td><td>2026-03-13</td></tr>
+</tbody></table>
+<blockquote>Architecturally-significant decisions from v0.3 onward are recorded as ADRs in <code>docs/adr/</code> (see CLAUDE.md decision log) rather than added to this table.</blockquote>
+<h2>Risk Register</h2>
+<table><thead><tr><th>Risk</th><th>Impact</th><th>Mitigation</th></tr></thead><tbody>
+<tr><td>Complexity creep</td><td>High</td><td>8 commands max for v0.x (canon locked by GETSITREP-13, shipped). New features must justify token cost.</td></tr>
+<tr><td>Low npm adoption</td><td>Medium</td><td>LinkedIn build-in-public, dogfood on Atlas, submit to awesome lists</td></tr>
+<tr><td>Competitor copies the approach</td><td>Low</td><td>Speed + community + brand. First mover in AI PM space.</td></tr>
+<tr><td>Dashboard HTML too large</td><td>Medium</td><td>Target under 80KB. CSS-only charts, no libraries.</td></tr>
+<tr><td>CLAUDE.md format changes</td><td>Low</td><td>Bootstrap reads generically, not format-specific</td></tr>
+</tbody></table>
+<h2>Future / Post-MVP Ideas (v1.0+, not yet in Jira)</h2>
+<blockquote>Engineering ideas explicitly named as deferred to v1.0+ in the v0.5 Epic, plus marketing/growth activities not yet formalized as Jira Epics.</blockquote>
+<table><thead><tr><th>#</th><th>Idea</th><th>Notes</th></tr></thead><tbody>
+<tr><td>F.1</td><td>Revenue model (Pro tier?)</td><td></td></tr>
+<tr><td>F.2</td><td>VS Code extension</td><td></td></tr>
+<tr><td>F.3</td><td>Team analytics dashboard</td><td></td></tr>
+<tr><td>F.4</td><td>Multi-developer support (merge-safe session logging)</td><td>Explicitly OUT of v0.5, deferred to v1.0+</td></tr>
+<tr><td>F.5</td><td>GitHub Actions integration</td><td>Explicitly OUT of v0.5, deferred to v1.0+</td></tr>
+<tr><td>F.6</td><td>Hosted/cloud version, live web dashboard</td><td>Explicitly OUT of v0.5, deferred to v1.0+</td></tr>
+<tr><td>F.7</td><td>True multi-agent context conflict resolution</td><td>Explicitly OUT of v0.5, deferred to v1.0+</td></tr>
+<tr><td>F.8</td><td>Smart init with codebase scanning</td><td></td></tr>
+<tr><td>F.9</td><td>Plugin system (custom commands and checks)</td><td></td></tr>
+<tr><td>F.10</td><td>Submit to awesome-claude-code, Product Hunt, HN Show HN, Dev.to/Hashnode tutorials, community feedback loop</td><td>Marketing/growth — not yet in Jira</td></tr>
+</tbody></table>
+    </details>
+    <details>
+      <summary>Status Report</summary>
+      <h1>sitrep — Status Report</h1>
+<blockquote><strong>Last Updated:</strong> 2026-07-07 — Session 7</blockquote>
+<blockquote><strong>Current Phase:</strong> Phase 3 (Sharper &amp; Self-Sufficient) — v0.3.0, Tier 0 + Tier 1 (GETSITREP-8) shipped, Tier 1 (GETSITREP-28) next</blockquote>
+<blockquote><strong>Overall Progress:</strong> 23/23 legacy tasks shipped (v0.1+v0.2). v0.3 tracked as 9 Jira Stories — 4 done (GETSITREP-4, 13, 36, 8), 5 remaining — see PROJECT_PLAN.md.</blockquote>
+<blockquote><strong>Next Milestone:</strong> <code>v0.3.0</code></blockquote>
+<h2>Active Sprint</h2>
+<p><strong>Phase 3: Sharper &amp; Self-Sufficient</strong> | Target: v0.3.0 | Tier 1 (needs Tier 0 — shipped)</p>
+<table><thead><tr><th>Story</th><th>Task</th><th>Status</th><th>Notes</th></tr></thead><tbody>
+<tr><td>GETSITREP-4</td><td>Confirm cost data sources &amp; schema</td><td>✅ Done</td><td>Tier 0 — merged, PR #2</td></tr>
+<tr><td>GETSITREP-13</td><td>Refresh command MDs (8-command canon)</td><td>✅ Done</td><td>Tier 0 — merged, PR #1</td></tr>
+<tr><td>GETSITREP-36</td><td>Adapter contract</td><td>✅ Done</td><td>Tier 0 — merged, PR #3</td></tr>
+<tr><td>GETSITREP-8</td><td>Platform-agnostic core/CLI extraction</td><td>✅ Done</td><td>Tier 1 — merged PR #4 (subtasks GETSITREP-9/10/12 all Done); 8-angle code review found + fixed 10 issues before merge</td></tr>
+<tr><td>GETSITREP-28</td><td>selfheal: MD-drift + upgrade protection</td><td>🔲 To Do</td><td>Tier 1 — next up, needs Tier 0 (shipped)</td></tr>
+</tbody></table>
+<p>Tier 2–3 Stories (GETSITREP-17, 21, 25, 32) not shown — blocked on GETSITREP-8 (now shipped) or Tier 3 gate. Full structure in <code>sitrep/PROJECT_PLAN.md</code> Phase 3.</p>
+<h2>Progress Dashboard</h2>
+<table><thead><tr><th>Phase</th><th>Name</th><th>Tasks</th><th>Done</th><th>Bar</th></tr></thead><tbody>
+<tr><td>1</td><td>Foundation</td><td>8</td><td>8</td><td>██████████ 100%</td></tr>
+<tr><td>2</td><td>Operations Layer</td><td>15</td><td>15</td><td>██████████ 100%</td></tr>
+<tr><td>3</td><td>Sharper &amp; Self-Sufficient (v0.3.0)</td><td>9 Stories</td><td>4</td><td>████░░░░░░ 44%</td></tr>
+<tr><td>4</td><td>Cost-to-Outcome &amp; Beside (v0.4.0)</td><td>Not yet broken into Stories</td><td>—</td><td>—</td></tr>
+<tr><td>5</td><td>Business Brief &amp; Breadth (v0.5.0)</td><td>Not yet broken into Stories</td><td>—</td><td>—</td></tr>
+<tr><td><strong>TOTAL</strong></td><td></td><td><strong>23 tasks + 9 Stories</strong></td><td><strong>23 tasks done, 4 Stories done</strong></td><td></td></tr>
+</tbody></table>
+<h2>Completed Phases</h2>
+<h3>Phase 1: Foundation ✅</h3>
+<p><strong>Tag:</strong> <code>v0.1.0</code></p>
+<ul>
+<li>5 commands, npm package, GitHub repo, README, LICENSE, install.sh</li>
+</ul>
+<h3>Phase 2: Operations Layer ✅</h3>
+<p><strong>Tag:</strong> <code>v0.2.0</code></p>
+<ul>
+<li>9 commands (capture, selfheal, handoff, dashboard, pulse)</li>
+<li>Cost tracking, user tracking, session history</li>
+<li>MANIFEST.md, .sitrep-data.json, history/ structure</li>
+<li>USAGE_GUIDE.md (15 use cases)</li>
+<li>LinkedIn Article 1 published</li>
+<li>Domain purchased (getsitrep.dev)</li>
+<li>npm v0.2.0 published</li>
+<li>First-run bootstrap from CLAUDE.md</li>
+</ul>
+<h2>Session Log</h2>
+<h3>Session 7 — 2026-07-07</h3>
+<ul>
+<li><strong>User:</strong> Rohit</li>
+<li><strong>Branch:</strong> main</li>
+<li><strong>Focus:</strong> GETSITREP-28 (hash manifest, drift, lock/diff/restore) + GETSITREP-10 reopened and resolved (all 8 command MDs converted to thin wrappers, CLI gaps closed first) + PR merged to main + marketing ContentOps brief filed</li>
+<li><strong>Done:</strong> GETSITREP-29, GETSITREP-30, GETSITREP-31, GETSITREP-10</li>
+<li><strong>Blockers:</strong> None</li>
+<li><strong>Tokens:</strong> ~600000 (estimate) | Cost: ~$4.50 (estimate)</li>
+<li><strong>Model:</strong> claude-sonnet-5</li>
+<li><strong>Next:</strong> Very heavy session: selfheal Check 3-5 + dashboard full implementation (all 10 sections) closed before flipping MDs, per session-owner decision to avoid regression. Reopened GETSITREP-10 (was Done with unmet thin-wrapper acceptance criterion) and completed it. Caught 3 real bugs during verification (table-offset corruption risk, git commit() nothing-to-commit regex gap, toLocaleString() locale bug). PR #6 merged to main. Confluence Command MD Audit page synced. Marketing: prepared v0.3 CLI upgrade announcement, discovered existing ContentOps automation pipeline, filed brief 015 under T04 (Ready for Review, not auto-approved). ADR-0005 written for the thin-wrapper decision. Flagging for next session: PROJECT_PLAN.md/STATUS_REPORT.md still show Phase 3-5 name mismatches (cosmetic, selfheal reports them every run) and CLAUDE.md Verified Repo Facts section predates GETSITREP-8/13 merges (package.json/index.js now exist, 8-command canon already shipped) — worth a fresh repo audit next session.</li>
+</ul>
+<h3>Session 6 — 2026-07-06</h3>
+<ul>
+<li><strong>User:</strong> Rohit</li>
+<li><strong>Branch:</strong> <code>GETSITREP-8-cli-extraction</code> (review + fixes, merged via PR #4) and <code>docs/cli-usage-section</code> (README docs, PR #5 open); this session-end record itself committed on <code>main</code></li>
+<li><strong>Focus:</strong> Code review of the GETSITREP-9/10/12 CLI, fix the findings, merge GETSITREP-8 to main, propose+apply Done transitions, document the CLI in README</li>
+<li><strong>Done:</strong></li>
+</ul>
+<p>  - 8-angle code review of the CLI (bin/getsitrep.js, src/); found 10 issues — fail-open regressions in JSON reading, an args-parsing bug breaking free-text descriptions containing &quot;--&quot;, an unbounded markdown-table-search regex risking silent data corruption, missing actual/estimate cost labels on the dashboard, an overwrite-without-check on session history, an NaN rendering bug, an archive-filename collision, and duplicated helpers</p>
+<p>  - Fixed all 10 (commit <code>357fa5a</code>), verified via the byte-identical suite (10/10) plus targeted smoke tests</p>
+<p>  - Cleaned up 2 accidental probe commits left on the branch by a review sub-agent</p>
+<p>  - Opened PR #4, user merged it to main (<code>d81bc33</code>)</p>
+<p>  - Transitioned GETSITREP-8, 9, 10, 12 to Done in Jira (user-approved)</p>
+<p>  - Added a scoped &quot;CLI (v0.3, in development)&quot; section to README.md documenting the 8 commands; opened PR #5 (awaiting review)</p>
+<p>  - Caught up this file&#39;s own drift: Active Sprint / Progress Dashboard hadn&#39;t reflected Tier 0 (GETSITREP-4/13/36) or GETSITREP-8 actually shipping — corrected above</p>
+<ul>
+<li><strong>Blockers:</strong> None</li>
+<li><strong>Tokens:</strong> ~350,000 (estimate — heavy session, includes 8 parallel code-review sub-agents&#39; own token usage on top of the main thread) | Cost: ~$2.61 (estimate, priced off MANIFEST.md&#39;s Sonnet-tier table)</li>
+<li><strong>Model:</strong> claude-sonnet-5</li>
+<li><strong>Next:</strong> Open next session with the still-deferred CLI dogfood test (running <code>getsitrep session-end</code>/<code>handoff</code> for real, on its own branch) before starting GETSITREP-28 (selfheal: MD-drift + upgrade protection, next Tier 1 story). PR #5 still needs merge.</li>
+</ul>
+<h3>Session 5 — 2026-07-03</h3>
+<ul>
+<li><strong>User:</strong> Rohit</li>
+<li><strong>Branch:</strong> <code>main</code> (git hygiene commit <code>e014326</code>, pushed — pre-Story housekeeping) → <code>GETSITREP-13-command-md-refresh</code> (reconciliation commit relocated here per session-owner direction so main stays direct-push-free; not yet pushed)</li>
+<li><strong>Focus:</strong> Session 1 opening tasks per CLAUDE.md v0.3 — git hygiene + dogfood reconciliation, before starting GETSITREP-13</li>
+<li><strong>Done:</strong></li>
+</ul>
+<p>  - Fetched GETSITREP-13 (Story, subtasks, comments) and the Command MD Audit / Jira Standard / Repo &amp; Branch Conventions Confluence pages via Atlassian MCP</p>
+<p>  - Flagged and resolved two conflicts with the session owner: two divergent <code>commands/</code> directories (root = canonical, <code>.claude/commands/</code> = drifted dogfood mirror to resync later), and the audit&#39;s &quot;logic → CLI&quot; verdicts vs. GETSITREP-8 not existing yet (deferred those specific portions)</p>
+<p>  - <code>.gitignore</code>: added missing <code>.DS_Store</code> entry</p>
+<p>  - Deleted stale root <code>PROJECT_PLAN.md</code> duplicate (content already current in <code>sitrep/PROJECT_PLAN.md</code>)</p>
+<p>  - Confirmed <code>marketing/</code> was already untracked (no git history for it — ADR-0003&#39;s intent already satisfied)</p>
+<p>  - Committed and pushed <code>.gitignore</code>, <code>CLAUDE.md</code>, <code>.claude/</code>, <code>docs/adr/</code> (ADRs 0001–0004) — commit <code>e014326</code>, plus the previously-pending session-4 commit</p>
+<p>  - Rewrote <code>sitrep/PROJECT_PLAN.md</code> Phases 3–5 to mirror live Jira Epics GETSITREP-1/2/3 (v0.3/v0.4/v0.5), pulled fresh via Atlassian MCP rather than waiting for a paste; fixed the stale &quot;9 commands max&quot; Risk Register line to 8</p>
+<ul>
+<li><strong>Blockers:</strong> None</li>
+<li><strong>Tokens:</strong> not tracked this session — no ccusage/CCUM integration configured yet (GETSITREP-4 will define the cost schema)</li>
+<li><strong>Model:</strong> claude-sonnet-5</li>
+<li><strong>Next:</strong> Create branch <code>GETSITREP-13-command-md-refresh</code>, propose the Story transition to In Progress via Jira MCP (pending approval), then execute the command MD refresh per the signed 8-command canon</li>
+</ul>
+<h3>Session 4 — 2026-04-06</h3>
+<ul>
+<li><strong>User:</strong> Rohit</li>
+<li><strong>Branch:</strong> <code>main</code> (pre-Story-branch convention)</li>
+<li><strong>Focus:</strong> Health check and selfheal diagnostics</li>
+<li><strong>Done:</strong> Ran /selfheal — fixed missing PROJECT_PLAN.md in sitrep/, created history/ directories, fixed progress header mismatch (23/36 → 23/41)</li>
+<li><strong>Blockers:</strong> None</li>
+<li><strong>Tokens:</strong> ~20,000 | Cost: ~$1.50</li>
+<li><strong>Model:</strong> claude-opus-4-6</li>
+<li><strong>Next:</strong> Create .sitrep-data.json, session awareness integration (3.3), test bootstrap on new project</li>
+</ul>
+<h3>Session 3 — 2026-03-13</h3>
+<ul>
+<li><strong>User:</strong> Rohit</li>
+<li><strong>Branch:</strong> <code>main</code> (pre-Story-branch convention)</li>
+<li><strong>Focus:</strong> Release v0.2 across platforms + project setup</li>
+<li><strong>Done:</strong> GitHub updated, npm v0.2.0 published, LinkedIn + X posts, first-run bootstrap, session awareness (pulse), project structure created</li>
+<li><strong>Blockers:</strong> None</li>
+<li><strong>Tokens:</strong> ~150,000 | Cost: ~$4.50</li>
+<li><strong>Model:</strong> claude-opus-4-6</li>
+<li><strong>Next:</strong> Session awareness integration, test bootstrap on real new project</li>
+</ul>
+<h3>Session 2 — 2026-03-12</h3>
+<ul>
+<li><strong>User:</strong> Rohit</li>
+<li><strong>Branch:</strong> <code>main</code> (pre-Story-branch convention)</li>
+<li><strong>Focus:</strong> Build new commands + competitive analysis + marketing</li>
+<li><strong>Done:</strong> capture, selfheal, handoff, dashboard commands. Competitive analysis. Marketing playbook. Usage guide (15 use cases).</li>
+<li><strong>Blockers:</strong> None</li>
+<li><strong>Tokens:</strong> ~200,000 | Cost: ~$6.00</li>
+<li><strong>Model:</strong> claude-opus-4-6</li>
+<li><strong>Next:</strong> Release v0.2</li>
+</ul>
+<h3>Session 1 — 2026-03-11</h3>
+<ul>
+<li><strong>User:</strong> Rohit</li>
+<li><strong>Branch:</strong> <code>main</code> (pre-Story-branch convention)</li>
+<li><strong>Focus:</strong> Extract sitrep from Atlas into standalone project</li>
+<li><strong>Done:</strong> Named product &quot;sitrep&quot;. Created 5 commands. Published npm v0.1.0. Created GitHub repo. Published LinkedIn article. Purchased getsitrep.dev.</li>
+<li><strong>Blockers:</strong> None</li>
+<li><strong>Tokens:</strong> ~100,000 | Cost: ~$3.00</li>
+<li><strong>Model:</strong> claude-opus-4-6</li>
+<li><strong>Next:</strong> Add cost tracking, dashboard, handoff commands</li>
+</ul>
+<h2>Blockers &amp; Risks</h2>
+<table><thead><tr><th>#</th><th>Issue</th><th>Status</th><th>Impact</th><th>Resolution</th></tr></thead><tbody>
+<tr><td>—</td><td>None currently</td><td>—</td><td>—</td><td>—</td></tr>
+</tbody></table>
+<h2>Changes &amp; Scope Updates</h2>
+<table><thead><tr><th>Date</th><th>Change</th><th>Reason</th></tr></thead><tbody>
+<tr><td>2026-07-06</td><td>Corrected Active Sprint/Progress Dashboard — Tier 0 (GETSITREP-4/13/36) and GETSITREP-8 were already merged but still showed 🔲 To Do here</td><td>This file&#39;s own tracking had drifted from real Jira state across several sessions; caught during session-end</td></tr>
+<tr><td>2026-07-06</td><td>Added README.md &quot;CLI (v0.3, in development)&quot; section (PR #5)</td><td>GETSITREP-8&#39;s CLI merged to main; needed accurate usage docs. Full README reconciliation (npx claim, command count) stays GETSITREP-32&#39;s scope</td></tr>
+<tr><td>2026-07-03</td><td>Flipped PROJECT_PLAN.md roadmap source of truth to Jira (GETSITREP-1/2/3); replaced Phases 3-5&#39;s aspirational content with live Epic scope</td><td>Dogfood file was stale since 2026-04-06, predated the Jira roadmap entirely — CLAUDE.md v0.3 required reconciliation before new work</td></tr>
+<tr><td>2026-07-03</td><td>Untracked marketing/ (already effectively untracked), committed CLAUDE.md v0.3 governance + ADRs 0001-0004</td><td>Repo governance restructure for v0.3; ADRs referenced as Accepted in CLAUDE.md needed to actually exist in git history</td></tr>
+<tr><td>2026-03-13</td><td>Renamed /doctor → /selfheal, /task-add → /capture</td><td>Avoid command conflicts</td></tr>
+<tr><td>2026-03-13</td><td>Added /pulse (9th command)</td><td>Session awareness feature</td></tr>
+<tr><td>2026-03-13</td><td>Added first-run bootstrap</td><td>Solve blank template problem</td></tr>
+<tr><td>2026-03-12</td><td>Named project &quot;sitrep&quot;</td><td>Brand decision</td></tr>
+<tr><td>2026-03-11</td><td>Extracted from Atlas into standalone</td><td>Product viability recognized</td></tr>
+</tbody></table>
+    </details>
+  </section>
+
+  <section id="history">
+    <h2>History</h2>
+    
+    <h3>Archived Handoffs</h3>
+    <p>No archived handoffs yet.</p>
+    <h3>Archived Dashboards</h3>
+    <p>No archived dashboards yet.</p>
+    <h3>Git Log (sitrep/, last 20)</h3>
+    <ul><li><code>fee5332</code> 2026-07-07 — sitrep: fix session 7 user attribution (unknown -&gt; Rohit)</li><li><code>016377c</code> 2026-07-07 — sitrep: session 7 — GETSITREP-28 (hash manifest, drift, lock/diff/restore) + GETSITREP-10 reopened and resolved (all 8 command MDs converted to thin wrappers, CLI gaps closed first) + PR merged to main + marketing ContentOps brief filed</li><li><code>08eeceb</code> 2026-07-07 — sitrep: selfheal — Created baseline hash manifest (sitrep/.sitrep-manifest.json) for 9 file(s), keyed to v0.2.0</li><li><code>c4229db</code> 2026-07-06 — sitrep: session 6 — code review, fixes, GETSITREP-8 merge, Jira Done, README CLI docs</li><li><code>65de825</code> 2026-07-05 — GETSITREP-13: refresh command MDs to 8-command canon, merge pulse into sitrep (#1)</li><li><code>f0174fa</code> 2026-04-06 — sitrep: session 4 — selfheal diagnostics and framework health fixes</li></ul>
+  
+  </section>
+
+  <footer>
+    <p>Generated by getsitrep dashboard on 2026-07-07T06:33:26.818Z</p>
+  </footer>
+</body>
+</html>
