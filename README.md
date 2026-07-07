@@ -1,4 +1,4 @@
-# sitrep
+# SitRep
 
 **AI-native project management. Two markdown files. Nine slash commands. Zero dependencies.**
 
