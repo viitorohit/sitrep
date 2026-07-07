@@ -1,8 +1,8 @@
 # sitrep — Status Report
 
 > **Last Updated:** 2026-07-07 — Session 8
-> **Current Phase:** Phase 3 (Sharper & Self-Sufficient) — v0.3.0, Tier 0-2 shipped, Tier 3 (GETSITREP-32) in review — last Story of the release
-> **Overall Progress:** 23/23 legacy tasks shipped (v0.1+v0.2). v0.3 tracked as 9 Jira Stories — 8 done (GETSITREP-4, 13, 36, 8, 28, 17, 21, 25), 1 in review (GETSITREP-32) — see PROJECT_PLAN.md.
+> **Current Phase:** Phase 3 (Sharper & Self-Sufficient) — v0.3.0, all 9 Stories merged to main. Jira status transitions to Done pending session-owner approval.
+> **Overall Progress:** 23/23 legacy tasks shipped (v0.1+v0.2). v0.3 tracked as 9 Jira Stories — all 9 merged to main (GETSITREP-4, 13, 36, 8, 28, 17, 21, 25, 32); GETSITREP-47 (selfheal bugfix found during close-out) also merged. See PROJECT_PLAN.md.
 > **Next Milestone:** `v0.3.0`
 
 ---
@@ -21,7 +21,7 @@
 | GETSITREP-17 | CLI onboarding wizard + config | ✅ Done | Tier 2 |
 | GETSITREP-21 | Auto-run adapters | ✅ Done | Tier 2 — Copilot/VS Code (GETSITREP-38) explicitly deferred, reuse-path unverified |
 | GETSITREP-25 | Plan-presence guard | ✅ Done | Tier 2 |
-| GETSITREP-32 | Housekeeping | 🟡 In Review | Tier 3 — PR #10 open (subtasks GETSITREP-33/34 both In Review); v0.2.0 GitHub Release published, npm packaging bug fixed, README/repo description corrected |
+| GETSITREP-32 | Housekeeping | ✅ Merged to main | Tier 3 — PR #10 merged (subtasks GETSITREP-33/34 still In Review in Jira, pending Done approval); v0.2.0 GitHub Release published, npm packaging bug fixed, README/repo description corrected |
 
 ---
 
@@ -31,10 +31,10 @@
 |-------|------|-------|------|-----|
 | 1 | Foundation | 8 | 8 | ██████████ 100% |
 | 2 | Operations Layer | 15 | 15 | ██████████ 100% |
-| 3 | Sharper & Self-Sufficient (v0.3.0) | 9 Stories | 8 | █████████░ 89% |
+| 3 | Sharper & Self-Sufficient (v0.3.0) | 9 Stories | 9 | ██████████ 100% |
 | 4 | Cost-to-Outcome & Beside (v0.4.0) | Not yet broken into Stories | — | — |
 | 5 | Business Brief & Breadth (v0.5.0) | Not yet broken into Stories | — | — |
-| **TOTAL** | | **23 tasks + 9 Stories** | **23 tasks done, 8 Stories done, 1 in review** | |
+| **TOTAL** | | **23 tasks + 9 Stories** | **23 tasks done, 9 Stories merged to main** | |
 
 ---
 
