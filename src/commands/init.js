@@ -12,10 +12,13 @@
 //   boundary: this handles a missing/broken INSTALL with residue; drift in
 //   a live install is selfheal's job (GETSITREP-28), a missing plan is
 //   GETSITREP-25's job.
-// - Writing actual per-platform hook config files (.claude/settings.json
-//   etc.) is explicitly NOT this Story's scope — that's GETSITREP-22, part
-//   of the separate GETSITREP-21 Story, not yet built. This command only
-//   records which tools are in use, for GETSITREP-21 to consume later.
+// - GETSITREP-21/22/24/37: writes per-platform hook config for whichever
+//   tools were selected (Claude Code, Codex, Cursor), plus the AGENTS.md
+//   factual block (GETSITREP-23) unconditionally — see src/lib/hooks.js
+//   and src/lib/agents-md.js. Copilot/VS Code (GETSITREP-38) is explicitly
+//   deferred: the reuse-path validation it depends on requires testing
+//   against a live VS Code install, which isn't something this pass can
+//   do — no bespoke writer, no claim of support, flagged in the output.
 // - sitrep/ directory scaffolding, the gitignore entry, and the hash-
 //   manifest baseline are delegated to selfheal's own execute() rather than
 //   reimplemented here — selfheal already does exactly this, tested and
@@ -39,6 +42,8 @@ const { PLAN_SOURCES, COST_SOURCES, TOOLS, buildConfig, writeConfig } = require(
 const { detectResidue } = require('../lib/residue');
 const { commandDir, readCanonicalFile } = require('../lib/manifest');
 const { CANON_COMMANDS } = require('../lib/canon');
+const { writeClaudeCodeHooks, writeCursorHooks, writeCodexConfig } = require('../lib/hooks');
+const { upsertAgentsBlock } = require('../lib/agents-md');
 const paths = require('../lib/paths');
 const selfheal = require('./selfheal');
 
@@ -113,6 +118,31 @@ function copyCanonCommands() {
     }
   }
   return copied;
+}
+
+// GETSITREP-21/22/24/37: writes hook config for whichever tools were
+// selected. Copilot/VS Code (GETSITREP-38) is deferred — see module header.
+function writeHooksForTools(tools) {
+  const results = [];
+  if (tools.includes('claude-code')) results.push({ tool: 'Claude Code', path: paths.CLAUDE_SETTINGS(), ...writeClaudeCodeHooks() });
+  if (tools.includes('codex')) results.push({ tool: 'Codex', path: paths.CODEX_CONFIG(), ...writeCodexConfig() });
+  if (tools.includes('cursor')) results.push({ tool: 'Cursor', path: paths.CURSOR_HOOKS(), ...writeCursorHooks() });
+  if (tools.includes('copilot')) {
+    results.push({
+      tool: 'Copilot / VS Code',
+      status: 'deferred',
+      reason:
+        "GETSITREP-38 (reuse-path validation) isn't confirmed yet — no hook written. If VS Code's chat.hookFilesLocations natively parses .claude/settings.json, the Claude Code hook above may already cover it; unverified, not claimed as working.",
+    });
+  }
+  return results;
+}
+
+// GETSITREP-23: written unconditionally — AGENTS.md is the portable
+// fallback nudge for any tool, hook-capable or not.
+function writeAgentsMdFile() {
+  const existing = readIfExists(paths.AGENTS_MD());
+  writeFile(paths.AGENTS_MD(), upsertAgentsBlock(existing));
 }
 
 async function execute(argv) {
@@ -190,9 +220,14 @@ async function execute(argv) {
 
     const copiedCommands = tools.includes('claude-code') ? copyCanonCommands() : [];
     const bootstrappedTemplates = bootstrapTemplates();
+    const hookResults = writeHooksForTools(tools);
+    writeAgentsMdFile();
 
-    const commitPaths = ['sitrep.config.json'];
+    const commitPaths = ['sitrep.config.json', 'AGENTS.md'];
     if (copiedCommands.length > 0) commitPaths.push(path.relative(process.cwd(), commandDir()));
+    for (const hr of hookResults) {
+      if (hr.path && hr.status !== 'skipped') commitPaths.push(path.relative(process.cwd(), hr.path));
+    }
     const gitResult = commit(commitPaths, `sitrep: init — plan=${planSource} cost=${costSource} tools=${tools.join(',') || 'none'}`);
 
     const selfhealResult = await selfheal.execute([]);
@@ -209,6 +244,10 @@ async function execute(argv) {
       bootstrappedTemplates.length > 0
         ? `Templates bootstrapped: ${bootstrappedTemplates.join(', ')}`
         : 'Templates: none needed (already present)',
+      'AGENTS.md: factual sitrep block written (portable nudge, no imperative commands).',
+      ...(hookResults.length > 0
+        ? ['', 'Hooks:', ...hookResults.map((hr) => `  - ${hr.tool}: ${hr.status}${hr.reason ? ` — ${hr.reason}` : ''}`)]
+        : []),
       '',
       'Scaffolding sitrep/ (via selfheal):',
       selfhealResult.message,

@@ -16,6 +16,7 @@ const ACTIVE_SESSION = () => path.join(SITREP_DIR(), '.sitrep-active-session');
 const HANDOFF = () => path.join(SITREP_DIR(), 'HANDOFF.md');
 const DASHBOARD_HTML = () => path.join(SITREP_DIR(), 'dashboard.html');
 const CLAUDE_MD = () => path.join(cwd(), 'CLAUDE.md');
+const AGENTS_MD = () => path.join(cwd(), 'AGENTS.md');
 const SITREP_CONFIG = () => path.join(cwd(), 'sitrep.config.json');
 
 const HISTORY_SESSIONS = () => path.join(SITREP_DIR(), 'history', 'sessions');
@@ -44,6 +45,7 @@ module.exports = {
   HANDOFF,
   DASHBOARD_HTML,
   CLAUDE_MD,
+  AGENTS_MD,
   SITREP_CONFIG,
   HISTORY_SESSIONS,
   HISTORY_HANDOFFS,

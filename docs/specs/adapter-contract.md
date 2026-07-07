@@ -1,6 +1,6 @@
 # Adapter Contract — v0.3
 
-> **Status:** Binding spec for GETSITREP-36 (Tier 0). Defines the *interface*, not an implementation — GETSITREP-8 (CLI extraction, Tier 1) is what builds against this contract. No adapter code exists yet; this is the shape it must take.
+> **Status:** Binding spec for GETSITREP-36 (Tier 0). Defines the *interface* — GETSITREP-8 (CLI extraction, Tier 1) built against it, and GETSITREP-21 (auto-run adapters, Tier 2) now implements the hook-writer side for Claude Code, Codex, and Cursor (`src/lib/hooks.js`) plus the AGENTS.md factual nudge (`src/lib/agents-md.js`). Copilot/VS Code (GETSITREP-38) remains unimplemented — the reuse-path it depends on hasn't been verified against a live install. The "Hook event support" table below is still the unverified-against-live-vendor-docs snapshot noted in its own header; the writers implement that snapshot, they don't independently re-confirm it.
 > **Source of truth:** this file is canonical. Confluence's "Command × Platform × Hook Mapping" page mirrors it, not the reverse (same flip as command-canon.md and cost-schema.md).
 
 ## Why adapters, and why optional
