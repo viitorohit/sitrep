@@ -21,6 +21,7 @@ function helpResult() {
     '  capture <desc> [--phase N | --future]   Add a task to plan + status',
     '  plan-update                Apply plan changes',
     '  selfheal [deep]            Health check + auto-fix',
+    '  selfheal lock|unlock|diff|restore --file <name> [--force]   Act on a drifted command MD',
     '  handoff [human|ai]         Generate a context package (default: ai)',
     '  dashboard                  Generate the visual MIS report',
   ].join('\n');

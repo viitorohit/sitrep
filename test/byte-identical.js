@@ -70,6 +70,9 @@ const CASES = [
   { name: 'session-end with --data', argv: ['session-end', '--data', '{"focus":"test session","tokens":{"total":100},"costUsd":0.01,"model":"test"}'] },
   { name: 'bad input: capture mutually exclusive flags', argv: ['capture', 'x', '--phase', '1', '--future'] },
   { name: 'bad input: unknown command', argv: ['bogus-command'] },
+  { name: 'selfheal lock missing --file', argv: ['selfheal', 'lock'] },
+  { name: 'selfheal diff unknown command name', argv: ['selfheal', 'diff', '--file', 'bogus'] },
+  { name: 'selfheal diff --file with no command dir in fixture', argv: ['selfheal', 'diff', '--file', 'selfheal'] },
 ];
 
 function run() {

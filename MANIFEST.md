@@ -52,7 +52,7 @@ sitrep/
 | `PROJECT_PLAN.md` | `/session-end`, `/plan-update`, `/capture` | Master roadmap. Phases, features, decisions, risks, future ideas. |
 | `STATUS_REPORT.md` | `/session-end`, `/capture` | Live progress. Task statuses, progress bars, session log, blockers. |
 | `.sitrep-data.json` | `/session-end` (auto) | Machine-readable data store. Costs, tokens, users, sessions. |
-| `.sitrep-manifest.json` | `/selfheal` (auto, created once) | Sha256 baseline of every command MD + MANIFEST.md, keyed to version. Foundation for drift detection and upgrade protection. Tracked in git, not gitignored. |
+| `.sitrep-manifest.json` | `/selfheal` (auto, created once; also `lock`/`unlock`/`restore` actions) | Sha256 baseline of every command MD + MANIFEST.md, keyed to version, plus which files are locked as intentional customizations. Drives drift detection and upgrade protection. Tracked in git, not gitignored. |
 | `.sitrep-active-session` | All commands (auto) | Tracks which commands ran this session. Gitignored. |
 | `HANDOFF.md` | `/handoff` | Context package for another person or AI session. |
 | `dashboard.html` | `/dashboard` | Visual MIS report. Open in browser. |

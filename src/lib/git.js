@@ -33,13 +33,16 @@ function commit(paths, message) {
 
   try {
     // --allow-empty-message not needed; but if nothing is staged, git commit
-    // exits non-zero with "nothing to commit" — that's expected/benign, not
-    // a real failure, so we distinguish it rather than surfacing it as an error.
+    // exits non-zero with one of two phrasings depending on whether
+    // untracked files are also present ("nothing to commit, working tree
+    // clean" vs. "nothing added to commit but untracked files present") —
+    // both are expected/benign, not a real failure, so both are matched
+    // rather than only the first surfacing as a confusing raw error.
     run(['commit', '-m', message]);
     return { committed: true };
   } catch (err) {
     const output = `${err.stdout || ''}${err.stderr || ''}`;
-    if (/nothing to commit/i.test(output)) {
+    if (/nothing to commit|nothing added to commit/i.test(output)) {
       return { committed: false, reason: 'nothing to commit' };
     }
     return { committed: false, reason: `git commit failed: ${err.message}` };
@@ -76,4 +79,34 @@ function currentBranch() {
   }
 }
 
-module.exports = { commit, isGitRepo, recentLog, userName, currentBranch };
+function tagExists(tagName) {
+  if (!isGitRepo()) return false;
+  try {
+    return run(['tag', '-l', tagName]).trim() === tagName;
+  } catch {
+    return false;
+  }
+}
+
+// Best-effort — a missing tag is worth reporting as auto-fixed even if the
+// tag itself couldn't be created (e.g. no commits yet), so this returns a
+// simple boolean rather than throwing.
+function createTag(tagName, message) {
+  if (!isGitRepo()) return false;
+  try {
+    run(['tag', tagName, '-m', message]);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function logSearch(pattern, maxCount = 200) {
+  try {
+    return run(['log', `--oneline`, `-${maxCount}`, `--grep=${pattern}`, '-i']).trim();
+  } catch {
+    return '';
+  }
+}
+
+module.exports = { commit, isGitRepo, recentLog, userName, currentBranch, tagExists, createTag, logSearch };
