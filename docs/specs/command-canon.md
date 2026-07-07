@@ -24,7 +24,7 @@ Math: 9 files in `commands/` − `pulse` (merged into `sitrep`) − `doctor` (dr
 | `sitrep` | Intentional | Rewritten — absorbed `/pulse`'s session command tracker and next-suggestion logic |
 | `capture` | Intentional | Refreshed — removed file-repair overlap with /selfheal, brief model-routing note (GETSITREP-14 scope). Task-ID assignment math **stays in prose for now**, same CLI deferral as session-end |
 | `plan-update` | Intentional | Light refresh — removed file-repair overlap with /selfheal |
-| `selfheal` | Intentional | Rewritten — removed hardcoded `.claude/commands/` paths (Hard Law #1 violation); now checks the canon against the active platform's command directory generically. Foundation for GETSITREP-28 (hash manifest, drift detection, lock/diff/restore) — that full system is not yet built |
+| `selfheal` | Intentional | Rewritten — removed hardcoded `.claude/commands/` paths (Hard Law #1 violation); now checks the canon against the active platform's command directory generically. Foundation for GETSITREP-28 (hash manifest, drift detection, lock/diff/restore) — baseline hash manifest lands with GETSITREP-29; drift detection (GETSITREP-30) and lock/diff/restore (GETSITREP-31) are not yet built |
 | `handoff` | Intentional | Light refresh — removed file-repair overlap with /selfheal |
 | `dashboard` | Intentional | Relocated from repo root into `commands/`; light refresh |
 | ~~`pulse`~~ | — | **Dropped** — merged into `sitrep` |

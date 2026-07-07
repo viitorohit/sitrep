@@ -22,17 +22,14 @@ const { ok, fail } = require('../lib/result');
 const { readIfExists, writeFile, ensureDir, exists } = require('../lib/fs-helpers');
 const paths = require('../lib/paths');
 const { commit } = require('../lib/git');
+const { computeManifest, readHashManifest, writeHashManifest } = require('../lib/manifest');
+const { CANON_COMMANDS } = require('../lib/canon');
 const fs = require('fs');
 const path = require('path');
 
 const SPEC = {
   positional: { name: 'mode', oneOf: ['deep'], default: null },
 };
-
-const CANON_COMMANDS = [
-  'session-start', 'session-end', 'sitrep', 'capture',
-  'plan-update', 'selfheal', 'handoff', 'dashboard',
-];
 
 // TODO(GETSITREP-36 follow-up): read this from adapter config once one
 // exists, instead of hardcoding Claude Code's path.
@@ -116,6 +113,25 @@ function checkFileIntegrity() {
   return { cannotFix };
 }
 
+// GETSITREP-29: create the baseline hash manifest the first time one is
+// missing. This does not compare against the baseline (GETSITREP-30) or
+// act on drift (GETSITREP-31) — see docs/adr and src/lib/manifest.js for
+// the full scope split across the three subtasks.
+function checkManifestBaseline() {
+  const fixed = [];
+
+  if (!exists(paths.HASH_MANIFEST())) {
+    const manifest = computeManifest();
+    if (Object.keys(manifest.files).length > 0) {
+      writeHashManifest(manifest);
+      const count = Object.keys(manifest.files).length;
+      fixed.push(`Created baseline hash manifest (sitrep/.sitrep-manifest.json) for ${count} file(s), keyed to v${manifest.version}`);
+    }
+  }
+
+  return { fixed };
+}
+
 function execute(argv) {
   const parsed = parseArgs(argv, SPEC);
   if (!parsed.ok) {
@@ -124,8 +140,9 @@ function execute(argv) {
 
   const structure = checkFileStructure();
   const integrity = checkFileIntegrity();
+  const manifestBaseline = checkManifestBaseline();
 
-  const allFixed = structure.fixed;
+  const allFixed = [...structure.fixed, ...manifestBaseline.fixed];
   const allCannotFix = [...structure.cannotFix, ...integrity.cannotFix];
 
   let gitNote = '';
@@ -134,10 +151,16 @@ function execute(argv) {
     gitNote = gitResult.committed ? 'Committed.' : `Not committed (${gitResult.reason}).`;
   }
 
+  const manifestNow = readHashManifest();
+  const manifestLine = manifestNow
+    ? `Manifest Baseline: ✅ ${Object.keys(manifestNow.files).length} file(s) tracked (v${manifestNow.version})`
+    : 'Manifest Baseline: ⚠️ Not created (no command MDs or MANIFEST.md found to hash)';
+
   const lines = [
     '=== SELFHEAL ===',
     `File Structure:  ${structure.fixed.length === 0 && structure.cannotFix.length === 0 ? '✅ All good' : '⚠️ see below'}`,
     `File Integrity:  ${integrity.cannotFix.length === 0 ? '✅ Clean' : '⚠️ see below'}`,
+    manifestLine,
     parsed.values.mode === 'deep' ? 'Codebase Sync:   ⏭️ Not yet implemented in the CLI (Checks 3-5 are a known gap)' : 'Codebase Sync:   ⏭️ Skipped (run selfheal deep — note: not yet implemented)',
     '',
   ];

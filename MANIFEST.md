@@ -34,6 +34,7 @@ sitrep/
 ├── PROJECT_PLAN.md            ← What to build. Roadmap, phases, decisions, risks.
 ├── STATUS_REPORT.md           ← Where we are. Tasks, progress, session log.
 ├── .sitrep-data.json          ← Machine-readable session + cost + user data.
+├── .sitrep-manifest.json      ← Baseline hash of command MDs + MANIFEST.md, for drift detection.
 ├── .sitrep-active-session     ← Ephemeral session tracker (gitignored).
 ├── HANDOFF.md                 ← Latest handoff context (regenerated on /handoff).
 ├── dashboard.html             ← Open in browser. The Intelligent MIS.
@@ -51,6 +52,7 @@ sitrep/
 | `PROJECT_PLAN.md` | `/session-end`, `/plan-update`, `/capture` | Master roadmap. Phases, features, decisions, risks, future ideas. |
 | `STATUS_REPORT.md` | `/session-end`, `/capture` | Live progress. Task statuses, progress bars, session log, blockers. |
 | `.sitrep-data.json` | `/session-end` (auto) | Machine-readable data store. Costs, tokens, users, sessions. |
+| `.sitrep-manifest.json` | `/selfheal` (auto, created once) | Sha256 baseline of every command MD + MANIFEST.md, keyed to version. Foundation for drift detection and upgrade protection. Tracked in git, not gitignored. |
 | `.sitrep-active-session` | All commands (auto) | Tracks which commands ran this session. Gitignored. |
 | `HANDOFF.md` | `/handoff` | Context package for another person or AI session. |
 | `dashboard.html` | `/dashboard` | Visual MIS report. Open in browser. |
