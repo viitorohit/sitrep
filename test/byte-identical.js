@@ -74,6 +74,7 @@ const CASES = [
   { name: 'selfheal diff unknown command name', argv: ['selfheal', 'diff', '--file', 'bogus'] },
   { name: 'selfheal diff --file with no command dir in fixture', argv: ['selfheal', 'diff', '--file', 'selfheal'] },
   { name: 'init on existing project (residue stop)', argv: ['init', '--yes'] },
+  { name: 'plan-update --generate on existing plan (no-op passthrough)', argv: ['plan-update', '--generate'] },
 ];
 
 async function run() {

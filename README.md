@@ -101,7 +101,7 @@ getsitrep init
 | `session-end` | `getsitrep session-end --data '<json>'` | Logs the session, updates cost/token totals, commits |
 | `sitrep` | `getsitrep sitrep` | Quick read-only status check |
 | `capture` | `getsitrep capture "<description>" --phase N` | Adds a task to a phase (or `--future` for the backlog) |
-| `plan-update` | `getsitrep plan-update --data '<json>'` | Records a decision or risk in PROJECT_PLAN.md |
+| `plan-update` | `getsitrep plan-update --data '<json>'` | Records a decision or risk in PROJECT_PLAN.md. If no plan exists yet, `--generate [--brief "..."]` creates a draft from repo introspection (GETSITREP-25) |
 | `selfheal` | `getsitrep selfheal` | File-structure/integrity health check, auto-fixes what it safely can |
 | `handoff` | `getsitrep handoff [human\|ai]` | Generates a context handoff document |
 | `dashboard` | `getsitrep dashboard` | Regenerates the self-contained HTML dashboard |
