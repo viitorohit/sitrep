@@ -88,19 +88,6 @@ function tagExists(tagName) {
   }
 }
 
-// Best-effort — a missing tag is worth reporting as auto-fixed even if the
-// tag itself couldn't be created (e.g. no commits yet), so this returns a
-// simple boolean rather than throwing.
-function createTag(tagName, message) {
-  if (!isGitRepo()) return false;
-  try {
-    run(['tag', tagName, '-m', message]);
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 function logSearch(pattern, maxCount = 200) {
   try {
     return run(['log', `--oneline`, `-${maxCount}`, `--grep=${pattern}`, '-i']).trim();
@@ -125,4 +112,4 @@ function logForPath(pathSpec, count = 20) {
   }
 }
 
-module.exports = { commit, isGitRepo, recentLog, userName, currentBranch, tagExists, createTag, logSearch, logForPath };
+module.exports = { commit, isGitRepo, recentLog, userName, currentBranch, tagExists, logSearch, logForPath };

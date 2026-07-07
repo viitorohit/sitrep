@@ -38,7 +38,7 @@ const { parseArgs } = require('../lib/args');
 const { ok, fail } = require('../lib/result');
 const { readIfExists, writeFile, ensureDir, exists, readJsonIfExists, writeJson } = require('../lib/fs-helpers');
 const paths = require('../lib/paths');
-const { commit, tagExists, createTag, logSearch } = require('../lib/git');
+const { commit, tagExists, logSearch } = require('../lib/git');
 const {
   stripBold,
   isPlainInteger,
@@ -293,11 +293,15 @@ function checkProgressAccuracy() {
 // judging what a diff "is" well enough to match it to a task description —
 // that's an LLM-judgment task, not something deterministic Node code can do
 // reliably, so it's left as an explicit, isolated gap rather than faked with
-// a weak heuristic. What IS implemented and real: git-tag presence for
-// phases marked complete (auto-fixable, pure git state), and a best-effort
-// search for a commit trace of each "done" Active Sprint item (report-only,
-// heuristic — a miss just means "no commit message happened to mention it,"
-// not "the work wasn't done").
+// a weak heuristic. Same reasoning applies to a missing phase-completion
+// tag: report-only, never auto-created (GETSITREP-47) — there's no reliable
+// way for deterministic code to know which historical commit actually
+// completed a given phase, so `git tag` would default to HEAD (today's
+// commit) and silently create a misleading tag rather than the real one.
+// What IS implemented and real: a best-effort search for a commit trace of
+// each "done" Active Sprint item (report-only, heuristic — a miss just
+// means "no commit message happened to mention it," not "the work wasn't
+// done").
 function checkCodebaseSync() {
   const fixed = [];
   const cannotFix = [];
@@ -313,12 +317,7 @@ function checkCodebaseSync() {
       if (!versionMatch) continue;
       const tag = versionMatch[1];
       if (!tagExists(tag)) {
-        const created = createTag(tag, `${line.replace(/^##\s*/, '').trim()} (auto-tagged by selfheal deep)`);
-        if (created) {
-          fixed.push(`Created missing git tag ${tag} for a completed phase`);
-        } else {
-          cannotFix.push(`Phase marked ✅ complete (${tag}) has no git tag, and selfheal couldn't create one (no commits yet?)`);
-        }
+        cannotFix.push(`Phase marked ✅ complete (${tag}) has no git tag — tag the actual milestone commit yourself; selfheal won't guess (it would default to HEAD, which is almost never the right commit)`);
       }
     }
   }
