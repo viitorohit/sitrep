@@ -59,7 +59,7 @@ Tier 2–3 Stories (GETSITREP-17, 21, 25, 32) not shown — blocked on GETSITREP
 
 
 ### Session 7 — 2026-07-07
-- **User:** unknown
+- **User:** Rohit
 - **Branch:** main
 - **Focus:** GETSITREP-28 (hash manifest, drift, lock/diff/restore) + GETSITREP-10 reopened and resolved (all 8 command MDs converted to thin wrappers, CLI gaps closed first) + PR merged to main + marketing ContentOps brief filed
 - **Done:** GETSITREP-29, GETSITREP-30, GETSITREP-31, GETSITREP-10
