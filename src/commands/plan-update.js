@@ -3,6 +3,7 @@
 // Usage: plan-update --data '<json>'   (or pipe JSON via stdin)
 //   {"type": "decision", "decision": "...", "rationale": "...", "date": "YYYY-MM-DD"?}
 //   {"type": "risk", "risk": "...", "impact": "High|Medium|Low", "mitigation": "..."}
+//   plan-update --generate [--brief "<one-line description>"] [--yes]
 //
 // Scope note: adding a task to a phase or the Future table is capture's job
 // (it already owns that table-insertion logic) — plan-update covers the two
@@ -11,6 +12,22 @@
 // interpretation step; this JSON shape is what that interpretation should
 // produce before calling the CLI (see docs/specs/adapter-contract.md's
 // discussion of what belongs in the CLI vs. the calling adapter).
+//
+// GETSITREP-25/27 (plan-presence guard): when no PROJECT_PLAN.md exists and
+// no --data edit was requested, this is where the guard lives — not
+// session-start/sitrep, which only detect and mention it (GETSITREP-26).
+// Both of those are meant to stay non-interactive (session-start is
+// hook-fired, Hard Law #5; sitrep is documented as fast/read-only), so the
+// actual "generate a draft?" confirmation prompt belongs here instead,
+// where interactivity is already safe — matches the existing "cannot fix"
+// pointer text ("run plan-update... to create it") this command already
+// carried before this Story.
+//
+// Known limitation: the guard triggers on `!values.data` alone, not on
+// whether stdin actually has piped JSON waiting — piping JSON without
+// --data while the plan is also missing will hit the guard instead of
+// being parsed. Not handled, since detecting that without consuming stdin
+// early adds real complexity for a combination no real caller does.
 
 const { parseArgs } = require('../lib/args');
 const { ok, fail } = require('../lib/result');
@@ -26,12 +43,66 @@ const {
 const paths = require('../lib/paths');
 const { commit } = require('../lib/git');
 const { today } = require('../lib/dates');
+const { createInterface, isInteractive, askYesNo, askText } = require('../lib/prompt');
+const { introspectRepo } = require('../lib/introspect');
+const { buildDraftPlan, readPlanTemplate } = require('../lib/plan-draft');
 
 const SPEC = {
   flags: {
     data: { type: 'value' },
+    generate: { type: 'boolean' },
+    brief: { type: 'value' },
+    yes: { type: 'boolean' },
   },
 };
+
+function generateDraftPlan(userBrief) {
+  const template = readPlanTemplate();
+  if (!template) {
+    return fail('plan-update', {}, 'Could not find the PROJECT_PLAN.md template to generate a draft from.');
+  }
+
+  const info = introspectRepo();
+  const draft = buildDraftPlan(template, { ...info, userBrief });
+  writeFile(paths.PROJECT_PLAN(), draft);
+
+  const gitResult = commit(['sitrep/'], 'sitrep: plan-update — generated draft PROJECT_PLAN.md from repo introspection');
+
+  const lines = [
+    '=== PLAN UPDATED ===',
+    `Generated a draft PROJECT_PLAN.md for "${info.name}" from repo introspection${userBrief ? ' + your description' : ''}.`,
+    'Review it — Phases/Decisions/Risks are the template\'s generic starter content, not inferred from your repo; fill in your own.',
+    gitResult.committed ? 'Committed.' : `Not committed (${gitResult.reason}).`,
+    '====================',
+  ];
+  return ok('plan-update', { generate: true }, lines.join('\n'));
+}
+
+async function guardMissingPlan(values) {
+  if (values.generate) {
+    return generateDraftPlan(values.brief);
+  }
+
+  if (values.yes || !isInteractive()) {
+    return fail(
+      'plan-update',
+      values,
+      '⚠️ No sitrep/PROJECT_PLAN.md found. Run `plan-update --generate` to create a draft from your repo, or write sitrep/PROJECT_PLAN.md yourself.'
+    );
+  }
+
+  const rl = createInterface();
+  try {
+    const confirmed = await askYesNo(rl, { question: 'No PROJECT_PLAN.md found. Generate a draft from your project?', defaultValue: true });
+    if (!confirmed) {
+      return ok('plan-update', values, 'No plan generated. Write sitrep/PROJECT_PLAN.md yourself, or re-run `plan-update --generate` later.');
+    }
+    const brief = await askText(rl, { question: "One-line description of what you're building (optional)" });
+    return generateDraftPlan(brief);
+  } finally {
+    rl.close();
+  }
+}
 
 function applyDecision(planContent, data) {
   if (!data.decision || !data.rationale) {
@@ -63,7 +134,7 @@ function applyRisk(planContent, data) {
   };
 }
 
-function execute(argv) {
+async function execute(argv) {
   const parsed = parseArgs(argv, SPEC);
   if (!parsed.ok) {
     return fail('plan-update', parsed.values, parsed.errors.join('; '));
@@ -71,6 +142,12 @@ function execute(argv) {
 
   const planContent = readIfExists(paths.PROJECT_PLAN());
   const statusContent = readIfExists(paths.STATUS_REPORT());
+
+  // GETSITREP-25 guard — only when there's no real --data edit in flight.
+  if (!planContent && !parsed.values.data) {
+    return await guardMissingPlan(parsed.values);
+  }
+
   if (!planContent || !statusContent) {
     return fail(
       'plan-update',

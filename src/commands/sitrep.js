@@ -108,6 +108,14 @@ function execute(argv) {
   lines.push(`Blockers: ${blockers.length ? blockers.join('; ') : 'None'}`);
   lines.push(`Last update: ${lastUpdated}`);
   lines.push('========================');
+
+  // GETSITREP-26 (plan-presence guard): detect and mention only — sitrep is
+  // documented as fast/read-only, so the actual "generate a draft?"
+  // confirmation lives in plan-update, not here.
+  if (!planContent) {
+    lines.push('⚠️ No sitrep/PROJECT_PLAN.md found — run `plan-update --generate` to create a draft, or write your own.');
+  }
+
   lines.push('');
   lines.push(suggestNext(entries, blockers));
 

@@ -36,7 +36,6 @@ function buildOrientation() {
   const missing = [];
   if (!manifestContent) missing.push('sitrep/MANIFEST.md');
   if (!statusContent) missing.push('sitrep/STATUS_REPORT.md');
-  if (!planContent) missing.push('sitrep/PROJECT_PLAN.md');
 
   const projectName = extractProjectName(planContent, path.basename(process.cwd()));
   const version = extractVersion(manifestContent);
@@ -66,7 +65,15 @@ function buildOrientation() {
   ];
 
   if (missing.length > 0) {
-    lines.push(`⚠️ Missing: ${missing.join(', ')} — run selfheal to diagnose and fix, or plan-update to create it.`);
+    lines.push(`⚠️ Missing: ${missing.join(', ')} — run selfheal to diagnose and fix.`);
+  }
+
+  // GETSITREP-26 (plan-presence guard): detect and mention, never block —
+  // session-start is hook-fired and must stay non-interactive (Hard Law
+  // #5), so the actual "generate a draft?" confirmation lives in
+  // plan-update, not here.
+  if (!planContent) {
+    lines.push('⚠️ No sitrep/PROJECT_PLAN.md found — run `plan-update --generate` to create a draft from your repo, or write your own.');
   }
 
   return lines.join('\n');
