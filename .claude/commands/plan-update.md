@@ -2,34 +2,23 @@
 
 > Intentional (manually invoked).
 
-## Step 0: Check sitrep presence
-1. Verify `sitrep/PROJECT_PLAN.md` and `sitrep/STATUS_REPORT.md` exist
-2. If either is missing → print "⚠️ Cannot update — [filename] not found. Run /selfheal to diagnose and fix." and stop. File repair is /selfheal's job, not plan-update's.
+Thin wrapper (GETSITREP-10) over `getsitrep plan-update` — the CLI owns the table lookup, row insertion, and commit. This file's only remaining job is the one step no CLI can do on its own: interpreting the free-form request in `$ARGUMENTS` into the structured JSON the CLI expects.
 
----
+## Step 1: Interpret the request
 
-Read `sitrep/PROJECT_PLAN.md` and apply the requested changes.
+Read `$ARGUMENTS`. Determine whether it describes a **decision** or a **risk**:
 
-## What can be updated
+- **Decision** → `{"type": "decision", "decision": "...", "rationale": "...", "date": "YYYY-MM-DD"?}` (`date` optional, defaults to today)
+- **Risk** → `{"type": "risk", "risk": "...", "impact": "High"|"Medium"|"Low", "mitigation": "..."}`
 
-### Adding new features
-- If it's current scope → add to the appropriate existing phase table
-- If it's future scope → add to the "Future / Post-MVP Ideas" table with priority and target version
-- If it requires a new phase → create a new phase section following the existing format
+If it's genuinely ambiguous which one applies, or a required field is missing from the request, ask the user rather than guessing.
 
-### Recording decisions
-- Add to the Key Decisions table with rationale and date
+Note: adding a task to a phase or the Future table is `/capture`'s job, not this command's — if the request is really "add a task," say so and suggest `/capture` instead of forcing it into this shape.
 
-### Updating risks
-- Add to Risk Register with impact and mitigation
+## Step 2: Call the CLI
 
-### Scope changes
-- If tasks are moved between phases, update both phase tables
-- If tasks are removed, move to Future table (never delete)
-- Also log the change in STATUS_REPORT.md → Changes & Scope Updates table
-
-### After any update
 ```bash
-git add sitrep/
-git commit -m "sitrep: plan update — [brief description of change]"
+getsitrep plan-update --data '<the JSON from Step 1>'
 ```
+
+Print its output verbatim.

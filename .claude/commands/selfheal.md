@@ -1,101 +1,26 @@
 # Selfheal — Health Check & Auto-Fix
 
-Run a full diagnostic on the sitrep framework. Fix what you can, report what needs human input.
+> Intentional (manually invoked). This command owns all file-repair behavior for sitrep — session-start, session-end, capture, plan-update, and handoff deliberately do not search for or move files themselves; they defer to /selfheal.
 
-> Intentional (manually invoked). This command owns all file-repair behavior for sitrep — session-start, session-end, capture, plan-update, and handoff deliberately do not search for or move files themselves; they defer to /selfheal. Path-agnostic per hard law #1 (no platform lock-in) — this is the GETSITREP-28 foundation; the full hash-manifest/drift/lock-diff-restore system lands there.
+Thin wrapper (GETSITREP-10) — every check below, and every auto-fix, lives in `getsitrep selfheal` (`src/commands/selfheal.js` is the single source of truth for exact behavior and known scope boundaries; this file is a pointer to it, not a second copy of its logic).
 
-Read `sitrep/PROJECT_PLAN.md` to extract the project name. Use as [PROJECT] in output.
-
----
-
-## Check 1: File Structure
-- [ ] `sitrep/` directory exists at repo root
-- [ ] `sitrep/MANIFEST.md` exists
-- [ ] `sitrep/PROJECT_PLAN.md` exists
-- [ ] `sitrep/STATUS_REPORT.md` exists
-- [ ] `sitrep/history/sessions/` exists
-- [ ] `sitrep/history/handoffs/` exists
-- [ ] `sitrep/history/dashboards/` exists
-- [ ] `sitrep/.sitrep-active-session` is in `.gitignore`
-- [ ] The active platform's command directory contains all 8 canon commands: `session-start`, `session-end`, `sitrep`, `capture`, `plan-update`, `selfheal`, `handoff`, `dashboard` (canon: `docs/specs/command-canon.md`). Read the directory from adapter config, not a hardcoded path — today that's `.claude/commands/` for Claude Code; this becomes fully config-driven once GETSITREP-36's adapter contract ships. Never hardcode a second platform's path here.
-
-**Auto-fix:** Create missing directories. Add gitignore entry.
-**Cannot fix:** Files that don't exist anywhere. A missing or misplaced command file is flagged for the developer, not auto-moved — without a hash manifest (GETSITREP-28) selfheal can't yet tell a stale file from an intentionally customized one, so it doesn't guess.
-
----
-
-## Check 2: File Integrity
-- [ ] PROJECT_PLAN.md has required sections: phases, Key Decisions, Risk Register, Future
-- [ ] STATUS_REPORT.md has required sections: Active Sprint, Progress Dashboard, Session Log, Blockers, Changes
-- [ ] MANIFEST.md has version and folder structure
-- [ ] .sitrep-data.json is valid JSON (if exists)
-- [ ] No corrupted markdown (broken tables, unclosed code blocks)
-- [ ] Session log in reverse chronological order
-
-**Auto-fix:** Add missing sections with empty templates. Fix table formatting.
-**Cannot fix:** Missing content within sections.
-
----
-
-## Check 3: Cross-File Consistency
-- [ ] Phase names match between both files
-- [ ] Task IDs in STATUS_REPORT all exist in PROJECT_PLAN
-- [ ] Task counts per phase match
-- [ ] Total task count matches actual tasks listed
-- [ ] Current Phase header matches actual active sprint
-- [ ] .sitrep-data.json session count matches session log entries
-
-**Auto-fix:** Update counts, fix references, sync IDs.
-**Cannot fix:** Conflicting descriptions — report both, ask human.
-
----
-
-## Check 4: Progress Accuracy
-- [ ] Progress bars match done/total ratios
-- [ ] TOTAL row sums correctly
-- [ ] Overall percentage matches TOTAL row
-- [ ] No phase marked complete with remaining 🔲 or 🟡 tasks
-- [ ] Cost totals in .sitrep-data.json match sum of session costs
-
-**Auto-fix:** Recalculate all progress bars, totals, percentages, cost sums.
-**Cannot fix:** Tasks marked done without verification.
-
----
-
-## Check 5: Codebase Sync (only if $ARGUMENTS contains "deep")
-- [ ] Scan codebase for implemented features
-- [ ] Flag tasks marked ✅ but not found in code
-- [ ] Flag code not tracked in any task
-- [ ] Check git tags for completed phases
-
-**Auto-fix:** Add missing git tags.
-**Cannot fix:** Untracked work — report and suggest placement.
-
----
-
-## Output
-
-```
-=== [PROJECT] SELFHEAL ===
-
-File Structure:     ✅ All files in place (or ⚠️ X issues)
-File Integrity:     ✅ Clean (or ⚠️ X issues)
-Cross-File Sync:    ✅ Consistent (or ⚠️ X mismatches)
-Progress Accuracy:  ✅ Correct (or ⚠️ X recalculated)
-Codebase Sync:      ⏭️ Skipped (run /selfheal deep to include)
-
-Auto-fixed:
-- [list corrections]
-
-Needs human input:
-- [list decisions needed]
-
-Overall: ✅ Healthy / ⚠️ X issues (Y fixed, Z need input)
-===========================
-```
-
-If files were modified:
+Run:
 ```bash
-git add sitrep/ .claude/
-git commit -m "sitrep: selfheal — [summary of fixes]"
+getsitrep selfheal $ARGUMENTS
 ```
+
+Examples: `getsitrep selfheal` (default checks), `getsitrep selfheal deep` (adds Check 5), `getsitrep selfheal lock --file dashboard`, `getsitrep selfheal diff --file selfheal`, `getsitrep selfheal restore --file selfheal --force`.
+
+Print its output verbatim — do not reinterpret, re-run, or duplicate its checks yourself.
+
+---
+
+## What it checks (reference — see the CLI source for exact scope)
+
+1. **File Structure** — sitrep/ layout, the 8 canon command files, the hash manifest. Auto-fixes what's safe to create.
+2. **File Integrity** — required sections in PROJECT_PLAN.md/STATUS_REPORT.md/MANIFEST.md, valid JSON.
+3. **Cross-File Consistency** — phase names, Active Sprint ID references, session-count drift, Current Phase sanity. Report-only.
+4. **Progress Accuracy** — recalculates progress bars and cost totals for phases it can confidently compute (skips this project's own Jira-Story-tracked phases rather than guessing).
+5. **Codebase Sync** (`deep` only) — git-tag presence for completed phases (auto-fixable), plus a best-effort commit-trace heuristic. Deliberately does not attempt "flag code not tracked in any task" — that needs an LLM's judgment, not deterministic code.
+
+**Lock/diff/restore** (GETSITREP-31) — `lock`/`unlock` accept or resume monitoring on a drifted command MD; `diff` shows it against the canonical version shipped with the CLI; `restore` overwrites it with canonical, refusing without `--force` if it's been customized (the upgrade-protection warning). `<name>` is one of the 8 canon command names, not a file path.
