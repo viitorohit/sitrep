@@ -94,6 +94,8 @@ getsitrep init
 
 `init` (GETSITREP-17) is the recommended first command on a new project — a one-time wizard that configures your plan source (native/Jira/OpenSpec/Spec Kit) and cost source, writes `sitrep.config.json`, bootstraps `sitrep/` from templates, and copies the 8 command MDs into `.claude/commands/`. It's not one of the 8 canon slash commands (it only runs once, like the old `install.sh`) and it detects prior sitrep state before touching anything — safe to re-run.
 
+For whichever AI tool(s) you select, `init` also wires up automatic session tracking (GETSITREP-21): SessionStart/SessionEnd hooks for Claude Code and Cursor, a SessionStart + `Stop`-bound hook for Codex (it has no native SessionEnd), and a factual (never imperative) `AGENTS.md` block as a portable fallback for any tool. It merges into existing hook config files rather than overwriting them — a pre-existing `.claude/settings.json` with your own permissions/hooks stays intact. Copilot/VS Code is not yet covered: the reuse-path this depends on (VS Code parsing `.claude/settings.json` natively) hasn't been verified against a live install (GETSITREP-38).
+
 | Command | Usage | What it does |
 |---|---|---|
 | `init` | `getsitrep init [--yes] [--plan ...] [--cost ...] [--tools ...]` | One-time onboarding wizard — not a slash command |
