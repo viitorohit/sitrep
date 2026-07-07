@@ -239,6 +239,131 @@ function insertChangeLogRow(statusContent, cells) {
   return statusContent.slice(0, insertAt) + rowText + '\n' + statusContent.slice(insertAt);
 }
 
+// Strips markdown bold markers ("**23**" -> "23") — the Progress Dashboard
+// table bolds the TOTAL row's cells, which would otherwise break a plain
+// integer check.
+function stripBold(s) {
+  return s.replace(/\*\*/g, '').trim();
+}
+
+// True only for a cell that is JUST an integer once bold-stripped — used to
+// tell a legacy numeric phase ("8") apart from this project's own hybrid
+// Story-tracked phases ("9 Stories"), which selfheal must not misparse as a
+// number nor silently "fix" into one.
+function isPlainInteger(cell) {
+  return /^\d+$/.test(stripBold(cell));
+}
+
+// All "## Phase N: Name — ..." headings in PROJECT_PLAN.md, in document
+// order. Stops at the em-dash (or end of line if there isn't one) so
+// trailing version/status annotations aren't captured as part of the name.
+function extractPhaseHeadings(planContent) {
+  if (!planContent) return [];
+  const re = /^##\s*Phase\s+(\d+):\s*([^—\n]+?)\s*(?:—|$)/gm;
+  const phases = [];
+  let match;
+  while ((match = re.exec(planContent)) !== null) {
+    phases.push({ number: parseInt(match[1], 10), name: match[2].trim() });
+  }
+  return phases;
+}
+
+// Parses the "## Progress Dashboard" table in STATUS_REPORT.md. Each row
+// becomes { phase, name, tasksRaw, doneRaw, bar, rowIndex }; the TOTAL row
+// (first cell containing "TOTAL") becomes { isTotal: true, tasksRaw,
+// doneRaw, rowIndex } instead. `rowIndex` is the row's position in
+// `table.rows` so a caller can rewrite that exact line back into the table.
+function extractProgressDashboardTable(statusContent) {
+  const table = findTableAfterHeading(statusContent, /^##\s*Progress Dashboard.*$/m);
+  if (!table) return null;
+
+  const rows = table.rows.map((row, rowIndex) => {
+    const cells = splitRowCells(row);
+    const first = stripBold(cells[0] || '');
+    if (/TOTAL/i.test(first)) {
+      return { isTotal: true, rowIndex, tasksRaw: cells[2], doneRaw: cells[3] };
+    }
+    return {
+      isTotal: false,
+      rowIndex,
+      phase: parseInt(first, 10),
+      name: (cells[1] || '').trim(),
+      tasksRaw: cells[2],
+      doneRaw: cells[3],
+      barRaw: cells[4],
+    };
+  });
+
+  return { ...table, parsedRows: rows };
+}
+
+// Renders a 10-segment block bar + rounded percentage the same way this
+// project's own docs already do it (see MANIFEST.md's progress-bar
+// examples): block count rounds `done/total*10`; the percentage text is
+// independently rounded from the true fraction, not derived from the block
+// count, so e.g. 4/9 renders as "████░░░░░░ 44%" (4 blocks, not 40%).
+function renderProgressBar(done, total) {
+  if (!total || total <= 0) return { bar: '░░░░░░░░░░', percent: 0 };
+  const fraction = done / total;
+  const filled = Math.max(0, Math.min(10, Math.round(fraction * 10)));
+  const percent = Math.round(fraction * 100);
+  return { bar: '█'.repeat(filled) + '░'.repeat(10 - filled) + ` ${percent}%`, percent };
+}
+
+// Rewrites one row of a table by index, replacing specific cell positions.
+// `cellUpdates` is { cellIndex: newValue }. Preserves every other cell
+// untouched (including any bold markers on cells not being replaced).
+function replaceTableRowCells(content, table, rowIndex, cellUpdates) {
+  const rows = table.rows.slice();
+  const cells = splitRowCells(rows[rowIndex]);
+  for (const [idx, value] of Object.entries(cellUpdates)) {
+    cells[Number(idx)] = value;
+  }
+  rows[rowIndex] = `| ${cells.join(' | ')} |`;
+
+  const oldTableBlock = table.rows.join('\n');
+  const newTableBlock = rows.join('\n');
+  const searchStart = table.tableEnd - oldTableBlock.length - 1;
+  return content.slice(0, searchStart) + newTableBlock + content.slice(table.tableEnd - 1);
+}
+
+// First column values from the "## Active Sprint" table — could be numeric
+// task IDs ("3.4") or Jira-style keys ("GETSITREP-28"); this project has
+// used both depending on whether a phase is still task-numbered or has
+// moved to Jira-Story tracking (see PROJECT_PLAN.md's roadmap-source-of-
+// truth note), so callers must not assume one shape.
+function extractActiveSprintIds(statusContent) {
+  const table = findTableAfterHeading(statusContent, /^##\s*Active Sprint.*$/m);
+  if (!table) return [];
+  return table.rows
+    .map((row) => splitRowCells(row)[0])
+    .filter(Boolean)
+    .map((cell) => stripBold(cell))
+    .filter((id) => id && id !== '—' && id !== '-');
+}
+
+// Active Sprint rows as { id, status } — both the legacy "#|Task|Status|
+// Notes" shape and this project's Jira-Story "Story|Task|Status|Notes"
+// shape put status in the 3rd column, so this doesn't need to know which
+// shape it's reading.
+function extractActiveSprintRows(statusContent) {
+  const table = findTableAfterHeading(statusContent, /^##\s*Active Sprint.*$/m);
+  if (!table) return [];
+  return table.rows
+    .map((row) => splitRowCells(row))
+    .filter((cells) => cells.length >= 3 && cells[0])
+    .map((cells) => ({ id: stripBold(cells[0]), status: cells[2] }));
+}
+
+// Count of "### Session N — ..." headings in the Session Log section —
+// compared against .sitrep-data.json's own session count to catch the two
+// stores drifting apart (a real drift this project has hit before).
+function countSessionLogEntries(statusContent) {
+  if (!statusContent) return 0;
+  const matches = statusContent.match(/^###\s*Session\s+\d+\s*—/gm);
+  return matches ? matches.length : 0;
+}
+
 module.exports = {
   extractSection,
   replaceHeaderField,
@@ -259,4 +384,13 @@ module.exports = {
   nextDecisionNumber,
   findRiskRegisterTable,
   insertRowAt,
+  stripBold,
+  isPlainInteger,
+  extractPhaseHeadings,
+  extractProgressDashboardTable,
+  renderProgressBar,
+  replaceTableRowCells,
+  extractActiveSprintIds,
+  extractActiveSprintRows,
+  countSessionLogEntries,
 };
