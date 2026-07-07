@@ -109,4 +109,20 @@ function logSearch(pattern, maxCount = 200) {
   }
 }
 
-module.exports = { commit, isGitRepo, recentLog, userName, currentBranch, tagExists, createTag, logSearch };
+// { hash, date, subject }[] for the last `count` commits touching `pathSpec`
+// (e.g. "sitrep/"). Used by dashboard's History section for a real audit
+// trail rather than a generic, unscoped log.
+function logForPath(pathSpec, count = 20) {
+  try {
+    const raw = run(['log', `--pretty=format:%h|%ad|%s`, '--date=short', `-${count}`, '--', pathSpec]).trim();
+    if (!raw) return [];
+    return raw.split('\n').map((line) => {
+      const [hash, date, ...rest] = line.split('|');
+      return { hash, date, subject: rest.join('|') };
+    });
+  } catch {
+    return [];
+  }
+}
+
+module.exports = { commit, isGitRepo, recentLog, userName, currentBranch, tagExists, createTag, logSearch, logForPath };
