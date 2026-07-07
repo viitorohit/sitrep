@@ -22,7 +22,7 @@ const { ok, fail } = require('../lib/result');
 const { readIfExists, writeFile, ensureDir, exists } = require('../lib/fs-helpers');
 const paths = require('../lib/paths');
 const { commit } = require('../lib/git');
-const { computeManifest, readHashManifest, writeHashManifest } = require('../lib/manifest');
+const { computeManifest, readHashManifest, writeHashManifest, diffManifest } = require('../lib/manifest');
 const { CANON_COMMANDS } = require('../lib/canon');
 const fs = require('fs');
 const path = require('path');
@@ -114,9 +114,8 @@ function checkFileIntegrity() {
 }
 
 // GETSITREP-29: create the baseline hash manifest the first time one is
-// missing. This does not compare against the baseline (GETSITREP-30) or
-// act on drift (GETSITREP-31) — see docs/adr and src/lib/manifest.js for
-// the full scope split across the three subtasks.
+// missing. Comparing against it is checkDrift() below (GETSITREP-30); acting
+// on drift (lock/diff/restore, upgrade warnings) is GETSITREP-31.
 function checkManifestBaseline() {
   const fixed = [];
 
@@ -132,6 +131,20 @@ function checkManifestBaseline() {
   return { fixed };
 }
 
+// GETSITREP-30: compare the baseline manifest against current disk state.
+// Purely informational — never blocks, never auto-fixes, and never
+// mutates the baseline (Hard Law #5: fail-open, non-interactive). Every
+// modified file is reported regardless of intent; locking a file out of
+// this report, or restoring/re-baselining, is GETSITREP-31's job.
+function checkDrift(baseline) {
+  if (!baseline) {
+    return { checked: false, modified: [], added: [], removed: [] };
+  }
+
+  const current = computeManifest();
+  return { checked: true, ...diffManifest(baseline, current) };
+}
+
 function execute(argv) {
   const parsed = parseArgs(argv, SPEC);
   if (!parsed.ok) {
@@ -141,9 +154,12 @@ function execute(argv) {
   const structure = checkFileStructure();
   const integrity = checkFileIntegrity();
   const manifestBaseline = checkManifestBaseline();
+  const baselineManifest = readHashManifest();
+  const drift = checkDrift(baselineManifest);
 
   const allFixed = [...structure.fixed, ...manifestBaseline.fixed];
   const allCannotFix = [...structure.cannotFix, ...integrity.cannotFix];
+  const driftCount = drift.modified.length + drift.added.length + drift.removed.length;
 
   let gitNote = '';
   if (allFixed.length > 0) {
@@ -151,16 +167,22 @@ function execute(argv) {
     gitNote = gitResult.committed ? 'Committed.' : `Not committed (${gitResult.reason}).`;
   }
 
-  const manifestNow = readHashManifest();
-  const manifestLine = manifestNow
-    ? `Manifest Baseline: ✅ ${Object.keys(manifestNow.files).length} file(s) tracked (v${manifestNow.version})`
+  const manifestLine = baselineManifest
+    ? `Manifest Baseline: ✅ ${Object.keys(baselineManifest.files).length} file(s) tracked (v${baselineManifest.version})`
     : 'Manifest Baseline: ⚠️ Not created (no command MDs or MANIFEST.md found to hash)';
+
+  const driftLine = !drift.checked
+    ? 'Manifest Drift:  ⏭️ Skipped (no baseline yet)'
+    : driftCount === 0
+      ? 'Manifest Drift:  ✅ No drift since baseline'
+      : `Manifest Drift:  ⚠️ ${driftCount} file(s) changed since baseline`;
 
   const lines = [
     '=== SELFHEAL ===',
     `File Structure:  ${structure.fixed.length === 0 && structure.cannotFix.length === 0 ? '✅ All good' : '⚠️ see below'}`,
     `File Integrity:  ${integrity.cannotFix.length === 0 ? '✅ Clean' : '⚠️ see below'}`,
     manifestLine,
+    driftLine,
     parsed.values.mode === 'deep' ? 'Codebase Sync:   ⏭️ Not yet implemented in the CLI (Checks 3-5 are a known gap)' : 'Codebase Sync:   ⏭️ Skipped (run selfheal deep — note: not yet implemented)',
     '',
   ];
@@ -177,10 +199,24 @@ function execute(argv) {
     lines.push('');
   }
 
-  if (allFixed.length === 0 && allCannotFix.length === 0) {
+  if (driftCount > 0) {
+    lines.push(`Drift since baseline (v${baselineManifest.version}):`);
+    for (const f of drift.modified) lines.push(`  - Modified: ${f}`);
+    for (const f of drift.added) lines.push(`  - Added: ${f}`);
+    for (const f of drift.removed) lines.push(`  - Removed: ${f}`);
+    lines.push('  (informational only — locking/restoring drifted files isn\'t implemented yet, GETSITREP-31)');
+    lines.push('');
+  }
+
+  const hasDrift = driftCount > 0;
+  if (allFixed.length === 0 && allCannotFix.length === 0 && !hasDrift) {
     lines.push('Overall: ✅ Healthy');
   } else {
-    lines.push(`Overall: ⚠️ ${allFixed.length} fixed, ${allCannotFix.length} need input`);
+    const parts = [];
+    if (allFixed.length > 0) parts.push(`${allFixed.length} fixed`);
+    if (allCannotFix.length > 0) parts.push(`${allCannotFix.length} need input`);
+    if (hasDrift) parts.push(`${driftCount} drifted (informational)`);
+    lines.push(`Overall: ⚠️ ${parts.join(', ')}`);
   }
   if (gitNote) lines.push(gitNote);
   lines.push('===========================');

@@ -2,7 +2,7 @@
 
 Run a full diagnostic on the sitrep framework. Fix what you can, report what needs human input.
 
-> Intentional (manually invoked). This command owns all file-repair behavior for sitrep — session-start, session-end, capture, plan-update, and handoff deliberately do not search for or move files themselves; they defer to /selfheal. Path-agnostic per hard law #1 (no platform lock-in) — this is the GETSITREP-28 foundation. GETSITREP-29 (baseline hash manifest) has landed; drift detection (GETSITREP-30) and lock/diff/restore + upgrade protection (GETSITREP-31) are still to come.
+> Intentional (manually invoked). This command owns all file-repair behavior for sitrep — session-start, session-end, capture, plan-update, and handoff deliberately do not search for or move files themselves; they defer to /selfheal. Path-agnostic per hard law #1 (no platform lock-in) — this is the GETSITREP-28 foundation. GETSITREP-29 (baseline hash manifest) and GETSITREP-30 (drift report) have landed; lock/diff/restore + upgrade protection (GETSITREP-31) is still to come.
 
 Read `sitrep/PROJECT_PLAN.md` to extract the project name. Use as [PROJECT] in output.
 
@@ -18,10 +18,11 @@ Read `sitrep/PROJECT_PLAN.md` to extract the project name. Use as [PROJECT] in o
 - [ ] `sitrep/history/dashboards/` exists
 - [ ] `sitrep/.sitrep-active-session` is in `.gitignore`
 - [ ] The active platform's command directory contains all 8 canon commands: `session-start`, `session-end`, `sitrep`, `capture`, `plan-update`, `selfheal`, `handoff`, `dashboard` (canon: `docs/specs/command-canon.md`). Read the directory from adapter config, not a hardcoded path — today that's `.claude/commands/` for Claude Code; this becomes fully config-driven once GETSITREP-36's adapter contract ships. Never hardcode a second platform's path here.
-- [ ] `sitrep/.sitrep-manifest.json` exists — a sha256 baseline of every canon command MD plus `sitrep/MANIFEST.md`, keyed to the version in `sitrep/MANIFEST.md`. (GETSITREP-29.) Created once, the first time it's missing — never regenerated on top of an existing one, since that would silently erase evidence of drift before GETSITREP-30 can report it.
+- [ ] `sitrep/.sitrep-manifest.json` exists — a sha256 baseline of every canon command MD plus `sitrep/MANIFEST.md`, keyed to the version in `sitrep/MANIFEST.md`. (GETSITREP-29.) Created once, the first time it's missing — never regenerated on top of an existing one, since that would silently erase the baseline drift is measured against.
+- [ ] Current file hashes are compared against the baseline manifest → report any modified/added/removed file, informational only. (GETSITREP-30.) Every drifted file is reported regardless of intent — nothing is excluded or acted on yet.
 
 **Auto-fix:** Create missing directories. Add gitignore entry. Create the baseline hash manifest if absent.
-**Cannot fix:** Files that don't exist anywhere. A missing or misplaced command file is flagged for the developer, not auto-moved — the baseline manifest now exists (GETSITREP-29) but nothing reads it for comparison yet (GETSITREP-30), so selfheal still can't tell a stale file from an intentionally customized one and doesn't guess.
+**Cannot fix:** Files that don't exist anywhere. A missing or misplaced command file is flagged for the developer, not auto-moved. Drifted files (per the manifest) are reported in the same spirit — informational only, never a nag — since selfheal still can't tell a stale file from an intentionally customized one; that distinction is GETSITREP-31's lock/diff/restore.
 
 ---
 

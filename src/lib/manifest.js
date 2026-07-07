@@ -1,9 +1,10 @@
-// GETSITREP-29: hash manifest baseline (foundation for GETSITREP-28).
+// GETSITREP-29/30: hash manifest baseline + drift comparison (foundation
+// for GETSITREP-28).
 //
-// Scope note: this module only computes and persists a baseline — it does
-// not compare against it. Drift detection is GETSITREP-30; lock/diff/restore
-// and upgrade-protection warnings are GETSITREP-31. Both build on top of the
-// manifest this module writes.
+// Scope note: this module computes/persists the baseline (GETSITREP-29) and
+// diffs it against current disk state (GETSITREP-30). It does not act on
+// the diff — lock/diff/restore and upgrade-protection warnings are
+// GETSITREP-31, built on top of diffManifest()'s output.
 //
 // "At install" per the Story description: there is no CLI init/install
 // command yet (that's GETSITREP-17, Tier 2) — today's install path is the
@@ -71,9 +72,40 @@ function writeHashManifest(manifest) {
   writeJson(paths.HASH_MANIFEST(), manifest);
 }
 
+// GETSITREP-30: compares a baseline manifest against a freshly computed one.
+// Pure comparison — never mutates the baseline and never touches disk beyond
+// what computeManifest() already reads. Locking a file as intentional so it
+// stops showing up as "modified" is GETSITREP-31's job, not this function's;
+// every modified file is reported here regardless of intent.
+function diffManifest(baseline, current) {
+  const baselineFiles = (baseline && baseline.files) || {};
+  const currentFiles = (current && current.files) || {};
+
+  const modified = [];
+  const added = [];
+  const removed = [];
+
+  for (const [file, hash] of Object.entries(currentFiles)) {
+    if (!(file in baselineFiles)) {
+      added.push(file);
+    } else if (baselineFiles[file] !== hash) {
+      modified.push(file);
+    }
+  }
+
+  for (const file of Object.keys(baselineFiles)) {
+    if (!(file in currentFiles)) {
+      removed.push(file);
+    }
+  }
+
+  return { modified, added, removed };
+}
+
 module.exports = {
   computeManifest,
   readHashManifest,
   writeHashManifest,
+  diffManifest,
   hashContent,
 };
