@@ -3,7 +3,7 @@
 > **Project:** sitrep
 > **Owner:** Rohit
 > **Started:** 2026-03-11
-> **Last Updated:** 2026-07-06
+> **Last Updated:** 2026-07-07
 > **Roadmap source of truth:** Jira project GETSITREP (Epics GETSITREP-1/2/3 = v0.3/v0.4/v0.5). This file mirrors Jira — if they diverge, Jira wins. See CLAUDE.md Sources of Truth.
 
 ---
@@ -73,26 +73,26 @@ sitrep is the operations, cost, and continuity layer for AI-assisted development
 | GETSITREP-13 — Refresh command MDs, canon per signed audit | `commands` | 9 − pulse − doctor + dashboard (relocated from root) = 8. Audit (2026-07-02) found doctor≈selfheal duplicate + misplaced dashboard.md. Binding spec: Command MD Audit (Confluence) → mirrored to `docs/specs/command-canon.md`. | ✅ Done (PR #1) |
 | GETSITREP-36 — Adapter contract | `cli-core` | Plan/cost/auto-run interfaces, all optional; 3 committed platforms + Copilot conditional | ✅ Done (PR #3) |
 
-### Tier 1 — needs Tier 0 (shipped) 🟡 in progress
+### Tier 1 — needs Tier 0 (shipped) ✅ shipped
 
 | Story | Component | Goal | Status |
 |---|---|---|---|
 | GETSITREP-8 — Platform-agnostic core/CLI extraction | `cli-core` | Move all logic into a real CLI; slash commands become thin wrappers | ✅ Done (PR #4; subtasks GETSITREP-9/10/12 all Done) |
-| GETSITREP-28 — selfheal: MD-drift + upgrade protection | `selfheal` | Hash manifest, drift report, lock/diff/restore; absorbs doctor's role | 🔲 To Do — next up |
+| GETSITREP-28 — selfheal: MD-drift + upgrade protection | `selfheal` | Hash manifest, drift report, lock/diff/restore; absorbs doctor's role | ✅ Done (subtasks GETSITREP-29/30/31; reopened+resolved GETSITREP-10's thin-wrapper conversion alongside, PR #6) |
 
-### Tier 2 — needs GETSITREP-8 (shipped) — unblocked
+### Tier 2 — needs GETSITREP-8 (shipped) ✅ shipped
 
 | Story | Component | Goal | Status |
 |---|---|---|---|
-| GETSITREP-17 — CLI onboarding wizard + config | `onboarding` | `getsitrep init`: plan source + cost source + tools in use; residue-detection/restore (GETSITREP-39) | 🔲 To Do |
-| GETSITREP-21 — Auto-run adapters | `onboarding` | SessionStart + SessionEnd hook writers per platform + AGENTS.md factual nudge; Codex spike | 🔲 To Do |
-| GETSITREP-25 — Plan-presence guard | `cli-core` | If no plan found, offer to generate one from repo introspection | 🔲 To Do |
+| GETSITREP-17 — CLI onboarding wizard + config | `onboarding` | `getsitrep init`: plan source + cost source + tools in use; residue-detection/restore (GETSITREP-39) | ✅ Done |
+| GETSITREP-21 — Auto-run adapters | `onboarding` | SessionStart + SessionEnd hook writers per platform + AGENTS.md factual nudge; Codex spike | ✅ Done (Copilot/VS Code, GETSITREP-38, explicitly deferred — reuse-path unverified) |
+| GETSITREP-25 — Plan-presence guard | `cli-core` | If no plan found, offer to generate one from repo introspection | ✅ Done |
 
 ### Tier 3 — pre-launch gate
 
 | Story | Component | Goal | Status |
 |---|---|---|---|
-| GETSITREP-32 — Housekeeping | `docs` | README says "eight" commands, publish v0.2 GitHub release, npm source visible in public repo | 🔲 To Do |
+| GETSITREP-32 — Housekeeping | `docs` | README says "eight" commands, publish v0.2 GitHub release, npm source visible in public repo | 🟡 In Review — PR #10 (subtasks GETSITREP-33/34 both In Review) |
 
 **Explicitly OUT of v0.3** (deferred to v0.4+): cost-to-outcome pipeline, Jira read-adapter, activity attribution, business brief, nudge engine (GETSITREP-35), adoption nudge (GETSITREP-40).
 

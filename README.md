@@ -1,6 +1,6 @@
 # SitRep
 
-**AI-native project management. Two markdown files. Nine slash commands. Zero dependencies.**
+**AI-native project management. Two markdown files. Eight slash commands. Zero dependencies.**
 
 > You don't need Jira to build with AI. You need a system that your AI assistant can read, update, and commit — automatically.
 
@@ -66,7 +66,6 @@ Two commands minimum. Everything else is optional but compounds in value.
 | `/selfheal` | Things feel off | Health check + auto-fix. `/selfheal deep` for codebase audit. |
 | `/handoff` | Switching context | Context package. `/handoff human` or `/handoff ai` |
 | `/dashboard` | Visual report | Generates full MIS dashboard as HTML |
-| `/pulse` | Mid-session | Shows which commands ran, suggests what to do next |
 
 ---
 
@@ -181,7 +180,7 @@ You're tracking.
 | Something feels wrong | `/selfheal` or `/selfheal deep` |
 | Stakeholder update | `/dashboard` → open HTML → Cmd+P to print |
 | End of day | `/session-end` — always, no exceptions |
-| Forgot what I ran | `/pulse` — see session command history |
+| Forgot what I ran | `/sitrep` — quick read-only status check |
 
 Full usage guide: [docs/USAGE_GUIDE.md](docs/USAGE_GUIDE.md)
 

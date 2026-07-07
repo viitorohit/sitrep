@@ -219,6 +219,38 @@
       "model": "claude-sonnet-5",
       "duration_minutes": 240,
       "notes": "Very heavy session: selfheal Check 3-5 + dashboard full implementation (all 10 sections) closed before flipping MDs, per session-owner decision to avoid regression. Reopened GETSITREP-10 (was Done with unmet thin-wrapper acceptance criterion) and completed it. Caught 3 real bugs during verification (table-offset corruption risk, git commit() nothing-to-commit regex gap, toLocaleString() locale bug). PR #6 merged to main. Confluence Command MD Audit page synced. Marketing: prepared v0.3 CLI upgrade announcement, discovered existing ContentOps automation pipeline, filed brief 015 under T04 (Ready for Review, not auto-approved). ADR-0005 written for the thin-wrapper decision. Flagging for next session: PROJECT_PLAN.md/STATUS_REPORT.md still show Phase 3-5 name mismatches (cosmetic, selfheal reports them every run) and CLAUDE.md Verified Repo Facts section predates GETSITREP-8/13 merges (package.json/index.js now exist, 8-command canon already shipped) — worth a fresh repo audit next session."
+    },
+    {
+      "number": 8,
+      "date": "2026-07-07",
+      "user": "Rohit",
+      "focus": "GETSITREP-32 housekeeping (last v0.3 Story): README + GitHub repo description accuracy (eight commands, was nine/five), v0.2.0 GitHub Release published, npm packaging bug fixed. Caught and fixed a real selfheal auto-tag bug (GETSITREP-47) while dogfooding. Reconciled 4 sessions worth of dogfood drift (GETSITREP-28/17/21/25 werent logged as Done).",
+      "tasks_completed": [
+        "GETSITREP-32",
+        "GETSITREP-33",
+        "GETSITREP-34",
+        "GETSITREP-47"
+      ],
+      "tasks_in_progress": [],
+      "tasks_blocked": [],
+      "blockers": [],
+      "decisions": [
+        "package.json needs an explicit files allowlist (bin, src, commands, templates, MANIFEST.md) -- without it npm publish would ship dogfood/dev data",
+        "selfheal phase-completion tag check must be report-only, never auto-create at HEAD -- no reliable way to infer the right historical commit deterministically"
+      ],
+      "tokens": {
+        "input": 105000,
+        "output": 45000,
+        "cacheCreation": 0,
+        "cacheRead": 0,
+        "total": 150000
+      },
+      "cost_usd": 0.99,
+      "cost_label": "estimate",
+      "cost_source": "manual_estimate",
+      "model": "claude-sonnet-5",
+      "duration_minutes": 90,
+      "notes": "PR #10 (GETSITREP-32 housekeeping) and PR #11 (GETSITREP-47 selfheal tag-bug fix) both open, awaiting review/merge -- neither merged by the assistant per governance. Once both merge, v0.3 is functionally complete (all 9 Stories done/in-review); next session should tag+release v0.3.0 on GitHub the same way v0.2.0 was backfilled this session. Open cross-cutting item still unresolved: no v0.2.0 Fix Version exists in Jira (versions start at v0.3) and there is no Jira version-management tool available in this MCP connection -- flagged on GETSITREP-32/33 for a manual decision. Token/cost estimate covers this session's visible continuation only (post-compaction); the full session (from /session-start) likely used more."
     }
   ],
   "users": [
@@ -231,10 +263,11 @@
         4,
         5,
         6,
-        7
+        7,
+        8
       ],
-      "total_tokens": 1420000,
-      "total_cost_usd": 22.11
+      "total_tokens": 1570000,
+      "total_cost_usd": 23.1
     }
   ],
   "phases": [
@@ -275,13 +308,13 @@
     }
   ],
   "totals": {
-    "sessions": 7,
-    "tasks_done": 27,
+    "sessions": 8,
+    "tasks_done": 31,
     "tasks_total": 41,
     "stories_done": 4,
     "stories_total": 9,
-    "tokens": 1420000,
-    "cost_usd": 22.11,
-    "hours": 10.75
+    "tokens": 1570000,
+    "cost_usd": 23.1,
+    "hours": 12.25
   }
 }
