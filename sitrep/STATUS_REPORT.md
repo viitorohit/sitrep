@@ -1,15 +1,15 @@
 # sitrep — Status Report
 
-> **Last Updated:** 2026-07-07 — Session 7
-> **Current Phase:** Phase 3 (Sharper & Self-Sufficient) — v0.3.0, Tier 0 + Tier 1 (GETSITREP-8) shipped, Tier 1 (GETSITREP-28) next
-> **Overall Progress:** 23/23 legacy tasks shipped (v0.1+v0.2). v0.3 tracked as 9 Jira Stories — 4 done (GETSITREP-4, 13, 36, 8), 5 remaining — see PROJECT_PLAN.md.
+> **Last Updated:** 2026-07-07 — Session 8
+> **Current Phase:** Phase 3 (Sharper & Self-Sufficient) — v0.3.0, Tier 0-2 shipped, Tier 3 (GETSITREP-32) in review — last Story of the release
+> **Overall Progress:** 23/23 legacy tasks shipped (v0.1+v0.2). v0.3 tracked as 9 Jira Stories — 8 done (GETSITREP-4, 13, 36, 8, 28, 17, 21, 25), 1 in review (GETSITREP-32) — see PROJECT_PLAN.md.
 > **Next Milestone:** `v0.3.0`
 
 ---
 
 ## Active Sprint
 
-**Phase 3: Sharper & Self-Sufficient** | Target: v0.3.0 | Tier 1 (needs Tier 0 — shipped)
+**Phase 3: Sharper & Self-Sufficient** | Target: v0.3.0 | Tier 3 (pre-launch gate) — last Story before release
 
 | Story | Task | Status | Notes |
 |---|------|--------|-------|
@@ -17,9 +17,11 @@
 | GETSITREP-13 | Refresh command MDs (8-command canon) | ✅ Done | Tier 0 — merged, PR #1 |
 | GETSITREP-36 | Adapter contract | ✅ Done | Tier 0 — merged, PR #3 |
 | GETSITREP-8 | Platform-agnostic core/CLI extraction | ✅ Done | Tier 1 — merged PR #4 (subtasks GETSITREP-9/10/12 all Done); 8-angle code review found + fixed 10 issues before merge |
-| GETSITREP-28 | selfheal: MD-drift + upgrade protection | 🔲 To Do | Tier 1 — next up, needs Tier 0 (shipped) |
-
-Tier 2–3 Stories (GETSITREP-17, 21, 25, 32) not shown — blocked on GETSITREP-8 (now shipped) or Tier 3 gate. Full structure in `sitrep/PROJECT_PLAN.md` Phase 3.
+| GETSITREP-28 | selfheal: MD-drift + upgrade protection | ✅ Done | Tier 1 — merged PR #6 (subtasks GETSITREP-29/30/31); reopened + resolved GETSITREP-10's thin-wrapper conversion alongside |
+| GETSITREP-17 | CLI onboarding wizard + config | ✅ Done | Tier 2 |
+| GETSITREP-21 | Auto-run adapters | ✅ Done | Tier 2 — Copilot/VS Code (GETSITREP-38) explicitly deferred, reuse-path unverified |
+| GETSITREP-25 | Plan-presence guard | ✅ Done | Tier 2 |
+| GETSITREP-32 | Housekeeping | 🟡 In Review | Tier 3 — PR #10 open (subtasks GETSITREP-33/34 both In Review); v0.2.0 GitHub Release published, npm packaging bug fixed, README/repo description corrected |
 
 ---
 
@@ -29,10 +31,10 @@ Tier 2–3 Stories (GETSITREP-17, 21, 25, 32) not shown — blocked on GETSITREP
 |-------|------|-------|------|-----|
 | 1 | Foundation | 8 | 8 | ██████████ 100% |
 | 2 | Operations Layer | 15 | 15 | ██████████ 100% |
-| 3 | Sharper & Self-Sufficient (v0.3.0) | 9 Stories | 4 | ████░░░░░░ 44% |
+| 3 | Sharper & Self-Sufficient (v0.3.0) | 9 Stories | 8 | █████████░ 89% |
 | 4 | Cost-to-Outcome & Beside (v0.4.0) | Not yet broken into Stories | — | — |
 | 5 | Business Brief & Breadth (v0.5.0) | Not yet broken into Stories | — | — |
-| **TOTAL** | | **23 tasks + 9 Stories** | **23 tasks done, 4 Stories done** | |
+| **TOTAL** | | **23 tasks + 9 Stories** | **23 tasks done, 8 Stories done, 1 in review** | |
 
 ---
 
@@ -155,6 +157,7 @@ Tier 2–3 Stories (GETSITREP-17, 21, 25, 32) not shown — blocked on GETSITREP
 
 | Date | Change | Reason |
 |------|--------|--------|
+| 2026-07-07 | Corrected Active Sprint/Progress Dashboard/PROJECT_PLAN.md Tier tables — GETSITREP-28, 17, 21, 25 were already merged (Tier 1-2 fully shipped) but still showed 🔲 To Do here | Several intervening sessions (GETSITREP-28→17→25→21) didn't call sitrep's own `/session-end` at close, so this file drifted 4 Stories behind real Jira/repo state; caught and reconciled before finishing v0.3 |
 | 2026-07-06 | Corrected Active Sprint/Progress Dashboard — Tier 0 (GETSITREP-4/13/36) and GETSITREP-8 were already merged but still showed 🔲 To Do here | This file's own tracking had drifted from real Jira state across several sessions; caught during session-end |
 | 2026-07-06 | Added README.md "CLI (v0.3, in development)" section (PR #5) | GETSITREP-8's CLI merged to main; needed accurate usage docs. Full README reconciliation (npx claim, command count) stays GETSITREP-32's scope |
 | 2026-07-03 | Flipped PROJECT_PLAN.md roadmap source of truth to Jira (GETSITREP-1/2/3); replaced Phases 3-5's aspirational content with live Epic scope | Dogfood file was stale since 2026-04-06, predated the Jira roadmap entirely — CLAUDE.md v0.3 required reconciliation before new work |
