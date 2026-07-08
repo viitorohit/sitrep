@@ -27,6 +27,7 @@ const { ok } = require('../lib/result');
 const { readIfExists, writeFile, readJsonIfExists, writeJson, ensureDir, exists } = require('../lib/fs-helpers');
 const { readJsonInput } = require('../lib/input');
 const { extractProjectName, replaceHeaderField, insertSessionLogEntry } = require('../lib/markdown');
+const { computeCostRollup } = require('../lib/cost-attribution');
 const paths = require('../lib/paths');
 const { commit, userName, currentBranch } = require('../lib/git');
 const { today } = require('../lib/dates');
@@ -217,6 +218,7 @@ function execute(argv) {
   }
 
   const updatedData = updateDataJson(dataJson, projectName, number, summary);
+  updatedData.cost_rollup = computeCostRollup(updatedData, planContent);
   writeJson(paths.DATA_JSON(), updatedData);
   filesUpdated.push('.sitrep-data.json');
 
