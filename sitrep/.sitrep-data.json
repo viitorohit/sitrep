@@ -251,6 +251,30 @@
       "model": "claude-sonnet-5",
       "duration_minutes": 90,
       "notes": "PR #10 (GETSITREP-32 housekeeping) and PR #11 (GETSITREP-47 selfheal tag-bug fix) both open, awaiting review/merge -- neither merged by the assistant per governance. Once both merge, v0.3 is functionally complete (all 9 Stories done/in-review); next session should tag+release v0.3.0 on GitHub the same way v0.2.0 was backfilled this session. Open cross-cutting item still unresolved: no v0.2.0 Fix Version exists in Jira (versions start at v0.3) and there is no Jira version-management tool available in this MCP connection -- flagged on GETSITREP-32/33 for a manual decision. Token/cost estimate covers this session's visible continuation only (post-compaction); the full session (from /session-start) likely used more."
+    },
+    {
+      "number": 9,
+      "date": "2026-07-08",
+      "user": "unknown",
+      "focus": "(not provided)",
+      "tasks_completed": [],
+      "tasks_in_progress": [],
+      "tasks_blocked": [],
+      "blockers": [],
+      "decisions": [],
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "cacheCreation": 0,
+        "cacheRead": 0,
+        "total": 0
+      },
+      "cost_usd": null,
+      "cost_label": "estimate",
+      "cost_source": "manual_estimate",
+      "model": "unknown",
+      "duration_minutes": 0,
+      "notes": ""
     }
   ],
   "users": [
@@ -268,6 +292,14 @@
       ],
       "total_tokens": 1570000,
       "total_cost_usd": 23.1
+    },
+    {
+      "name": "unknown",
+      "sessions": [
+        9
+      ],
+      "total_tokens": 0,
+      "total_cost_usd": 0
     }
   ],
   "phases": [
@@ -308,7 +340,7 @@
     }
   ],
   "totals": {
-    "sessions": 8,
+    "sessions": 9,
     "tasks_done": 31,
     "tasks_total": 41,
     "stories_done": 4,
@@ -316,5 +348,333 @@
     "tokens": 1570000,
     "cost_usd": 23.1,
     "hours": 12.25
+  },
+  "cost_rollup": {
+    "by_phase": {
+      "1": {
+        "tokens": 100000,
+        "cost_usd": 3,
+        "cost_label": "estimate",
+        "sessions": [
+          1
+        ]
+      },
+      "2": {
+        "tokens": 350000,
+        "cost_usd": 10.5,
+        "cost_label": "estimate",
+        "sessions": [
+          2,
+          3
+        ]
+      },
+      "3": {
+        "tokens": 1100000,
+        "cost_usd": 8.1,
+        "cost_label": "estimate",
+        "sessions": [
+          6,
+          7,
+          8
+        ]
+      }
+    },
+    "by_ticket": {
+      "1.1": {
+        "tokens": 12500,
+        "cost_usd": 0.38,
+        "cost_label": "estimate",
+        "sessions": [
+          1
+        ]
+      },
+      "1.2": {
+        "tokens": 12500,
+        "cost_usd": 0.38,
+        "cost_label": "estimate",
+        "sessions": [
+          1
+        ]
+      },
+      "1.3": {
+        "tokens": 12500,
+        "cost_usd": 0.38,
+        "cost_label": "estimate",
+        "sessions": [
+          1
+        ]
+      },
+      "1.4": {
+        "tokens": 12500,
+        "cost_usd": 0.38,
+        "cost_label": "estimate",
+        "sessions": [
+          1
+        ]
+      },
+      "1.5": {
+        "tokens": 12500,
+        "cost_usd": 0.38,
+        "cost_label": "estimate",
+        "sessions": [
+          1
+        ]
+      },
+      "1.6": {
+        "tokens": 12500,
+        "cost_usd": 0.38,
+        "cost_label": "estimate",
+        "sessions": [
+          1
+        ]
+      },
+      "1.7": {
+        "tokens": 12500,
+        "cost_usd": 0.38,
+        "cost_label": "estimate",
+        "sessions": [
+          1
+        ]
+      },
+      "1.8": {
+        "tokens": 12500,
+        "cost_usd": 0.38,
+        "cost_label": "estimate",
+        "sessions": [
+          1
+        ]
+      },
+      "2.1": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.2": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.3": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.4": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.6": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.7": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.8": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.9": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.10": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.13": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.5": {
+        "tokens": 30000,
+        "cost_usd": 0.9,
+        "cost_label": "estimate",
+        "sessions": [
+          3
+        ]
+      },
+      "2.11": {
+        "tokens": 30000,
+        "cost_usd": 0.9,
+        "cost_label": "estimate",
+        "sessions": [
+          3
+        ]
+      },
+      "2.12": {
+        "tokens": 30000,
+        "cost_usd": 0.9,
+        "cost_label": "estimate",
+        "sessions": [
+          3
+        ]
+      },
+      "2.14": {
+        "tokens": 30000,
+        "cost_usd": 0.9,
+        "cost_label": "estimate",
+        "sessions": [
+          3
+        ]
+      },
+      "2.15": {
+        "tokens": 30000,
+        "cost_usd": 0.9,
+        "cost_label": "estimate",
+        "sessions": [
+          3
+        ]
+      },
+      "GETSITREP-8": {
+        "tokens": 87500,
+        "cost_usd": 0.65,
+        "cost_label": "estimate",
+        "sessions": [
+          6
+        ]
+      },
+      "GETSITREP-9": {
+        "tokens": 87500,
+        "cost_usd": 0.65,
+        "cost_label": "estimate",
+        "sessions": [
+          6
+        ]
+      },
+      "GETSITREP-10": {
+        "tokens": 237500,
+        "cost_usd": 1.78,
+        "cost_label": "estimate",
+        "sessions": [
+          6,
+          7
+        ]
+      },
+      "GETSITREP-12": {
+        "tokens": 87500,
+        "cost_usd": 0.65,
+        "cost_label": "estimate",
+        "sessions": [
+          6
+        ]
+      },
+      "GETSITREP-29": {
+        "tokens": 150000,
+        "cost_usd": 1.13,
+        "cost_label": "estimate",
+        "sessions": [
+          7
+        ]
+      },
+      "GETSITREP-30": {
+        "tokens": 150000,
+        "cost_usd": 1.13,
+        "cost_label": "estimate",
+        "sessions": [
+          7
+        ]
+      },
+      "GETSITREP-31": {
+        "tokens": 150000,
+        "cost_usd": 1.13,
+        "cost_label": "estimate",
+        "sessions": [
+          7
+        ]
+      },
+      "GETSITREP-32": {
+        "tokens": 37500,
+        "cost_usd": 0.25,
+        "cost_label": "estimate",
+        "sessions": [
+          8
+        ]
+      },
+      "GETSITREP-33": {
+        "tokens": 37500,
+        "cost_usd": 0.25,
+        "cost_label": "estimate",
+        "sessions": [
+          8
+        ]
+      },
+      "GETSITREP-34": {
+        "tokens": 37500,
+        "cost_usd": 0.25,
+        "cost_label": "estimate",
+        "sessions": [
+          8
+        ]
+      },
+      "GETSITREP-47": {
+        "tokens": 37500,
+        "cost_usd": 0.25,
+        "cost_label": "estimate",
+        "sessions": [
+          8
+        ]
+      }
+    },
+    "unattributed": [
+      {
+        "session": 6,
+        "ids": [
+          "GETSITREP-12"
+        ]
+      },
+      {
+        "session": 7,
+        "ids": [
+          "GETSITREP-30",
+          "GETSITREP-31"
+        ]
+      },
+      {
+        "session": 8,
+        "ids": [
+          "GETSITREP-33",
+          "GETSITREP-34"
+        ]
+      }
+    ]
   }
 }
