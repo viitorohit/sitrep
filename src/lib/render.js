@@ -4,6 +4,16 @@
 // swap in without touching any command module or cli.js's dispatch logic.
 
 function render(result) {
+  // GETSITREP-35: an ok result with a genuinely empty message means "nothing
+  // to report" (nudge-check's silent-tick case, fired many times per session
+  // via a hook) — stay completely silent rather than printing a bare
+  // "[command] ✓" line on every single invocation. No existing command
+  // before this one ever produced an empty message on success, so this
+  // doesn't change any other command's output.
+  if (result.ok && result.message.trim() === '') {
+    return;
+  }
+
   if (result.message.includes('\n')) {
     // Multi-line message (e.g. top-level help text) — print as-is, no prefix.
     console.log(result.message);

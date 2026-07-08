@@ -15,7 +15,7 @@
     "MANIFEST.md"
   ],
   "scripts": {
-    "test": "node test/byte-identical.js"
+    "test": "node test/byte-identical.js && node test/nudge-triggers.js"
   },
   "engines": {
     "node": ">=20"
