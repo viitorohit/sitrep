@@ -14,6 +14,20 @@
 // cost-source adapter types exactly (Jira/OpenSpec/Spec Kit/native, and
 // ccusage/thin-local-log) — this file is the concrete persistence of that
 // contract's choices, not a new vocabulary.
+//
+// NEVER add a token/credential/secret field to this schema, for jira or any
+// future external tool. sitrep.config.json is tracked in git, not
+// gitignored — any field here is committed by default. Credentials never
+// enter sitrep at all; see ADR-0006 and src/lib/plan-adapters.js's
+// readExternalPlan(). `jira: {site, projectKey}` are non-secret identifiers,
+// fine to keep committed.
+//
+// GETSITREP-50: any `planSource` value beyond native/openspec/speckit/none
+// is treated generically as an externally-tracked tool by
+// src/lib/plan-adapters.js's readExternalPlan() and src/lib/agents-md.js's
+// declarative block — adding a new one (asana, linear, github, ...) needs
+// no new reader code, just adding its name below and to init.js's wizard
+// options.
 
 const { readJsonIfExists, writeJson } = require('./fs-helpers');
 const paths = require('./paths');

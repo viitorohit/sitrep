@@ -17,9 +17,12 @@ const {
 } = require('../lib/markdown');
 const { readConfig } = require('../lib/config');
 const { readPlan } = require('../lib/plan-adapters');
+const { readJsonInput } = require('../lib/input');
 const paths = require('../lib/paths');
 
-const SPEC = {};
+const FILE_BASED_PLAN_SOURCES = ['native', 'openspec', 'speckit'];
+
+const SPEC = { flags: { 'plan-data': { type: 'value' } } };
 
 function costLabelForTotals(dataJson) {
   if (!dataJson || !Array.isArray(dataJson.sessions) || dataJson.sessions.length === 0) {
@@ -29,7 +32,7 @@ function costLabelForTotals(dataJson) {
   return allActual ? 'actual' : 'estimate';
 }
 
-function buildOrientation() {
+function buildOrientation(planDataFlagValue) {
   const manifestContent = readIfExists(paths.MANIFEST());
   const statusContent = readIfExists(paths.STATUS_REPORT());
   const planContent = readIfExists(paths.PROJECT_PLAN());
@@ -76,14 +79,15 @@ function buildOrientation() {
   // plan-update, not here. GETSITREP-49: checks whichever plan source is
   // actually configured, not just native PROJECT_PLAN.md — a project set up
   // with --plan openspec/speckit no longer gets a false native-only warning.
-  const plan = readPlan(readConfig(), { planContent, statusContent });
+  // GETSITREP-50: an externally-tracked source (jira, or any future value)
+  // reads via --plan-data, handled generically — see
+  // src/lib/plan-adapters.js's readExternalPlan().
+  const externalInput = readJsonInput(planDataFlagValue);
+  const plan = readPlan(readConfig(), { planContent, statusContent, externalData: externalInput.ok ? externalInput.data : undefined });
   if (!plan.available) {
-    const suggestion =
-      plan.source === 'native'
-        ? 'run `plan-update --generate` to create a draft from your repo, or write your own.'
-        : plan.source === 'jira'
-          ? "the Jira adapter isn't built yet (GETSITREP-50)."
-          : `check your ${plan.source} setup, or reconfigure the plan source via \`getsitrep init\`.`;
+    const suggestion = FILE_BASED_PLAN_SOURCES.includes(plan.source)
+      ? 'run `plan-update --generate` to create a draft from your repo, or write your own.'
+      : `pass a status summary via --plan-data from an agent with its own access to "${plan.source}", or reconfigure the plan source via \`getsitrep init\`.`;
     lines.push(`⚠️ No plan found (source: ${plan.source} — ${plan.note}) — ${suggestion}`);
   }
 
@@ -93,7 +97,7 @@ function buildOrientation() {
 function execute(argv) {
   const parsed = parseArgs(argv, SPEC);
   const warning = parsed.ok ? '' : `\n(ignored: ${parsed.errors.join('; ')})`;
-  const orientation = buildOrientation();
+  const orientation = buildOrientation(parsed.values['plan-data']);
   return ok('session-start', parsed.values, `${orientation}${warning}`);
 }
 

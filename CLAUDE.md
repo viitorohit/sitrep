@@ -22,6 +22,7 @@ Full record in `docs/adr/`. Index:
 | 0003 | marketing/ untrack-only, not history rewrite | Accepted |
 | 0004 | CLI (GETSITREP-8) built greenfield in-repo, not ported | Accepted |
 | 0005 | Command MDs are permanent thin wrappers; CLI is sole source of truth | Accepted |
+| 0006 | Third-party integrations are tool-neutral and agent-mediated; sitrep never custodies credentials | Accepted |
 
 New architecturally-significant decision this session? Propose an ADR (use `docs/adr/template.md`), don't just narrate it in chat or bury it in a commit message.
 

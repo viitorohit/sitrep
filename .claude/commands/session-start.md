@@ -4,6 +4,12 @@
 
 Thin wrapper (GETSITREP-10) — orientation logic (reading MANIFEST.md/STATUS_REPORT.md/PROJECT_PLAN.md/.sitrep-data.json, building the summary) lives entirely in `getsitrep session-start`. This file's only job is to invoke it and show the result — it does not re-read those files or re-derive the summary itself.
 
+**If `sitrep.config.json`'s `planSource` names an external tool** (jira, or any other value that isn't native/openspec/speckit/none) **and you have your own independent access to that tool** (e.g. an MCP connection), you may optionally fetch a brief status summary and pass it along:
+```bash
+getsitrep session-start --plan-data '{"tool":"jira","ref":"...","fetchedAt":"<ISO date>","totalTasks":N,"doneTasks":N,"summary":"..."}'
+```
+This is entirely optional (GETSITREP-50 — see `docs/specs/adapter-contract.md` and ADR-0006) — sitrep never fetches this itself, and omitting the flag is always fine.
+
 Run:
 ```bash
 getsitrep session-start

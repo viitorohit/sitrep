@@ -17,10 +17,18 @@
 // aggregates across every change/feature directory found, since sitrep's
 // "progress" concept is project-wide, not scoped to a single change.
 //
-// Jira ('jira' planSource) is explicitly NOT handled here — that's
-// GETSITREP-50's own adapter (needs live API access, out of scope for a
-// file-reading module). Requesting it here returns an honest "not yet built"
-// result rather than silently falling back to a wrong source.
+// GETSITREP-50: any `planSource` naming an externally-tracked tool (today
+// just 'jira'; tomorrow maybe 'asana'/'linear'/'github') is handled by ONE
+// generic reader, readExternalPlan() — not a per-tool adapter. sitrep never
+// fetches from or authenticates to any of these tools itself (see ADR-0006):
+// it only ever consumes an aggregate status summary the calling AI agent
+// already produced using its own independent access to that tool, passed in
+// via --plan-data. Adding a new external tool later needs zero new code
+// here — just a new allowed value in config.js's PLAN_SOURCES. The
+// complementary half of this (an agent optionally *relaying* sitrep-observed
+// events out to that tool) has no sitrep code at all — it's declared as
+// factual, non-imperative context in AGENTS.md (src/lib/agents-md.js) and
+// left entirely to the agent's own judgment and access.
 
 const fs = require('fs');
 const path = require('path');
@@ -89,6 +97,40 @@ function readSpecKitPlan(cwd) {
   return summarize('speckit', tasks, 'specs/ exists but no feature has a tasks.md yet');
 }
 
+// GETSITREP-50: generic reader for any externally-tracked tool. Deliberately
+// aggregate-only (tool, ref, fetchedAt, totalTasks, doneTasks, summary) —
+// no per-item task list, since a Jira issue, an Asana task, and a GitHub PR
+// comment thread aren't the same shape and forcing one would be guessing at
+// a universal structure sitrep doesn't need. `externalData` is JSON an AI
+// agent already produced using its own access to whatever tool is
+// configured — this function only validates and normalizes it, never
+// fetches anything itself.
+function readExternalPlan(source, externalData) {
+  if (!externalData || typeof externalData !== 'object') {
+    return unavailable(
+      source,
+      `no --plan-data provided for external source "${source}" — pass a status summary from an agent with its own access to it, see docs/specs/adapter-contract.md`
+    );
+  }
+
+  const totalTasks = externalData.totalTasks;
+  const doneTasks = externalData.doneTasks;
+  if (typeof totalTasks !== 'number' || typeof doneTasks !== 'number') {
+    return unavailable(source, `--plan-data for "${source}" is missing numeric totalTasks/doneTasks — ignoring malformed input rather than guessing`);
+  }
+
+  const fetchedAt = typeof externalData.fetchedAt === 'string' ? externalData.fetchedAt : 'unknown time';
+  const summary = typeof externalData.summary === 'string' && externalData.summary.trim() ? `: ${externalData.summary.trim()}` : '';
+  return {
+    source,
+    available: true,
+    tasks: [],
+    totalTasks,
+    doneTasks,
+    note: `${source} status as of ${fetchedAt}${summary}`,
+  };
+}
+
 // Native mode's "available" is deliberately just "does PROJECT_PLAN.md
 // exist" — same test the pre-GETSITREP-49 hardcoded check used. Task counts
 // come from STATUS_REPORT.md's Progress Dashboard table separately, but a
@@ -138,8 +180,9 @@ function readNativePlan(planContent, statusContent) {
 // Single entry point every command should call instead of hardcoding a
 // PROJECT_PLAN.md existence check. `config` is the parsed sitrep.config.json
 // (or null if it doesn't exist yet, in which case this falls back to
-// 'native' — the default before any wizard ran).
-function readPlan(config, { planContent, statusContent, cwd } = {}) {
+// 'native' — the default before any wizard ran). `externalData` is only
+// consulted for the `default` (externally-tracked tool) branch below.
+function readPlan(config, { planContent, statusContent, cwd, externalData } = {}) {
   const source = (config && config.planSource) || 'native';
   const workingDir = cwd || process.cwd();
 
@@ -150,12 +193,15 @@ function readPlan(config, { planContent, statusContent, cwd } = {}) {
       return readOpenSpecPlan(workingDir);
     case 'speckit':
       return readSpecKitPlan(workingDir);
-    case 'jira':
-      return unavailable('jira', 'Jira adapter not yet built (GETSITREP-50) — plan/progress reads fall back to nothing for now');
     case 'none':
-    default:
       return unavailable(source, 'no plan source configured');
+    default:
+      // Any other configured value (jira, and any future external tool) is
+      // an externally-tracked source — handled identically, see
+      // readExternalPlan()'s own comment for why this is a `default`, not a
+      // growing list of per-tool cases.
+      return readExternalPlan(source, externalData);
   }
 }
 
-module.exports = { readPlan, parseChecklistFile, readNativePlan, readOpenSpecPlan, readSpecKitPlan };
+module.exports = { readPlan, parseChecklistFile, readNativePlan, readOpenSpecPlan, readSpecKitPlan, readExternalPlan };
