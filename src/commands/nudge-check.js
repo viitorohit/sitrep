@@ -22,13 +22,13 @@
 
 const { parseArgs } = require('../lib/args');
 const { ok } = require('../lib/result');
-const { readJsonIfExists, exists } = require('../lib/fs-helpers');
+const { readJsonIfExists } = require('../lib/fs-helpers');
 const { hasUncommittedChanges } = require('../lib/git');
 const { readHashManifest, computeManifest, diffManifest } = require('../lib/manifest');
 const { evaluateTriggers } = require('../lib/nudge-triggers');
 const { tick, hasFired, markFired } = require('../lib/nudge-state');
+const dashboard = require('./dashboard');
 const paths = require('../lib/paths');
-const fs = require('fs');
 
 const SPEC = {};
 
@@ -43,15 +43,6 @@ function safeDriftResult() {
   }
 }
 
-function safeDashboardArchiveCount() {
-  try {
-    if (!exists(paths.HISTORY_DASHBOARDS())) return 0;
-    return fs.readdirSync(paths.HISTORY_DASHBOARDS()).filter((f) => f.endsWith('.html')).length;
-  } catch {
-    return 0;
-  }
-}
-
 function gatherState() {
   const nudgeState = tick();
   const dataJson = readJsonIfExists(paths.DATA_JSON());
@@ -62,7 +53,10 @@ function gatherState() {
     driftResult: safeDriftResult(),
     hasUncommittedChanges: hasUncommittedChanges(),
     sessionCount,
-    dashboardArchiveCount: safeDashboardArchiveCount(),
+    // GETSITREP-51: shared with session-end.js's dashboard-fold threshold
+    // check — one implementation of "how many dashboards have been
+    // archived" instead of two that could silently drift apart.
+    dashboardArchiveCount: dashboard.archiveCount(),
     nudgeState,
   };
 }

@@ -507,12 +507,29 @@ function listDirSafe(dirPath) {
   }
 }
 
-function execute(argv) {
-  const parsed = parseArgs(argv, SPEC);
-  // Dashboard "must never fail" per its own spec — bad args become a
-  // warning, not a refusal to generate the report.
-  const warning = parsed.ok ? '' : ` (ignored: ${parsed.errors.join('; ')})`;
+// Count of already-archived dashboard snapshots — lives here (not in
+// nudge-check.js, which used to have its own private copy of this exact
+// logic) since this file already owns paths.HISTORY_DASHBOARDS()'s naming
+// convention. Shared by nudge-check.js's mid-session staleness nudge and
+// session-end.js's fold-in threshold check (GETSITREP-51 dashboard fold),
+// so there is exactly one implementation of "how many dashboards have been
+// archived" rather than two that could silently drift apart.
+function archiveCount() {
+  try {
+    if (!exists(paths.HISTORY_DASHBOARDS())) return 0;
+    return fs.readdirSync(paths.HISTORY_DASHBOARDS()).filter((f) => f.endsWith('.html')).length;
+  } catch {
+    return 0;
+  }
+}
 
+// Everything execute() does except the final commit — split out so
+// session-end.js can fold a dashboard regeneration into its own single
+// commit instead of firing a second, separate one (GETSITREP-51). Never
+// throws by itself; per this file's own "must never fail" spec, any I/O
+// error here is the caller's responsibility to catch (session-end.js wraps
+// this in a try/catch so a dashboard failure never blocks its own commit).
+function generate() {
   ensureDir(paths.SITREP_DIR());
 
   const planContent = readIfExists(paths.PROJECT_PLAN());
@@ -557,13 +574,30 @@ function execute(argv) {
   writeFile(paths.DASHBOARD_HTML(), html);
 
   const sizeKb = (Buffer.byteLength(html, 'utf8') / 1024).toFixed(1);
-  const gitResult = commit(['sitrep/'], `sitrep: dashboard — session ${sessionNumber}`);
+
+  return {
+    written: true,
+    archived: archived ? path.relative(process.cwd(), archived) : null,
+    sizeKb,
+    sessionNumber,
+    exceedsSizeTarget: Number(sizeKb) > 80,
+  };
+}
+
+function execute(argv) {
+  const parsed = parseArgs(argv, SPEC);
+  // Dashboard "must never fail" per its own spec — bad args become a
+  // warning, not a refusal to generate the report.
+  const warning = parsed.ok ? '' : ` (ignored: ${parsed.errors.join('; ')})`;
+
+  const result = generate();
+  const gitResult = commit(['sitrep/'], `sitrep: dashboard — session ${result.sessionNumber}`);
 
   const lines = [
     '=== DASHBOARD ===',
     'File: sitrep/dashboard.html',
-    `Size: ${sizeKb}KB${sizeKb > 80 ? ' ⚠️ exceeds the 80KB target' : ''}`,
-    `Archived: ${archived ? path.relative(process.cwd(), archived) : 'none'}`,
+    `Size: ${result.sizeKb}KB${result.exceedsSizeTarget ? ' ⚠️ exceeds the 80KB target' : ''}`,
+    `Archived: ${result.archived || 'none'}`,
     gitResult.committed ? 'Committed.' : `Not committed (${gitResult.reason}).`,
     `Sections: Summary, Progress, Active Sprint, Sessions, Costs, Users, Decisions, Risks, Documents, History${warning}`,
     '=================',
@@ -572,4 +606,4 @@ function execute(argv) {
   return ok('dashboard', parsed.values, lines.join('\n'));
 }
 
-module.exports = { name: 'dashboard', execute };
+module.exports = { name: 'dashboard', execute, generate, archiveCount };
