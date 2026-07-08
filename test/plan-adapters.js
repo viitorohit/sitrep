@@ -6,7 +6,7 @@ const assert = require('assert');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { readPlan, parseChecklistFile, readNativePlan } = require('../src/lib/plan-adapters');
+const { readPlan, parseChecklistFile, readNativePlan, readExternalPlan } = require('../src/lib/plan-adapters');
 
 let passed = 0;
 function test(name, fn) {
@@ -84,11 +84,38 @@ test('readPlan("speckit") aggregates across every specs/*/tasks.md', () => {
   fs.rmSync(cwd, { recursive: true, force: true });
 });
 
-test('readPlan("jira") honestly reports "not yet built" rather than silently falling back', () => {
+test('readPlan("jira") with no --plan-data honestly reports unavailable, never silently falls back', () => {
   const plan = readPlan({ planSource: 'jira' }, {});
   assert.strictEqual(plan.available, false);
   assert.strictEqual(plan.source, 'jira');
-  assert.match(plan.note, /not yet built/);
+  assert.match(plan.note, /--plan-data/);
+});
+
+test('readPlan("jira") with real --plan-data returns the agent-provided summary', () => {
+  const plan = readPlan(
+    { planSource: 'jira' },
+    { externalData: { tool: 'jira', ref: 'GETSITREP', fetchedAt: '2026-07-08T12:00:00Z', totalTasks: 9, doneTasks: 8, summary: '8/9 stories done' } }
+  );
+  assert.strictEqual(plan.available, true);
+  assert.strictEqual(plan.totalTasks, 9);
+  assert.strictEqual(plan.doneTasks, 8);
+  assert.match(plan.note, /2026-07-08T12:00:00Z/);
+  assert.match(plan.note, /8\/9 stories done/);
+});
+
+test('readPlan is genuinely tool-neutral: an unconfigured-anywhere-else source like "asana" needs zero new code', () => {
+  // Proves the "adding a new tool needs zero new reader code" claim
+  // directly -- 'asana' appears nowhere else in this codebase.
+  const plan = readPlan({ planSource: 'asana' }, { externalData: { totalTasks: 4, doneTasks: 1, fetchedAt: '2026-01-01' } });
+  assert.strictEqual(plan.source, 'asana');
+  assert.strictEqual(plan.available, true);
+  assert.strictEqual(plan.totalTasks, 4);
+});
+
+test('readExternalPlan degrades gracefully on malformed --plan-data, never throws', () => {
+  assert.strictEqual(readExternalPlan('jira', null).available, false);
+  assert.strictEqual(readExternalPlan('jira', { totalTasks: 'nine' }).available, false, 'non-numeric counts must be rejected, not coerced/guessed');
+  assert.strictEqual(readExternalPlan('jira', {}).available, false);
 });
 
 test('readPlan defaults to native when no config exists yet', () => {

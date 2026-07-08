@@ -139,10 +139,12 @@ function writeHooksForTools(tools) {
 }
 
 // GETSITREP-23: written unconditionally — AGENTS.md is the portable
-// fallback nudge for any tool, hook-capable or not.
-function writeAgentsMdFile() {
+// fallback nudge for any tool, hook-capable or not. GETSITREP-50: passing
+// `config` through lets the block declare an externally-tracked plan
+// source (see src/lib/agents-md.js) when one is configured.
+function writeAgentsMdFile(config) {
   const existing = readIfExists(paths.AGENTS_MD());
-  writeFile(paths.AGENTS_MD(), upsertAgentsBlock(existing));
+  writeFile(paths.AGENTS_MD(), upsertAgentsBlock(existing, config));
 }
 
 async function execute(argv) {
@@ -221,7 +223,7 @@ async function execute(argv) {
     const copiedCommands = tools.includes('claude-code') ? copyCanonCommands() : [];
     const bootstrappedTemplates = bootstrapTemplates();
     const hookResults = writeHooksForTools(tools);
-    writeAgentsMdFile();
+    writeAgentsMdFile(config);
 
     const commitPaths = ['sitrep.config.json', 'AGENTS.md'];
     if (copiedCommands.length > 0) commitPaths.push(path.relative(process.cwd(), commandDir()));
