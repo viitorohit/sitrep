@@ -15,6 +15,8 @@ const {
   extractLatestSessionLogEntry,
   extractBlockers,
 } = require('../lib/markdown');
+const { readConfig } = require('../lib/config');
+const { readPlan } = require('../lib/plan-adapters');
 const paths = require('../lib/paths');
 
 const SPEC = {};
@@ -71,9 +73,18 @@ function buildOrientation() {
   // GETSITREP-26 (plan-presence guard): detect and mention, never block —
   // session-start is hook-fired and must stay non-interactive (Hard Law
   // #5), so the actual "generate a draft?" confirmation lives in
-  // plan-update, not here.
-  if (!planContent) {
-    lines.push('⚠️ No sitrep/PROJECT_PLAN.md found — run `plan-update --generate` to create a draft from your repo, or write your own.');
+  // plan-update, not here. GETSITREP-49: checks whichever plan source is
+  // actually configured, not just native PROJECT_PLAN.md — a project set up
+  // with --plan openspec/speckit no longer gets a false native-only warning.
+  const plan = readPlan(readConfig(), { planContent, statusContent });
+  if (!plan.available) {
+    const suggestion =
+      plan.source === 'native'
+        ? 'run `plan-update --generate` to create a draft from your repo, or write your own.'
+        : plan.source === 'jira'
+          ? "the Jira adapter isn't built yet (GETSITREP-50)."
+          : `check your ${plan.source} setup, or reconfigure the plan source via \`getsitrep init\`.`;
+    lines.push(`⚠️ No plan found (source: ${plan.source} — ${plan.note}) — ${suggestion}`);
   }
 
   return lines.join('\n');
