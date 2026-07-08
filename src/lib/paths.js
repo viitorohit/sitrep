@@ -13,6 +13,7 @@ const STATUS_REPORT = () => path.join(SITREP_DIR(), 'STATUS_REPORT.md');
 const DATA_JSON = () => path.join(SITREP_DIR(), '.sitrep-data.json');
 const HASH_MANIFEST = () => path.join(SITREP_DIR(), '.sitrep-manifest.json');
 const ACTIVE_SESSION = () => path.join(SITREP_DIR(), '.sitrep-active-session');
+const NUDGE_STATE = () => path.join(SITREP_DIR(), '.sitrep-nudge-state.json');
 const HANDOFF = () => path.join(SITREP_DIR(), 'HANDOFF.md');
 const DASHBOARD_HTML = () => path.join(SITREP_DIR(), 'dashboard.html');
 const CLAUDE_MD = () => path.join(cwd(), 'CLAUDE.md');
@@ -42,6 +43,7 @@ module.exports = {
   DATA_JSON,
   HASH_MANIFEST,
   ACTIVE_SESSION,
+  NUDGE_STATE,
   HANDOFF,
   DASHBOARD_HTML,
   CLAUDE_MD,

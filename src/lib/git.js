@@ -18,6 +18,17 @@ function isGitRepo() {
   }
 }
 
+// False (not true) on any error — a nudge heuristic that can't tell must
+// stay silent, never guess "yes there's uncommitted work" from a failure.
+function hasUncommittedChanges() {
+  if (!isGitRepo()) return false;
+  try {
+    return run(['status', '--porcelain']).trim().length > 0;
+  } catch {
+    return false;
+  }
+}
+
 // paths: string[] of paths to stage (relative to cwd). message: commit message.
 // Returns { committed: boolean, reason?: string }.
 function commit(paths, message) {
@@ -112,4 +123,4 @@ function logForPath(pathSpec, count = 20) {
   }
 }
 
-module.exports = { commit, isGitRepo, recentLog, userName, currentBranch, tagExists, logSearch, logForPath };
+module.exports = { commit, isGitRepo, hasUncommittedChanges, recentLog, userName, currentBranch, tagExists, logSearch, logForPath };
