@@ -15,7 +15,7 @@
     "MANIFEST.md"
   ],
   "scripts": {
-    "test": "node test/byte-identical.js && node test/plan-adapters.js"
+    "test": "node test/byte-identical.js && node test/cost-attribution.js && node test/plan-adapters.js"
   },
   "engines": {
     "node": ">=20"
