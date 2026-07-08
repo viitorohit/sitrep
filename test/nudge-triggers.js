@@ -10,6 +10,7 @@ const {
   dashboardStaleTrigger,
   handoffLongSessionTrigger,
   sitrepPeriodicTrigger,
+  SESSIONS_WITHOUT_DASHBOARD_THRESHOLD,
 } = require('../src/lib/nudge-triggers');
 
 let passed = 0;
@@ -39,6 +40,17 @@ test('dashboardStaleTrigger only fires once enough sessions have passed without 
   const nudge = dashboardStaleTrigger({ sessionCount: 5, dashboardArchiveCount: 1 });
   assert.strictEqual(nudge.command, 'dashboard');
   assert.match(nudge.reason, /4 sessions/);
+});
+
+// GETSITREP-51: session-end.js's dashboard fold reuses this exact exported
+// constant rather than a hardcoded copy of "3" — this guards against the
+// export and the trigger's own internal comparison silently diverging.
+test('SESSIONS_WITHOUT_DASHBOARD_THRESHOLD is exported and matches what actually fires the trigger', () => {
+  assert.strictEqual(typeof SESSIONS_WITHOUT_DASHBOARD_THRESHOLD, 'number');
+  const atThreshold = dashboardStaleTrigger({ sessionCount: SESSIONS_WITHOUT_DASHBOARD_THRESHOLD, dashboardArchiveCount: 0 });
+  const belowThreshold = dashboardStaleTrigger({ sessionCount: SESSIONS_WITHOUT_DASHBOARD_THRESHOLD - 1, dashboardArchiveCount: 0 });
+  assert.ok(atThreshold, 'must fire exactly at the threshold');
+  assert.strictEqual(belowThreshold, null, 'must not fire one session below the threshold');
 });
 
 test('handoffLongSessionTrigger and sitrepPeriodicTrigger both gate on tick thresholds', () => {

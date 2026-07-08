@@ -106,4 +106,5 @@ module.exports = {
   dashboardStaleTrigger,
   handoffLongSessionTrigger,
   sitrepPeriodicTrigger,
+  SESSIONS_WITHOUT_DASHBOARD_THRESHOLD,
 };

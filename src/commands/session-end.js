@@ -28,6 +28,8 @@ const { readIfExists, writeFile, readJsonIfExists, writeJson, ensureDir, exists 
 const { readJsonInput } = require('../lib/input');
 const { extractProjectName, replaceHeaderField, insertSessionLogEntry } = require('../lib/markdown');
 const { computeCostRollup } = require('../lib/cost-attribution');
+const { dashboardStaleTrigger } = require('../lib/nudge-triggers');
+const dashboard = require('./dashboard');
 const paths = require('../lib/paths');
 const { commit, userName, currentBranch } = require('../lib/git');
 const { today } = require('../lib/dates');
@@ -225,6 +227,33 @@ function execute(argv) {
   const historyPath = writeHistoryRecord(number, projectName, summary, branch);
   filesUpdated.push(path.relative(process.cwd(), historyPath));
 
+  // GETSITREP-51: fold a dashboard regeneration into this same commit,
+  // gated by the exact same staleness signal GETSITREP-35's mid-session
+  // nudge-check already uses (dashboardStaleTrigger, threshold currently 3
+  // sessions) — reusing it rather than inventing a second heuristic that
+  // could drift out of sync. This bounds dashboard staleness to at most
+  // THRESHOLD-1 sessions automatically, without regenerating (and
+  // re-archiving) on every single session-end. Wrapped in try/catch per
+  // Hard Law #5 — a dashboard failure must never block this command's own
+  // commit, only degrade to a warning line.
+  let dashboardLine;
+  try {
+    const sessionCount = updatedData.totals.sessions;
+    const dashboardArchiveCountBefore = dashboard.archiveCount();
+    const trigger = dashboardStaleTrigger({ sessionCount, dashboardArchiveCount: dashboardArchiveCountBefore });
+    if (trigger) {
+      const result = dashboard.generate();
+      filesUpdated.push('sitrep/dashboard.html');
+      if (result.archived) filesUpdated.push(result.archived);
+      dashboardLine = `Dashboard: regenerated (${trigger.reason})`;
+    } else {
+      const sessionsSinceDashboard = sessionCount - dashboardArchiveCountBefore;
+      dashboardLine = `Dashboard: up to date (${sessionsSinceDashboard} session(s) since last view)`;
+    }
+  } catch (err) {
+    dashboardLine = `Dashboard: regeneration failed (${err.message}) — session recorded anyway`;
+  }
+
   const gitResult = commit(['sitrep/'], `sitrep: session ${number} — ${summary.focus}`);
 
   const lines = [
@@ -236,6 +265,7 @@ function execute(argv) {
     `Tokens: ${summary.tokens.total} (${summary.costLabel})`,
     `Cost: ${summary.costUsd === null ? 'not tracked' : `$${summary.costUsd.toFixed(2)} (${summary.costLabel})`}`,
     `Updated: ${filesUpdated.join(', ')}`,
+    dashboardLine,
     gitResult.committed ? 'Committed.' : `Not committed (${gitResult.reason}).`,
     ...(warnings.length ? [`Warnings: ${warnings.join(' | ')}`] : []),
     '===================================',
