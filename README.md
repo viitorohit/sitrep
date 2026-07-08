@@ -69,29 +69,38 @@ Two commands minimum. Everything else is optional but compounds in value.
 
 ---
 
-## CLI (v0.3, in development)
+## CLI (v0.3.0, published)
 
 Alongside the slash-command files above, sitrep now also ships a real,
 dependency-free Node.js CLI (GETSITREP-8) that implements the same 8 commands
 as callable functions — usable from a bare terminal, a CI job, or any AI
 coding tool that can run a shell command, not just Claude Code.
 
-**Not yet published to npm** — run it from a clone of this repo:
+**Published on npm as of v0.3.0:**
+
+```bash
+npx getsitrep init
+```
+
+Or install it globally:
+
+```bash
+npm install -g getsitrep
+getsitrep init
+```
+
+Working from a clone instead (e.g. contributing)?
 
 ```bash
 git clone https://github.com/viitorohit/sitrep.git
 cd sitrep
-node bin/getsitrep.js session-start
-```
-
-Or link it as a global `getsitrep` command:
-
-```bash
-npm link
+npm link          # links your clone's code to the global `getsitrep` command
 getsitrep init
 ```
 
 `init` (GETSITREP-17) is the recommended first command on a new project — a one-time wizard that configures your plan source (native/Jira/OpenSpec/Spec Kit) and cost source, writes `sitrep.config.json`, bootstraps `sitrep/` from templates, and copies the 8 command MDs into `.claude/commands/`. It's not one of the 8 canon slash commands (it only runs once, like the old `install.sh`) and it detects prior sitrep state before touching anything — safe to re-run.
+
+Every command also accepts `--help`/`-h` for its own usage, without running (safe to explore, including for an AI agent probing the CLI's surface — see `docs/adr/` for why this matters).
 
 For whichever AI tool(s) you select, `init` also wires up automatic session tracking (GETSITREP-21): SessionStart/SessionEnd hooks for Claude Code and Cursor, a SessionStart + `Stop`-bound hook for Codex (it has no native SessionEnd), and a factual (never imperative) `AGENTS.md` block as a portable fallback for any tool. It merges into existing hook config files rather than overwriting them — a pre-existing `.claude/settings.json` with your own permissions/hooks stays intact. Copilot/VS Code is not yet covered: the reuse-path this depends on (VS Code parsing `.claude/settings.json` natively) hasn't been verified against a live install (GETSITREP-38).
 

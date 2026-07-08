@@ -4,14 +4,14 @@
 sitrep is an open-source AI-native project operations framework — the operations, cost, and continuity layer for AI-assisted development. It lives inside developer repos as markdown files that AI coding assistants read and update. It sits BESIDE planning tools (Jira, OpenSpec, Spec Kit), it does not replace them.
 
 **GitHub:** github.com/viitorohit/sitrep · **Domain:** getsitrep.dev · **License:** MIT
-**Shipped:** v0.2.0 (tag on origin/main) · **In development:** v0.3.0 "Sharper & Self-Sufficient"
+**Shipped:** v0.3.0 "Sharper & Self-Sufficient" (npm + GitHub release, 2026-07-08) · **In development:** v0.4.0 "Cost-to-Outcome & Beside"
 
 ## Sources of Truth — Priority Order
 1. **Jira project GETSITREP** — canonical for scope, status, build order. Atlassian MCP is connected — fetch live rather than asking the session owner to paste.
 2. **This repo, `docs/specs/`** — canonical for technical specs (command canon, adapter contract, cost schema), as they're authored. **Confluence is a mirror of this, not the source** (flipped 2026-07-03 — see ADR index below; specs not yet migrated are still Confluence-only until their owning Story authors the `docs/specs/` version as part of its acceptance criteria).
 3. **`docs/adr/`** — canonical for *why* a decision was made. Immutable once Accepted; only ever superseded, never edited. Read the relevant ADR instead of asking "why" — don't re-litigate a decision that already has one.
 4. **This file** — durable operating rules only (governance, hard laws, pointers). No decision rationale lives here anymore — that's what ADRs are for. No file-tree snapshot either (previous versions drifted twice) — audit the actual tree yourself at session start (`ls`, `git status`).
-5. **`sitrep/` dogfood files** — currently STALE (last session 2026-04-06, pre-Jira roadmap). Do not orient from them until the reconciliation task below is done.
+5. **`sitrep/` dogfood files** — reconciled and actively maintained (`STATUS_REPORT.md`/`PROJECT_PLAN.md`/`.sitrep-data.json` via `session-end`, `dashboard.html` folded into the same commit per ADR-0007). Still worth a quick `git log`/Jira cross-check at session start — this project has hit real drift before when a session skipped `session-end` (see GETSITREP-54, and the Session 9 close-out incident in `sitrep/STATUS_REPORT.md`'s own log).
 
 ## Decision Log (ADRs)
 Full record in `docs/adr/`. Index:
@@ -27,27 +27,19 @@ Full record in `docs/adr/`. Index:
 
 New architecturally-significant decision this session? Propose an ADR (use `docs/adr/template.md`), don't just narrate it in chat or bury it in a commit message.
 
-## Verified Repo Facts (audited 2026-07-03 — re-verify, don't assume)
-- 9 command MDs exist; `dashboard.md` sits at repo ROOT (misplaced; moves to commands/ under GETSITREP-13).
-- **No `package.json`, no `index.js` exist.** README/MANIFEST claims of `npx getsitrep init` do not match this repo — the working install path is `install.sh`. GETSITREP-8 builds the CLI greenfield. Do not "fix" the README preemptively; that claim is handled under GETSITREP-8/32.
-- `.gitignore` exists locally but is UNTRACKED — nothing has actually been ignored yet. `marketing/` is tracked and public. Resolution → ADR-0003.
-- `package.json`/`index.js` do not exist in this repo — the npm-published CLI has no in-repo source. Resolution → ADR-0004.
-- Local main = origin/main + 1 unpushed commit; untracked: .gitignore, CLAUDE.md, PROJECT_PLAN.md, .claude/, .DS_Store files.
+## Verified Repo Facts (re-audited 2026-07-09 — v0.3 fully shipped; re-verify, don't assume)
+- `package.json` and `bin/getsitrep.js` are real and in-repo (GETSITREP-8). The CLI is published to npm as `getsitrep@0.3.0` (2026-07-08) — `npx getsitrep init` works exactly as README documents.
+- 8 command MDs live in `commands/` (canon locked by GETSITREP-13); `.claude/commands/` is a byte-identical thin-wrapper mirror (ADR-0005).
+- `.gitignore` is tracked; `marketing/` is gitignored (ADR-0003), not public.
+- Every command supports `--help`/`-h` without running (GETSITREP-55); `session-end`/`dashboard` refuse outright (no write, no commit) on any other malformed flag rather than proceeding with placeholder data (GETSITREP-54).
 
-## SESSION 1 OPENING TASKS (do these before any feature code)
-1. **Git hygiene** (confirm each step with the session owner before executing):
-   - `git rm -r --cached marketing/` (untrack, keep local files, history stays intact)
-   - Ensure `.gitignore` contains `marketing/`, `.DS_Store`, `sitrep/.sitrep-active-session`
-   - `git add .gitignore CLAUDE.md .claude/` and commit (`chore: untrack marketing/, add CLAUDE.md v0.3`)
-   - `git push origin main` — this pushes both the untrack commit and the previously-unpushed session-4 commit
-2. **Dogfood reconciliation:** rewrite `sitrep/PROJECT_PLAN.md` phases to mirror the Jira v0.3–v0.5 structure (the session owner pastes the tier/story list). Log this as a session in `sitrep/STATUS_REPORT.md`. The repo must track itself truthfully before it tracks new work.
-
-## v0.3 Scope — Tier Build Order (mirror of Jira, dated 2026-07-03)
-- **Tier 0 (parallel, current):** GETSITREP-4 (cost schema: every figure labeled actual/estimate), GETSITREP-13 (command MD refresh; merge /pulse into /sitrep, drop /doctor-redundancy, relocate dashboard.md → 9 commands become 8), GETSITREP-36 (adapter contract: plan/cost/auto-run, all optional).
-- **Tier 1:** GETSITREP-8 (CLI extraction — greenfield), GETSITREP-28 (selfheal drift). Need Tier 0 merged.
-- **Tier 2:** GETSITREP-17 (onboarding wizard), GETSITREP-21 (auto-run adapters: Claude Code, Codex, Cursor committed; Copilot conditional), GETSITREP-25 (plan-presence guard). Need GETSITREP-8.
-- **Tier 3:** GETSITREP-32 (housekeeping, pre-launch gate — includes README npx-claim fix and repo description fix, currently "Five slash commands").
-- **Command canon stays 9 until GETSITREP-13 merges.** Never update command counts/lists ahead of the ticket that owns them.
+## v0.4 Scope — Tier Build Order (mirror of Jira, current as of 2026-07-09)
+- **Tier 0 — shipped:** GETSITREP-48 (cost-to-outcome pipeline), GETSITREP-49 (native/OpenSpec/Spec Kit plan adapter), GETSITREP-35 (proactive nudges).
+- **Tier 1 — shipped:** GETSITREP-50 (tool-neutral external integration, ADR-0006), GETSITREP-51 (report/plan/progress commands), GETSITREP-44 (model cost breakdown).
+- **Tier 1, remaining:** GETSITREP-42 (dashboard: session timeline + print CSS polish — cost charts already landed via GETSITREP-44).
+- **Tier 2:** GETSITREP-52 (scoped plan-vs-reality conflict check). Needs Tier 1.
+- **Tier 3:** GETSITREP-53 (cost optimization advisory). Needs GETSITREP-52.
+- **v0.4.0 tags/releases only once Tier 2+3 land** — matching the v0.2/v0.3 precedent of releasing complete versions only, not partial ones.
 
 ## Session Governance — Story → Branch → Ticket Loop
 1. Pick up one Story per session-thread, respecting tier order. One branch per Story: `{JIRA-KEY}-{slug}` off main. Subtasks share the Story branch.
