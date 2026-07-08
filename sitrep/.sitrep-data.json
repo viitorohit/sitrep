@@ -251,6 +251,39 @@
       "model": "claude-sonnet-5",
       "duration_minutes": 90,
       "notes": "PR #10 (GETSITREP-32 housekeeping) and PR #11 (GETSITREP-47 selfheal tag-bug fix) both open, awaiting review/merge -- neither merged by the assistant per governance. Once both merge, v0.3 is functionally complete (all 9 Stories done/in-review); next session should tag+release v0.3.0 on GitHub the same way v0.2.0 was backfilled this session. Open cross-cutting item still unresolved: no v0.2.0 Fix Version exists in Jira (versions start at v0.3) and there is no Jira version-management tool available in this MCP connection -- flagged on GETSITREP-32/33 for a manual decision. Token/cost estimate covers this session's visible continuation only (post-compaction); the full session (from /session-start) likely used more."
+    },
+    {
+      "number": 9,
+      "date": "2026-07-08",
+      "user": "Rohit",
+      "focus": "v0.4 Tier 0 shipped (GETSITREP-48 cost-to-outcome pipeline, GETSITREP-49 plan adapter, GETSITREP-35 proactive advisor) plus GETSITREP-50 (Tier 1), redesigned twice during review into a tool-neutral, agent-mediated integration mechanism (ADR-0006) that never custodies credentials for any external tool. Emergency hotfix for a broken package.json from a bad PR merge-conflict resolution. Confluence mirror updated (with a self-caught-and-fixed content-loss mistake along the way).",
+      "tasks_completed": [
+        "GETSITREP-48",
+        "GETSITREP-49",
+        "GETSITREP-35",
+        "GETSITREP-50"
+      ],
+      "tasks_in_progress": [],
+      "tasks_blocked": [],
+      "blockers": [],
+      "decisions": [
+        "ADR-0006: sitrep never stores/reads/transmits credentials for any third-party integration, present or future -- agent-mediated JSON handoff (declarative AGENTS.md relay + generic --plan-data read-back) is the default mechanism, extending ADR-0005 from data-interpretation to data-retrieval/relay",
+        "cost-to-outcome rollup (GETSITREP-48) is recomputed from scratch every session-end, never incremental, same discipline as other recompute-not-mutate fixes this project has made before",
+        "native plan-adapter availability must depend only on PROJECT_PLAN.md existing, never on STATUS_REPORT.md dashboard-table parsing succeeding -- caught as a real regression during self-review before opening the GETSITREP-49 PR"
+      ],
+      "tokens": {
+        "input": 400000,
+        "output": 150000,
+        "cacheCreation": 0,
+        "cacheRead": 0,
+        "total": 550000
+      },
+      "cost_usd": 3.75,
+      "cost_label": "estimate",
+      "cost_source": "manual_estimate",
+      "model": "claude-sonnet-5",
+      "duration_minutes": 180,
+      "notes": "Session ending here for a fresh window. GETSITREP-51 (read/report commands) is the recommended next pick -- first real consumer of GETSITREP-49/50 adapter work, so any rough edges in readPlan()/--plan-data surface immediately. After Tier 1 (51, 42 dashboard charts, 44 model cost breakdown), Tier 2 is GETSITREP-52 (scoped conflict check) then Tier 3 GETSITREP-53 (cost advisory) closes v0.4. Two subagent-driven design pivots happened on GETSITREP-50 this session (both user-rejected iterations, both real architecture corrections, not busywork) -- worth reading ADR-0006 fresh in the next session rather than assuming the final design was the first idea. Estimate covers this session visible continuation only; heavy session (2 large subagent research/design passes plus 4 shipped Stories plus an emergency hotfix), likely undercounts the true total."
     }
   ],
   "users": [
@@ -264,10 +297,11 @@
         5,
         6,
         7,
-        8
+        8,
+        9
       ],
-      "total_tokens": 1570000,
-      "total_cost_usd": 23.1
+      "total_tokens": 2120000,
+      "total_cost_usd": 26.85
     }
   ],
   "phases": [
@@ -308,13 +342,382 @@
     }
   ],
   "totals": {
-    "sessions": 8,
-    "tasks_done": 31,
+    "sessions": 9,
+    "tasks_done": 35,
     "tasks_total": 41,
     "stories_done": 4,
     "stories_total": 9,
-    "tokens": 1570000,
-    "cost_usd": 23.1,
-    "hours": 12.25
+    "tokens": 2120000,
+    "cost_usd": 26.85,
+    "hours": 15.25
+  },
+  "cost_rollup": {
+    "by_phase": {
+      "1": {
+        "tokens": 100000,
+        "cost_usd": 3,
+        "cost_label": "estimate",
+        "sessions": [
+          1
+        ]
+      },
+      "2": {
+        "tokens": 350000,
+        "cost_usd": 10.5,
+        "cost_label": "estimate",
+        "sessions": [
+          2,
+          3
+        ]
+      },
+      "3": {
+        "tokens": 1375000,
+        "cost_usd": 9.98,
+        "cost_label": "estimate",
+        "sessions": [
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      "4": {
+        "tokens": 275000,
+        "cost_usd": 1.88,
+        "cost_label": "estimate",
+        "sessions": [
+          9
+        ]
+      }
+    },
+    "by_ticket": {
+      "1.1": {
+        "tokens": 12500,
+        "cost_usd": 0.38,
+        "cost_label": "estimate",
+        "sessions": [
+          1
+        ]
+      },
+      "1.2": {
+        "tokens": 12500,
+        "cost_usd": 0.38,
+        "cost_label": "estimate",
+        "sessions": [
+          1
+        ]
+      },
+      "1.3": {
+        "tokens": 12500,
+        "cost_usd": 0.38,
+        "cost_label": "estimate",
+        "sessions": [
+          1
+        ]
+      },
+      "1.4": {
+        "tokens": 12500,
+        "cost_usd": 0.38,
+        "cost_label": "estimate",
+        "sessions": [
+          1
+        ]
+      },
+      "1.5": {
+        "tokens": 12500,
+        "cost_usd": 0.38,
+        "cost_label": "estimate",
+        "sessions": [
+          1
+        ]
+      },
+      "1.6": {
+        "tokens": 12500,
+        "cost_usd": 0.38,
+        "cost_label": "estimate",
+        "sessions": [
+          1
+        ]
+      },
+      "1.7": {
+        "tokens": 12500,
+        "cost_usd": 0.38,
+        "cost_label": "estimate",
+        "sessions": [
+          1
+        ]
+      },
+      "1.8": {
+        "tokens": 12500,
+        "cost_usd": 0.38,
+        "cost_label": "estimate",
+        "sessions": [
+          1
+        ]
+      },
+      "2.1": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.2": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.3": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.4": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.6": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.7": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.8": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.9": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.10": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.13": {
+        "tokens": 20000,
+        "cost_usd": 0.6,
+        "cost_label": "estimate",
+        "sessions": [
+          2
+        ]
+      },
+      "2.5": {
+        "tokens": 30000,
+        "cost_usd": 0.9,
+        "cost_label": "estimate",
+        "sessions": [
+          3
+        ]
+      },
+      "2.11": {
+        "tokens": 30000,
+        "cost_usd": 0.9,
+        "cost_label": "estimate",
+        "sessions": [
+          3
+        ]
+      },
+      "2.12": {
+        "tokens": 30000,
+        "cost_usd": 0.9,
+        "cost_label": "estimate",
+        "sessions": [
+          3
+        ]
+      },
+      "2.14": {
+        "tokens": 30000,
+        "cost_usd": 0.9,
+        "cost_label": "estimate",
+        "sessions": [
+          3
+        ]
+      },
+      "2.15": {
+        "tokens": 30000,
+        "cost_usd": 0.9,
+        "cost_label": "estimate",
+        "sessions": [
+          3
+        ]
+      },
+      "GETSITREP-8": {
+        "tokens": 87500,
+        "cost_usd": 0.65,
+        "cost_label": "estimate",
+        "sessions": [
+          6
+        ]
+      },
+      "GETSITREP-9": {
+        "tokens": 87500,
+        "cost_usd": 0.65,
+        "cost_label": "estimate",
+        "sessions": [
+          6
+        ]
+      },
+      "GETSITREP-10": {
+        "tokens": 237500,
+        "cost_usd": 1.78,
+        "cost_label": "estimate",
+        "sessions": [
+          6,
+          7
+        ]
+      },
+      "GETSITREP-12": {
+        "tokens": 87500,
+        "cost_usd": 0.65,
+        "cost_label": "estimate",
+        "sessions": [
+          6
+        ]
+      },
+      "GETSITREP-29": {
+        "tokens": 150000,
+        "cost_usd": 1.13,
+        "cost_label": "estimate",
+        "sessions": [
+          7
+        ]
+      },
+      "GETSITREP-30": {
+        "tokens": 150000,
+        "cost_usd": 1.13,
+        "cost_label": "estimate",
+        "sessions": [
+          7
+        ]
+      },
+      "GETSITREP-31": {
+        "tokens": 150000,
+        "cost_usd": 1.13,
+        "cost_label": "estimate",
+        "sessions": [
+          7
+        ]
+      },
+      "GETSITREP-32": {
+        "tokens": 37500,
+        "cost_usd": 0.25,
+        "cost_label": "estimate",
+        "sessions": [
+          8
+        ]
+      },
+      "GETSITREP-33": {
+        "tokens": 37500,
+        "cost_usd": 0.25,
+        "cost_label": "estimate",
+        "sessions": [
+          8
+        ]
+      },
+      "GETSITREP-34": {
+        "tokens": 37500,
+        "cost_usd": 0.25,
+        "cost_label": "estimate",
+        "sessions": [
+          8
+        ]
+      },
+      "GETSITREP-47": {
+        "tokens": 37500,
+        "cost_usd": 0.25,
+        "cost_label": "estimate",
+        "sessions": [
+          8
+        ]
+      },
+      "GETSITREP-48": {
+        "tokens": 137500,
+        "cost_usd": 0.94,
+        "cost_label": "estimate",
+        "sessions": [
+          9
+        ]
+      },
+      "GETSITREP-49": {
+        "tokens": 137500,
+        "cost_usd": 0.94,
+        "cost_label": "estimate",
+        "sessions": [
+          9
+        ]
+      },
+      "GETSITREP-35": {
+        "tokens": 137500,
+        "cost_usd": 0.94,
+        "cost_label": "estimate",
+        "sessions": [
+          9
+        ]
+      },
+      "GETSITREP-50": {
+        "tokens": 137500,
+        "cost_usd": 0.94,
+        "cost_label": "estimate",
+        "sessions": [
+          9
+        ]
+      }
+    },
+    "unattributed": [
+      {
+        "session": 6,
+        "ids": [
+          "GETSITREP-12"
+        ]
+      },
+      {
+        "session": 7,
+        "ids": [
+          "GETSITREP-30",
+          "GETSITREP-31"
+        ]
+      },
+      {
+        "session": 8,
+        "ids": [
+          "GETSITREP-33",
+          "GETSITREP-34"
+        ]
+      }
+    ]
   }
 }
