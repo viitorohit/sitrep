@@ -83,6 +83,10 @@ const ROLLUP = {
     '1.1': { tokens: 100, cost_usd: 1, cost_label: 'estimate', sessions: [1] },
     'GETSITREP-8': { tokens: 200, cost_usd: 2, cost_label: 'mixed', sessions: [2, 3] },
   },
+  by_model: {
+    'claude-sonnet-5': { tokens: 250, cost_usd: 2.5, cost_label: 'mixed', sessions: [1, 2, 3] },
+    'claude-opus-4-6': { tokens: 50, cost_usd: 0.5, cost_label: 'estimate', sessions: [4] },
+  },
   unattributed: [{ session: 4, ids: ['GETSITREP-99'] }],
 };
 
@@ -99,6 +103,32 @@ test('buildReportLines: default view shows per-phase names, top tickets, and una
   assert.ok(text.includes('Phase 3: Sharper'));
   assert.ok(text.includes('GETSITREP-8'));
   assert.ok(text.includes('could not be attributed to a phase'), 'must not read as missing money');
+  assert.ok(text.includes('By model:'));
+  assert.ok(text.includes('claude-sonnet-5'));
+  assert.ok(text.includes('claude-opus-4-6'));
+});
+
+test('buildReportLines: --model filter hit and miss', () => {
+  const hit = buildReportLines({
+    dataJson: { cost_rollup: ROLLUP },
+    phaseHeadings: PHASE_HEADINGS,
+    planSource: 'native',
+    planAvailable: true,
+    planNote: null,
+    modelFilter: 'claude-sonnet-5',
+  });
+  assert.ok(hit.some((l) => l.includes('Model claude-sonnet-5')));
+  assert.ok(hit.some((l) => l.includes('mixed')), 'a model bucket blending actual/estimate sessions must say so');
+
+  const miss = buildReportLines({
+    dataJson: { cost_rollup: ROLLUP },
+    phaseHeadings: PHASE_HEADINGS,
+    planSource: 'native',
+    planAvailable: true,
+    planNote: null,
+    modelFilter: 'gpt-5',
+  });
+  assert.ok(miss.some((l) => l.includes('No cost recorded for model')));
 });
 
 test('buildReportLines: "mixed" cost_label is called out explicitly, never silently collapsed', () => {

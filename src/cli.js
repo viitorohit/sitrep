@@ -24,7 +24,7 @@ function helpResult() {
     '  selfheal lock|unlock|diff|restore --file <name> [--force]   Act on a drifted command MD',
     '  handoff [human|ai]         Generate a context package (default: ai)',
     '  dashboard                  Generate the visual MIS report',
-    '  report [--phase N | --ticket ID] [--plan-data <json>]   Cost-to-outcome summary (from the persisted cost rollup)',
+    '  report [--phase N | --ticket ID | --model NAME] [--plan-data <json>]   Cost-to-outcome summary (from the persisted cost rollup)',
     '  plan [--phase N] [--plan-data <json>]        Read-only view of the plan (all phases, or one phase\'s content)',
     '  progress [--plan-data <json>]                Quick, source-agnostic progress readout',
     '  init [--yes] [--plan <native|jira|openspec|speckit|none>] [--cost <manual|ccusage|none>] [--tools <list>] [--force]   One-time onboarding wizard (not a slash command)',

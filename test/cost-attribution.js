@@ -100,4 +100,38 @@ test('a session with no cost_usd (not tracked) still attributes tokens, cost sta
   assert.strictEqual(rollup.by_ticket['1.1'].cost_usd, 0);
 });
 
+// GETSITREP-44: model cost comparison — by_model attributes a session's
+// FULL cost to its one model, with no splitting (unlike by_phase/by_ticket).
+test('computeCostRollup attributes a session\'s full cost/tokens to its model, unsplit', () => {
+  const dataJson = {
+    sessions: [
+      { number: 1, tasks_completed: ['1.1', '1.2'], tokens: { total: 100 }, cost_usd: 2, cost_label: 'estimate', model: 'claude-sonnet-5' },
+    ],
+  };
+  const rollup = computeCostRollup(dataJson, PLAN);
+  assert.strictEqual(rollup.by_model['claude-sonnet-5'].cost_usd, 2, 'model bucket gets the full session cost, not a per-ticket share');
+  assert.strictEqual(rollup.by_model['claude-sonnet-5'].tokens, 100);
+});
+
+test('computeCostRollup counts a session toward by_model even with zero completed tasks', () => {
+  const dataJson = {
+    sessions: [{ number: 5, tasks_completed: [], tokens: { total: 999 }, cost_usd: 99, cost_label: 'estimate', model: 'claude-opus-4-6' }],
+  };
+  const rollup = computeCostRollup(dataJson, PLAN);
+  assert.strictEqual(rollup.by_model['claude-opus-4-6'].cost_usd, 99, 'unlike by_phase/by_ticket, a session with no completed tasks still spent money on some model');
+});
+
+test('computeCostRollup defaults to "unknown" when a session record has no model field, and labels mixed models correctly', () => {
+  const dataJson = {
+    sessions: [
+      { number: 1, tasks_completed: ['1.1'], tokens: { total: 100 }, cost_usd: 1, cost_label: 'estimate', model: 'claude-sonnet-5' },
+      { number: 2, tasks_completed: ['1.2'], tokens: { total: 50 }, cost_usd: 0.5, cost_label: 'actual', model: 'claude-sonnet-5' },
+      { number: 3, tasks_completed: [], tokens: { total: 10 }, cost_usd: 0.1, cost_label: 'estimate' },
+    ],
+  };
+  const rollup = computeCostRollup(dataJson, PLAN);
+  assert.strictEqual(rollup.by_model['claude-sonnet-5'].cost_label, 'mixed', 'one estimate session + one actual session must be labeled mixed, not silently one or the other');
+  assert.strictEqual(rollup.by_model['unknown'].cost_usd, 0.1);
+});
+
 console.log(`\n${passed}/${passed} cost-attribution tests passed`);

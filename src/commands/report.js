@@ -21,8 +21,13 @@ const SPEC = {
     'plan-data': { type: 'value' },
     phase: { type: 'value', pattern: /^\d+$/ },
     ticket: { type: 'value' },
+    model: { type: 'value' },
   },
-  mutuallyExclusive: [['phase', 'ticket']],
+  mutuallyExclusive: [
+    ['phase', 'ticket'],
+    ['phase', 'model'],
+    ['ticket', 'model'],
+  ],
 };
 
 function phaseName(phaseHeadings, phaseNumber) {
@@ -42,7 +47,7 @@ function formatBucket(bucket) {
   return `$${(bucket.cost_usd || 0).toFixed(2)}${labelSuffix(bucket.cost_label)} — ${bucket.tokens} tokens across ${bucket.sessions.length} session(s)`;
 }
 
-function buildReportLines({ dataJson, phaseHeadings, planSource, planAvailable, planNote, phaseFilter, ticketFilter }) {
+function buildReportLines({ dataJson, phaseHeadings, planSource, planAvailable, planNote, phaseFilter, ticketFilter, modelFilter }) {
   const lines = [`=== COST REPORT (source: ${planSource}) ===`];
 
   const rollup = dataJson && dataJson.cost_rollup;
@@ -54,6 +59,13 @@ function buildReportLines({ dataJson, phaseHeadings, planSource, planAvailable, 
 
   if (!planAvailable && planNote) {
     lines.push(`Plan: ${planNote}`);
+  }
+
+  if (modelFilter) {
+    const bucket = (rollup.by_model || {})[modelFilter];
+    lines.push(bucket ? `Model ${modelFilter}: ${formatBucket(bucket)}` : `No cost recorded for model "${modelFilter}".`);
+    lines.push('=========================');
+    return lines;
   }
 
   if (ticketFilter) {
@@ -102,6 +114,16 @@ function buildReportLines({ dataJson, phaseHeadings, planSource, planAvailable, 
     }
   }
 
+  // GETSITREP-44: which model the spend actually went to — sorted highest
+  // cost first, same "no unlabeled figure" discipline as phases/tickets.
+  const modelEntries = Object.entries(rollup.by_model || {}).sort((a, b) => (b[1].cost_usd || 0) - (a[1].cost_usd || 0));
+  if (modelEntries.length) {
+    lines.push('By model:');
+    for (const [model, bucket] of modelEntries) {
+      lines.push(`  ${model} — ${formatBucket(bucket)}`);
+    }
+  }
+
   // Transparency, not a financial gap — the cost for these IDs is still
   // counted in the ticket figures above (see cost-attribution.js's own
   // comment); this must never read as "money went missing."
@@ -136,6 +158,7 @@ function execute(argv) {
     planNote: plan.note,
     phaseFilter: parsed.values.phase,
     ticketFilter: parsed.values.ticket,
+    modelFilter: parsed.values.model,
   });
 
   return ok('report', parsed.values, lines.join('\n'));
