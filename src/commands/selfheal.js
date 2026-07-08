@@ -108,14 +108,21 @@ function checkFileStructure() {
   }
 
   const gitignorePath = path.join(process.cwd(), '.gitignore');
-  const gitignoreContent = readIfExists(gitignorePath) || '';
-  if (!gitignoreContent.includes('sitrep/.sitrep-active-session')) {
-    const updated = gitignoreContent.length > 0 && !gitignoreContent.endsWith('\n')
-      ? gitignoreContent + '\n' + 'sitrep/.sitrep-active-session\n'
-      : gitignoreContent + 'sitrep/.sitrep-active-session\n';
-    writeFile(gitignorePath, updated);
-    fixed.push('Added sitrep/.sitrep-active-session to .gitignore');
+  let gitignoreContent = readIfExists(gitignorePath) || '';
+  let gitignoreChanged = false;
+  // Ephemeral, session-scoped state files — never meant to be committed.
+  // GETSITREP-35's nudge-state file joins .sitrep-active-session here.
+  for (const entry of ['sitrep/.sitrep-active-session', 'sitrep/.sitrep-nudge-state.json']) {
+    if (!gitignoreContent.includes(entry)) {
+      gitignoreContent =
+        gitignoreContent.length > 0 && !gitignoreContent.endsWith('\n')
+          ? gitignoreContent + '\n' + entry + '\n'
+          : gitignoreContent + entry + '\n';
+      gitignoreChanged = true;
+      fixed.push(`Added ${entry} to .gitignore`);
+    }
   }
+  if (gitignoreChanged) writeFile(gitignorePath, gitignoreContent);
 
   const cmdDir = commandDir();
   if (exists(cmdDir)) {

@@ -20,7 +20,7 @@
 const { readIfExists, readJsonIfExists, writeJson, writeFile, exists } = require('./fs-helpers');
 const paths = require('./paths');
 
-const OWNED_COMMAND_PATTERN = /getsitrep session-(start|end)/;
+const OWNED_COMMAND_PATTERN = /getsitrep (session-(start|end)|nudge-check)/;
 
 function fileHasSitrepEntry(rawContent) {
   return typeof rawContent === 'string' && OWNED_COMMAND_PATTERN.test(rawContent);
@@ -38,6 +38,11 @@ function replaceOwnEntries(existingArray, ownEntry) {
   return [...kept, ownEntry];
 }
 
+// GETSITREP-35: PostToolUse binds the proactive command advisor
+// (nudge-check) — confirmed mid-session event per docs/specs/adapter-
+// contract.md's Hook event support table. Fail-open/idempotent/non-
+// interactive by nudge-check.js's own design (Hard Law #5 applies to this
+// hook exactly as much as SessionStart/SessionEnd).
 function mergeClaudeCodeSettings(existing) {
   const settings = existing && typeof existing === 'object' ? { ...existing } : {};
   const hooks = settings.hooks && typeof settings.hooks === 'object' ? { ...settings.hooks } : {};
@@ -48,13 +53,19 @@ function mergeClaudeCodeSettings(existing) {
   hooks.SessionEnd = replaceOwnEntries(hooks.SessionEnd, {
     hooks: [{ type: 'command', command: 'getsitrep session-end' }],
   });
+  hooks.PostToolUse = replaceOwnEntries(hooks.PostToolUse, {
+    hooks: [{ type: 'command', command: 'getsitrep nudge-check' }],
+  });
 
   settings.hooks = hooks;
   return settings;
 }
 
 // Cursor requires a top-level "version": 1 field (different shape from
-// Claude Code/Codex) — per docs/specs/adapter-contract.md.
+// Claude Code/Codex) — per docs/specs/adapter-contract.md. Cursor's
+// mid-session event names differ from Claude Code's too (afterFileEdit /
+// beforeSubmitPrompt, not PostToolUse) — bound to afterFileEdit as the
+// closer analog to "meaningful tool use happened," per the same table.
 function mergeCursorHooks(existing) {
   const config = existing && typeof existing === 'object' ? { ...existing } : {};
   config.version = 1;
@@ -62,11 +73,16 @@ function mergeCursorHooks(existing) {
 
   hooks.sessionStart = replaceOwnEntries(hooks.sessionStart, { command: 'getsitrep session-start' });
   hooks.sessionEnd = replaceOwnEntries(hooks.sessionEnd, { command: 'getsitrep session-end' });
+  hooks.afterFileEdit = replaceOwnEntries(hooks.afterFileEdit, { command: 'getsitrep nudge-check' });
 
   config.hooks = hooks;
   return config;
 }
 
+// Codex's PostToolUse key name below (post_tool_use, snake_case) follows the
+// same precedent as session_start/stop — inferred from Codex's own naming
+// convention, not independently re-verified against live vendor docs this
+// pass, same caveat this file's header already carries for the whole table.
 function buildCodexConfigToml() {
   return [
     '[features]',
@@ -78,6 +94,8 @@ function buildCodexConfigToml() {
     '# equivalent (turn-scoped, not a true session close) — see',
     '# docs/specs/adapter-contract.md.',
     'stop = "getsitrep session-end"',
+    '# GETSITREP-35: proactive command advisor, fired on tool use mid-session.',
+    'post_tool_use = "getsitrep nudge-check"',
     '',
   ].join('\n');
 }
