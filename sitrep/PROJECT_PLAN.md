@@ -92,9 +92,11 @@ sitrep is the operations, cost, and continuity layer for AI-assisted development
 
 | Story | Component | Goal | Status |
 |---|---|---|---|
-| GETSITREP-32 — Housekeeping | `docs` | README says "eight" commands, publish v0.2 GitHub release, npm source visible in public repo | 🟡 In Review — PR #10 (subtasks GETSITREP-33/34 both In Review) |
+| GETSITREP-32 — Housekeeping | `docs` | README says "eight" commands, publish v0.2 GitHub release, npm source visible in public repo | ✅ Merged to main (PR #10) — Jira status still In Review, Done transition pending session-owner approval |
 
 **Explicitly OUT of v0.3** (deferred to v0.4+): cost-to-outcome pipeline, Jira read-adapter, activity attribution, business brief, nudge engine (GETSITREP-35), adoption nudge (GETSITREP-40).
+
+**v0.3 build order complete:** all 9 Stories shipped/merged to main as of 2026-07-07 (Tier 0-3). Also merged this close-out: GETSITREP-47, a selfheal bugfix found during dogfooding (PR #11), not part of the original 9 but landed in the same window.
 
 **Definition of Done:** fresh `getsitrep init` on a bare repo → working config + hooks in under 2 minutes; all 8 command MDs pass the audit's cross-cutting rules; `selfheal --verify` flags manual edits; SessionStart/SessionEnd auto-fire with zero typing on Claude Code, Codex, Cursor; no hook ever blocks a session; public repo is traffic-ready.
 
