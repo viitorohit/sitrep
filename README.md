@@ -106,6 +106,9 @@ For whichever AI tool(s) you select, `init` also wires up automatic session trac
 | `selfheal` | `getsitrep selfheal` | File-structure/integrity health check, auto-fixes what it safely can |
 | `handoff` | `getsitrep handoff [human\|ai]` | Generates a context handoff document |
 | `dashboard` | `getsitrep dashboard` | Regenerates the self-contained HTML dashboard |
+| `report` | `getsitrep report [--phase N \| --ticket ID \| --model NAME]` | Cost-to-outcome summary — cost by phase, by ticket, and by model, from the already-persisted rollup |
+| `plan` | `getsitrep plan [--phase N]` | Read-only view of the plan — overview or one phase's full content, works against any configured plan source |
+| `progress` | `getsitrep progress` | Quick, source-agnostic progress readout with a visual bar |
 
 `session-end` and `plan-update` take structured JSON (via `--data` or piped
 stdin) rather than free-form prose — see
@@ -118,6 +121,34 @@ or in-process by a platform adapter — see
 
 ---
 
+## v0.4 (in progress) — Cost-to-Outcome & Beside
+
+The category-defining release: sitrep reads whatever planning tool you already
+use and overlays cost + continuity on top of it, instead of replacing it.
+
+- **Cost-to-outcome pipeline** — every session's cost/tokens are attributed to
+  the plan phase and ticket they went toward, and to the model that did the
+  work (`report`, `report --phase N`, `report --ticket ID`, `report --model
+  NAME`). Every figure keeps its `actual`/`estimate` label, or `mixed` if a
+  phase/ticket/model drew from sessions with different labels — never blurred.
+- **Native + file-based plan adapter** — `plan`/`progress`/`report` work
+  identically whether your plan lives in `PROJECT_PLAN.md`, an OpenSpec
+  `changes/` folder, or a Spec Kit `specs/` folder.
+- **Tool-neutral external integration** — a plan tracked in Jira (or any
+  future external tool) works through one generic, agent-mediated mechanism:
+  sitrep never authenticates to or stores credentials for anything external
+  (see [ADR-0006](docs/adr/0006-tool-neutral-agent-mediated-integration.md)).
+- **Proactive nudges** — a `nudge-check` hook surfaces at most one
+  opportunity-detection suggestion per invocation (drift, a stale dashboard,
+  uncommitted work worth capturing), never more than one at a time.
+
+Still in progress for v0.4: a scoped plan-vs-reality conflict check and a
+cost-optimization advisory. Follow along in
+[`sitrep/PROJECT_PLAN.md`](sitrep/PROJECT_PLAN.md) (Phase 4), which this repo
+keeps genuinely current on itself, dogfood-style.
+
+---
+
 ## The Dashboard
 
 `/dashboard` generates a self-contained HTML report you open in any browser:
@@ -126,7 +157,7 @@ or in-process by a platform adapter — see
 - **Progress** — visual bars per phase with cost attribution
 - **Sprint** — active tasks with status badges
 - **Sessions** — timeline of who did what, when, at what cost
-- **Costs** — token usage over time, cost by phase, projections
+- **Costs** — token usage over time, cost by phase, cost by model
 - **Users** — team activity and contribution tracking
 - **Decisions** — architecture decision log
 - **Risks** — blockers and risk register
@@ -213,6 +244,13 @@ Full usage guide: [docs/USAGE_GUIDE.md](docs/USAGE_GUIDE.md)
 - [x] Session history archives
 - [x] Session awareness (`/pulse`)
 - [x] Self-healing (`/selfheal`)
+- [x] Platform-agnostic CLI (`getsitrep`, not locked to Claude Code)
+- [x] Cost-to-outcome pipeline (cost by phase, ticket, and model)
+- [x] Native + OpenSpec + Spec Kit plan adapters
+- [x] Tool-neutral external integration (e.g. Jira), zero credentials stored
+- [ ] Scoped plan-vs-reality conflict check
+- [ ] Cost optimization advisory
+- [ ] Business-user brief generator
 - [ ] `getsitrep.dev` landing page
 - [ ] HTML intake form for project onboarding
 - [ ] GitHub Actions integration
