@@ -102,15 +102,24 @@ function computeCostRollup(dataJson, planContent) {
   const phaseSections = extractPhaseSections(planContent);
   const byPhase = {};
   const byTicket = {};
+  const byModel = {};
   const unattributed = [];
 
   for (const session of (dataJson && dataJson.sessions) || []) {
-    const ids = Array.isArray(session.tasks_completed) ? session.tasks_completed : [];
-    if (ids.length === 0) continue;
-
     const label = session.cost_label || 'estimate';
     const totalTokens = (session.tokens && session.tokens.total) || 0;
     const totalCost = typeof session.cost_usd === 'number' ? session.cost_usd : null;
+
+    // GETSITREP-44: every session's full cost/tokens goes to its one model —
+    // unlike by_phase/by_ticket, there's nothing to split, and this counts
+    // even a session with no completed tasks (its spend still went
+    // somewhere), so this lives outside the ids.length===0 guard below.
+    const model = session.model || 'unknown';
+    if (!byModel[model]) byModel[model] = { tokens: 0, cost_usd: 0, cost_label: null, sessions: [] };
+    bumpBucket(byModel[model], totalTokens, totalCost, label, session.number);
+
+    const ids = Array.isArray(session.tasks_completed) ? session.tasks_completed : [];
+    if (ids.length === 0) continue;
 
     const perTicketTokens = totalTokens / ids.length;
     const perTicketCost = totalCost === null ? null : totalCost / ids.length;
@@ -140,7 +149,7 @@ function computeCostRollup(dataJson, planContent) {
     }
   }
 
-  return { by_phase: byPhase, by_ticket: byTicket, unattributed };
+  return { by_phase: byPhase, by_ticket: byTicket, by_model: byModel, unattributed };
 }
 
 module.exports = { extractPhaseSections, phaseForTaskId, computeCostRollup };

@@ -76,6 +76,8 @@ const CASES = [
   { name: 'init on existing project (residue stop)', argv: ['init', '--yes'] },
   { name: 'plan-update --generate on existing plan (no-op passthrough)', argv: ['plan-update', '--generate'] },
   { name: 'report (no args)', argv: ['report'] },
+  { name: 'report --model claude-sonnet-5', argv: ['report', '--model', 'claude-sonnet-5'] },
+  { name: 'bad input: report --phase and --model together', argv: ['report', '--phase', '1', '--model', 'claude-sonnet-5'] },
   { name: 'plan (no args)', argv: ['plan'] },
   { name: 'plan --phase 1', argv: ['plan', '--phase', '1'] },
   { name: 'progress (no args)', argv: ['progress'] },

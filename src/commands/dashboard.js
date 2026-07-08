@@ -328,6 +328,18 @@ function buildHtml({
     color: '#ef476f',
   });
 
+  // GETSITREP-44: which model the spend actually went to, reusing
+  // computeCostRollup's already-persisted by_model bucket (session-end.js
+  // owns computing it) — same "no re-measuring" discipline as the phase
+  // chart above.
+  const modelRollup = (dataJson && dataJson.cost_rollup && dataJson.cost_rollup.by_model) || {};
+  const modelEntries = Object.entries(modelRollup).sort((a, b) => (b[1].cost_usd || 0) - (a[1].cost_usd || 0));
+  const costByModelChart = svgHorizontalBarChart({
+    values: modelEntries.map(([, bucket]) => bucket.cost_usd || 0),
+    labels: modelEntries.map(([model]) => model),
+    color: '#4cc9f0',
+  });
+
   return `<!doctype html>
 <html>
 <head>
@@ -437,6 +449,8 @@ function buildHtml({
     ${tokensChart}
     <h3>Cost by phase</h3>
     ${costByPhaseChart}
+    <h3>Cost by model</h3>
+    ${costByModelChart}
   </section>
 
   <section id="users">
