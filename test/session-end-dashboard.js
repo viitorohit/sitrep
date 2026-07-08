@@ -77,7 +77,7 @@ function bumpSessionCountTo(dir, targetCurrentTotal) {
   git(dir, ['commit', '--quiet', '-m', 'bump session count for test setup']);
 }
 
-async function runSessionEnd(dir, dataOverride) {
+async function runCli(dir, argv) {
   const originalCwd = process.cwd();
   const originalLog = console.log;
   const originalError = console.error;
@@ -90,7 +90,6 @@ async function runSessionEnd(dir, dataOverride) {
 
   try {
     delete require.cache[require.resolve('../src/cli')];
-    const argv = ['session-end', '--data', JSON.stringify(dataOverride)];
     await require('../src/cli').run(argv);
     return { stdout: captured.join('\n'), exitCode: process.exitCode ?? 0 };
   } finally {
@@ -99,6 +98,10 @@ async function runSessionEnd(dir, dataOverride) {
     process.exitCode = undefined;
     process.chdir(originalCwd);
   }
+}
+
+function runSessionEnd(dir, dataOverride) {
+  return runCli(dir, ['session-end', '--data', JSON.stringify(dataOverride)]);
 }
 
 async function test(name, fn) {
@@ -156,6 +159,72 @@ async function main() {
       assert.strictEqual(result.exitCode, 0, 'session-end must still succeed overall');
       assert.ok(result.stdout.includes('Dashboard: regeneration failed'), result.stdout);
       assert.strictEqual(commitCount(dir), before + 1, 'the commit must still happen despite the dashboard failure');
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  // GETSITREP-54/55: the literal incident regression tests — a help probe
+  // or a malformed flag must never produce a commit, at either defense
+  // layer (cli.js's --help interception, or session-end.js's own
+  // parseArgs-error refusal for anything that isn't --help).
+  await test('session-end --help: shows usage, exits 0, commits nothing', async () => {
+    const dir = setupGitFixture();
+    try {
+      const before = commitCount(dir);
+      const result = await runCli(dir, ['session-end', '--help']);
+      assert.strictEqual(result.exitCode, 0);
+      assert.ok(result.stdout.includes('Usage: getsitrep session-end'), result.stdout);
+      assert.strictEqual(commitCount(dir), before, 'a help probe must never commit');
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  await test('session-end --bogus-flag: refuses, exits non-zero, commits nothing', async () => {
+    const dir = setupGitFixture();
+    try {
+      const before = commitCount(dir);
+      const result = await runCli(dir, ['session-end', '--bogus-flag']);
+      assert.notStrictEqual(result.exitCode, 0, 'a malformed invocation must not report success');
+      assert.ok(result.stdout.includes('Invalid arguments'), result.stdout);
+      assert.ok(result.stdout.includes('NOT recorded'), result.stdout);
+      assert.strictEqual(commitCount(dir), before, 'the exact incident this ticket exists to prevent: no garbage commit from a bad flag');
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  await test('dashboard --bogus-flag: refuses, commits nothing', async () => {
+    const dir = setupGitFixture();
+    try {
+      const before = commitCount(dir);
+      const result = await runCli(dir, ['dashboard', '--bogus-flag']);
+      assert.notStrictEqual(result.exitCode, 0);
+      assert.ok(result.stdout.includes('Invalid arguments'), result.stdout);
+      assert.strictEqual(commitCount(dir), before);
+    } finally {
+      fs.rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  await test('session-end references the immediately prior session in STATUS_REPORT.md and the history record', async () => {
+    const dir = setupGitFixture();
+    try {
+      await runSessionEnd(dir, { focus: 'first real session for this test' });
+      const secondResult = await runSessionEnd(dir, { focus: 'second session, should reference the first' });
+      assert.ok(secondResult.stdout.includes('Session:'), secondResult.stdout);
+
+      const status = fs.readFileSync(path.join(dir, 'sitrep', 'STATUS_REPORT.md'), 'utf8');
+      assert.ok(status.includes('Since Session'), 'STATUS_REPORT.md session log must reference the previous session');
+      assert.ok(status.includes('first real session for this test'), 'must quote the previous session\'s actual focus, not just its number');
+
+      const historyFiles = fs.readdirSync(path.join(dir, 'sitrep', 'history', 'sessions')).filter((f) => f.endsWith('.md'));
+      const latestHistory = fs.readFileSync(
+        path.join(dir, 'sitrep', 'history', 'sessions', historyFiles.sort().slice(-1)[0]),
+        'utf8'
+      );
+      assert.ok(latestHistory.includes('Since Session'), 'the per-session history record must also reference the previous session');
     } finally {
       fs.rmSync(dir, { recursive: true, force: true });
     }
