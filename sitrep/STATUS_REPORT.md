@@ -1,27 +1,27 @@
 # sitrep — Status Report
 
-> **Last Updated:** 2026-07-07 — Session 8
-> **Current Phase:** Phase 3 (Sharper & Self-Sufficient) — v0.3.0, all 9 Stories merged to main. Jira status transitions to Done pending session-owner approval.
-> **Overall Progress:** 23/23 legacy tasks shipped (v0.1+v0.2). v0.3 tracked as 9 Jira Stories — all 9 merged to main (GETSITREP-4, 13, 36, 8, 28, 17, 21, 25, 32); GETSITREP-47 (selfheal bugfix found during close-out) also merged. See PROJECT_PLAN.md.
-> **Next Milestone:** `v0.3.0`
+> **Last Updated:** 2026-07-08 — Session 9
+> **Current Phase:** Phase 4 (Cost-to-Outcome & Beside) — v0.4.0, Tier 0 shipped (GETSITREP-48/49/35), Tier 1's GETSITREP-50 also shipped. GETSITREP-51 recommended next.
+> **Overall Progress:** v0.3.0 fully shipped and Done in Jira (all 9 Stories + 21 subtasks + GETSITREP-47 bugfix). v0.4.0 tracked as 9 Jira Stories — 4 done (GETSITREP-48, 49, 35, 50), 5 remaining (GETSITREP-51, 42, 44, 52, 53). See PROJECT_PLAN.md.
+> **Next Milestone:** `v0.4.0`
 
 ---
 
 ## Active Sprint
 
-**Phase 3: Sharper & Self-Sufficient** | Target: v0.3.0 | Tier 3 (pre-launch gate) — last Story before release
+**Phase 4: Cost-to-Outcome & Beside** | Target: v0.4.0 | Tier 1 — Tier 0 shipped, GETSITREP-51/42/44 next
 
 | Story | Task | Status | Notes |
 |---|------|--------|-------|
-| GETSITREP-4 | Confirm cost data sources & schema | ✅ Done | Tier 0 — merged, PR #2 |
-| GETSITREP-13 | Refresh command MDs (8-command canon) | ✅ Done | Tier 0 — merged, PR #1 |
-| GETSITREP-36 | Adapter contract | ✅ Done | Tier 0 — merged, PR #3 |
-| GETSITREP-8 | Platform-agnostic core/CLI extraction | ✅ Done | Tier 1 — merged PR #4 (subtasks GETSITREP-9/10/12 all Done); 8-angle code review found + fixed 10 issues before merge |
-| GETSITREP-28 | selfheal: MD-drift + upgrade protection | ✅ Done | Tier 1 — merged PR #6 (subtasks GETSITREP-29/30/31); reopened + resolved GETSITREP-10's thin-wrapper conversion alongside |
-| GETSITREP-17 | CLI onboarding wizard + config | ✅ Done | Tier 2 |
-| GETSITREP-21 | Auto-run adapters | ✅ Done | Tier 2 — Copilot/VS Code (GETSITREP-38) explicitly deferred, reuse-path unverified |
-| GETSITREP-25 | Plan-presence guard | ✅ Done | Tier 2 |
-| GETSITREP-32 | Housekeeping | ✅ Merged to main | Tier 3 — PR #10 merged (subtasks GETSITREP-33/34 still In Review in Jira, pending Done approval); v0.2.0 GitHub Release published, npm packaging bug fixed, README/repo description corrected |
+| GETSITREP-48 | Cost-to-outcome pipeline | ✅ Done | Tier 0 — merged PR #13; attributes session cost/tokens to phase+ticket, `.sitrep-data.json`'s `cost_rollup` |
+| GETSITREP-49 | Native + file-based plan adapter | ✅ Done | Tier 0 — merged PR #14; OpenSpec/Spec Kit real checkbox-file reading, fixed a real native-mode false-warning regression during review |
+| GETSITREP-35 | Proactive command advisor | ✅ Done | Tier 0 — merged PR #15; 4 of 6 original triggers on real signals, 2 honestly deferred (plan-update divergence needs GETSITREP-52; context-hygiene needs unverified telemetry) |
+| GETSITREP-50 | Tool-neutral, agent-mediated integration | ✅ Done | Tier 1 — merged PR #17; redesigned twice during review (removed credential storage, then removed Jira-specificity entirely) — see ADR-0006 |
+| GETSITREP-51 | Read/report commands | 🔲 To Do | Tier 1 — recommended next session; first real consumer of GETSITREP-49/50's adapter work |
+| GETSITREP-42 | Dashboard improvements | 🔲 To Do | Tier 1 — needs GETSITREP-48 (shipped) |
+| GETSITREP-44 | Model cost comparison | 🔲 To Do | Tier 1 |
+
+Tier 2 (GETSITREP-52) and Tier 3 (GETSITREP-53) not shown — blocked on Tier 1. Full structure in `sitrep/PROJECT_PLAN.md` Phase 4.
 
 ---
 
@@ -32,9 +32,9 @@
 | 1 | Foundation | 8 | 8 | ██████████ 100% |
 | 2 | Operations Layer | 15 | 15 | ██████████ 100% |
 | 3 | Sharper & Self-Sufficient (v0.3.0) | 9 Stories | 9 | ██████████ 100% |
-| 4 | Cost-to-Outcome & Beside (v0.4.0) | Not yet broken into Stories | — | — |
+| 4 | Cost-to-Outcome & Beside (v0.4.0) | 9 Stories | 4 | ████░░░░░░ 44% |
 | 5 | Business Brief & Breadth (v0.5.0) | Not yet broken into Stories | — | — |
-| **TOTAL** | | **23 tasks + 9 Stories** | **23 tasks done, 9 Stories merged to main** | |
+| **TOTAL** | | **23 tasks + 18 Stories** | **23 tasks done, 13 Stories done** | |
 
 ---
 

@@ -3,7 +3,7 @@
 > **Project:** sitrep
 > **Owner:** Rohit
 > **Started:** 2026-03-11
-> **Last Updated:** 2026-07-07
+> **Last Updated:** 2026-07-08
 > **Roadmap source of truth:** Jira project GETSITREP (Epics GETSITREP-1/2/3 = v0.3/v0.4/v0.5). This file mirrors Jira — if they diverge, Jira wins. See CLAUDE.md Sources of Truth.
 
 ---
@@ -102,23 +102,42 @@ sitrep is the operations, cost, and continuity layer for AI-assisted development
 
 ---
 
-## Phase 4: Cost-to-Outcome & Beside — `v0.4.0` (planned)
+## Phase 4: Cost-to-Outcome & Beside — `v0.4.0` 🟡 In Progress
 
-> **Jira Epic:** GETSITREP-2. Depends on v0.3 shipping (needs the platform-agnostic CLI + confirmed cost schema). The category-flag release — no other SDD tool or meter maps spend to shipped outcome.
+> **Jira Epic:** GETSITREP-2. The category-flag release — no other SDD tool or meter maps spend to shipped outcome. Broken into 9 Stories on 2026-07-08 (previously titles only).
 
-| Planned capability | What it does |
-|---|---|
-| Cost-to-outcome pipeline | Ingest ccusage/CCUM JSON or thin local-log fallback; attribute spend to plan phase / ticket / feature |
-| Jira adapter (read) | Pull epics/stories/status from the configured Jira project; overlay cost + progress — enables sitrep to self-report on its own GETSITREP board |
-| Native + file-based adapter | Read `PROJECT_PLAN.md` or an OpenSpec/Spec Kit folder as plan source; not hardcoded to Jira |
-| Scoped conflict check | Plan-vs-reality divergence + contradicted-decision flags (extension of selfheal) — not full multi-agent conflict resolution |
-| Read/report commands | `getsitrep report`, `plan --phase N`, `progress` |
-| Cost optimization advisory | e.g. "Phase 3 cost 3× Phase 2 for similar scope," tied to outcome data |
-| Tier-B / Tier-C cost separation | Tier-B (input/output/thinking/cache) = `actual`; Tier-C (activity attribution) = `attributed (estimate)` — never blurred |
+### Tier 0 — parallel, no dependencies ✅ shipped
 
-**Explicitly OUT of v0.4:** business brief, nudge engine, adoption nudge (deferred to v0.5+).
+| Story | Component | Goal | Status |
+|---|---|---|---|
+| GETSITREP-48 — Cost-to-outcome pipeline | `cost` | Ingest ccusage/CCUM or thin local-log; attribute spend to plan phase/ticket | ✅ Done (PR #13) |
+| GETSITREP-49 — Native + file-based plan adapter | `cli-core` | Read PROJECT_PLAN.md / OpenSpec / Spec Kit as plan source | ✅ Done (PR #14) |
+| GETSITREP-35 — Proactive command advisor | `nudge` | Mid-session opportunity nudges for 6 commands, 4 implemented on real signals (selfheal drift, dashboard staleness, capture/handoff/sitrep tick-based proxies) | ✅ Done (PR #15) |
 
-*Titles only — Stories not yet broken into subtasks per Jira ("detailed once v0.3 ships"). Authoritative scope: Jira Epic GETSITREP-2.*
+### Tier 1 — needs Tier 0 (shipped) — unblocked
+
+| Story | Component | Goal | Status |
+|---|---|---|---|
+| GETSITREP-50 — Tool-neutral, agent-mediated integration | `cli-core` | Redesigned from "Jira REST adapter" (rejected twice in review) to: declarative AGENTS.md relay + generic `readExternalPlan()` read-back via `--plan-data`. sitrep never custodies credentials for any tool. ADR-0006. | ✅ Done (PR #17) |
+| GETSITREP-51 — Read/report commands | `cli-core` | `getsitrep report`, `plan --phase N`, `progress` — source-agnostic across whichever adapter is configured | 🔲 To Do — recommended next |
+| GETSITREP-42 — Dashboard improvements | `dashboard` | Cost-over-time charts, session timeline, print CSS. Needs GETSITREP-48's rollup (shipped). | 🔲 To Do |
+| GETSITREP-44 — Model cost comparison | `cost` | Per-model cost/token breakdown in sitrep/dashboard/session logs | 🔲 To Do |
+
+### Tier 2 — needs Tier 1
+
+| Story | Component | Goal | Status |
+|---|---|---|---|
+| GETSITREP-52 — Scoped conflict check | `selfheal` | Plan-vs-reality divergence + contradicted-decision flags, extension of selfheal. NOT full multi-agent conflict resolution. | 🔲 To Do |
+
+### Tier 3 — pre-launch gate
+
+| Story | Component | Goal | Status |
+|---|---|---|---|
+| GETSITREP-53 — Cost optimization advisory | `cost` | e.g. "Phase 3 cost 3× Phase 2 for similar scope," tied to outcome data. Needs GETSITREP-48 mature. | 🔲 To Do |
+
+**Explicitly OUT of v0.4:** business brief, adoption nudge (GETSITREP-40), context-hygiene nudge family (deferred pending unverified per-platform telemetry — see GETSITREP-35's PR), headless/no-agent credential fallback for external integrations (deferred per ADR-0006).
+
+**Definition of Done:** `getsitrep report`/`progress`/`plan --phase N` work against any configured plan source; dashboard shows real cost/token charts; sitrep never stores/transmits a credential for any integration, verified via repo-wide grep, not just asserted.
 
 ---
 
