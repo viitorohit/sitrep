@@ -65,10 +65,10 @@
     <p><strong>Phase:</strong> Phase 3 (Sharper &amp; Self-Sufficient) — v0.3.0, all 9 Stories merged to main. Jira status transitions to Done pending session-owner approval.</p>
     <p><strong>Overall:</strong> 23/23 legacy tasks shipped (v0.1+v0.2). v0.3 tracked as 9 Jira Stories — all 9 merged to main (GETSITREP-4, 13, 36, 8, 28, 17, 21, 25, 32); GETSITREP-47 (selfheal bugfix found during close-out) also merged. See PROJECT_PLAN.md.</p>
     <div class="metrics">
-      <div class="metric"><div class="value">10</div><div class="label">Sessions</div></div>
-      <div class="metric"><div class="value">15.3h</div><div class="label">Time invested</div></div>
-      <div class="metric"><div class="value">$29.10</div><div class="label">Total cost to date (estimate)</div></div>
-      <div class="metric"><div class="value">36 / 41</div><div class="label">Tasks done</div></div>
+      <div class="metric"><div class="value">9</div><div class="label">Sessions</div></div>
+      <div class="metric"><div class="value">12.3h</div><div class="label">Time invested</div></div>
+      <div class="metric"><div class="value">$23.10</div><div class="label">Total cost to date (estimate)</div></div>
+      <div class="metric"><div class="value">35 / 41</div><div class="label">Tasks done</div></div>
     </div>
   </section>
 
@@ -116,8 +116,7 @@
     <h2>Sessions</h2>
     <table>
       <thead><tr><th>#</th><th>Date</th><th>User</th><th>Focus</th><th>Tokens</th><th>Cost</th><th>Model</th></tr></thead>
-      <tbody><tr><td>10</td><td>2026-07-08</td><td>Rohit</td><td>GETSITREP-51 (report/plan/progress read-only CLI commands) shipped, PR #19 merged; folded dashboard regeneration into session-end (ADR-0007), reusing GETSITREP-35&#39;s dashboardStaleTrigger threshold rather than leaving dashboard staleness fully manual or regenerating unconditionally. Separately discovered and resolved a parallel-session conflict: PR #18 had independently done its own Session 9 close-out before this session&#39;s own backfill landed on main; closed #18 as superseded, salvaged its one real fix (nudge-state .gitignore gap) as PR #20, merged.</td><td>800000</td><td>$6.00 (estimate)</td><td>claude-sonnet-5</td></tr>
-<tr><td>9</td><td>2026-07-08</td><td>Rohit</td><td>Backfill reconciliation: 4 v0.4 Stories (GETSITREP-48/35/49/50) merged to main across PRs #13-#17 without a sitrep session-end ever being run for them — this entry closes that gap.</td><td>0</td><td>$0.00 (estimate)</td><td>unknown</td></tr>
+      <tbody><tr><td>9</td><td>2026-07-08</td><td>Rohit</td><td>Backfill reconciliation: 4 v0.4 Stories (GETSITREP-48/35/49/50) merged to main across PRs #13-#17 without a sitrep session-end ever being run for them — this entry closes that gap.</td><td>0</td><td>$0.00 (estimate)</td><td>unknown</td></tr>
 <tr><td>8</td><td>2026-07-07</td><td>Rohit</td><td>GETSITREP-32 housekeeping (last v0.3 Story): README + GitHub repo description accuracy (eight commands, was nine/five), v0.2.0 GitHub Release published, npm packaging bug fixed. Caught and fixed a real selfheal auto-tag bug (GETSITREP-47) while dogfooding. Reconciled 4 sessions worth of dogfood drift (GETSITREP-28/17/21/25 werent logged as Done).</td><td>150000</td><td>$0.99 (estimate)</td><td>claude-sonnet-5</td></tr>
 <tr><td>7</td><td>2026-07-07</td><td>Rohit</td><td>GETSITREP-28 (hash manifest, drift, lock/diff/restore) + GETSITREP-10 reopened and resolved (all 8 command MDs converted to thin wrappers, CLI gaps closed first) + PR merged to main + marketing ContentOps brief filed</td><td>600000</td><td>$4.50 (estimate)</td><td>claude-sonnet-5</td></tr>
 <tr><td>6</td><td>2026-07-06</td><td>Rohit</td><td>Code review of GETSITREP-9/10/12 CLI, fix findings, merge GETSITREP-8 to main, Jira Done transitions, README CLI docs</td><td>350000</td><td>$2.61 (estimate)</td><td>claude-sonnet-5</td></tr>
@@ -132,63 +131,58 @@
   <section id="costs">
     <h2>Costs &amp; Tokens</h2>
     <div class="metrics">
-      <div class="metric"><div class="value">$29.10</div><div class="label">Total project cost (estimate)</div></div>
-      <div class="metric"><div class="value">$2.91</div><div class="label">Average per session (estimate)</div></div>
+      <div class="metric"><div class="value">$23.10</div><div class="label">Total project cost (estimate)</div></div>
+      <div class="metric"><div class="value">$2.57</div><div class="label">Average per session (estimate)</div></div>
       <div class="metric"><div class="value">Session 2</div><div class="label">Most expensive ($6.00)</div></div>
       <div class="metric"><div class="value">Session 5</div><div class="label">Cheapest ($0.00)</div></div>
     </div>
     <h3>Cost per session</h3>
-    <svg viewBox="0 0 640 160" width="100%" height="160" role="img" aria-label="bar chart"><rect x="9.6" y="72.0" width="44.8" height="68.0" fill="#06d6a0" />
-<text x="32.0" y="154" font-size="9" fill="#999" text-anchor="middle">#1</text>
-<rect x="73.6" y="4.0" width="44.8" height="136.0" fill="#06d6a0" />
-<text x="96.0" y="154" font-size="9" fill="#999" text-anchor="middle">#2</text>
-<rect x="137.6" y="38.0" width="44.8" height="102.0" fill="#06d6a0" />
-<text x="160.0" y="154" font-size="9" fill="#999" text-anchor="middle">#3</text>
-<rect x="201.6" y="106.0" width="44.8" height="34.0" fill="#06d6a0" />
-<text x="224.0" y="154" font-size="9" fill="#999" text-anchor="middle">#4</text>
-<rect x="265.6" y="140.0" width="44.8" height="0.0" fill="#06d6a0" />
-<text x="288.0" y="154" font-size="9" fill="#999" text-anchor="middle">#5</text>
-<rect x="329.6" y="80.8" width="44.8" height="59.2" fill="#06d6a0" />
-<text x="352.0" y="154" font-size="9" fill="#999" text-anchor="middle">#6</text>
-<rect x="393.6" y="38.0" width="44.8" height="102.0" fill="#06d6a0" />
-<text x="416.0" y="154" font-size="9" fill="#999" text-anchor="middle">#7</text>
-<rect x="457.6" y="117.6" width="44.8" height="22.4" fill="#06d6a0" />
-<text x="480.0" y="154" font-size="9" fill="#999" text-anchor="middle">#8</text>
-<rect x="521.6" y="140.0" width="44.8" height="0.0" fill="#06d6a0" />
-<text x="544.0" y="154" font-size="9" fill="#999" text-anchor="middle">#9</text>
-<rect x="585.6" y="4.0" width="44.8" height="136.0" fill="#06d6a0" />
-<text x="608.0" y="154" font-size="9" fill="#999" text-anchor="middle">#10</text></svg>
+    <svg viewBox="0 0 640 160" width="100%" height="160" role="img" aria-label="bar chart"><rect x="10.7" y="72.0" width="49.8" height="68.0" fill="#06d6a0" />
+<text x="35.6" y="154" font-size="9" fill="#999" text-anchor="middle">#1</text>
+<rect x="81.8" y="4.0" width="49.8" height="136.0" fill="#06d6a0" />
+<text x="106.7" y="154" font-size="9" fill="#999" text-anchor="middle">#2</text>
+<rect x="152.9" y="38.0" width="49.8" height="102.0" fill="#06d6a0" />
+<text x="177.8" y="154" font-size="9" fill="#999" text-anchor="middle">#3</text>
+<rect x="224.0" y="106.0" width="49.8" height="34.0" fill="#06d6a0" />
+<text x="248.9" y="154" font-size="9" fill="#999" text-anchor="middle">#4</text>
+<rect x="295.1" y="140.0" width="49.8" height="0.0" fill="#06d6a0" />
+<text x="320.0" y="154" font-size="9" fill="#999" text-anchor="middle">#5</text>
+<rect x="366.2" y="80.8" width="49.8" height="59.2" fill="#06d6a0" />
+<text x="391.1" y="154" font-size="9" fill="#999" text-anchor="middle">#6</text>
+<rect x="437.3" y="38.0" width="49.8" height="102.0" fill="#06d6a0" />
+<text x="462.2" y="154" font-size="9" fill="#999" text-anchor="middle">#7</text>
+<rect x="508.4" y="117.6" width="49.8" height="22.4" fill="#06d6a0" />
+<text x="533.3" y="154" font-size="9" fill="#999" text-anchor="middle">#8</text>
+<rect x="579.6" y="140.0" width="49.8" height="0.0" fill="#06d6a0" />
+<text x="604.4" y="154" font-size="9" fill="#999" text-anchor="middle">#9</text></svg>
     <h3>Tokens per session (input + output)</h3>
-    <svg viewBox="0 0 640 160" width="100%" height="160" role="img" aria-label="stacked bar chart"><rect x="9.6" y="129.8" width="44.8" height="10.2" fill="#4361ee" />
-<rect x="9.6" y="123.0" width="44.8" height="6.8" fill="#ffd166" />
-<text x="32.0" y="154" font-size="9" fill="#999" text-anchor="middle">#1</text>
-<rect x="73.6" y="119.6" width="44.8" height="20.4" fill="#4361ee" />
-<rect x="73.6" y="106.0" width="44.8" height="13.6" fill="#ffd166" />
-<text x="96.0" y="154" font-size="9" fill="#999" text-anchor="middle">#2</text>
-<rect x="137.6" y="124.7" width="44.8" height="15.3" fill="#4361ee" />
-<rect x="137.6" y="114.5" width="44.8" height="10.2" fill="#ffd166" />
-<text x="160.0" y="154" font-size="9" fill="#999" text-anchor="middle">#3</text>
-<rect x="201.6" y="138.0" width="44.8" height="2.0" fill="#4361ee" />
-<rect x="201.6" y="136.6" width="44.8" height="1.4" fill="#ffd166" />
-<text x="224.0" y="154" font-size="9" fill="#999" text-anchor="middle">#4</text>
-<rect x="265.6" y="140.0" width="44.8" height="0.0" fill="#4361ee" />
-<rect x="265.6" y="140.0" width="44.8" height="0.0" fill="#ffd166" />
-<text x="288.0" y="154" font-size="9" fill="#999" text-anchor="middle">#5</text>
-<rect x="329.6" y="102.6" width="44.8" height="37.4" fill="#4361ee" />
-<rect x="329.6" y="80.5" width="44.8" height="22.1" fill="#ffd166" />
-<text x="352.0" y="154" font-size="9" fill="#999" text-anchor="middle">#6</text>
-<rect x="393.6" y="75.4" width="44.8" height="64.6" fill="#4361ee" />
-<rect x="393.6" y="38.0" width="44.8" height="37.4" fill="#ffd166" />
-<text x="416.0" y="154" font-size="9" fill="#999" text-anchor="middle">#7</text>
-<rect x="457.6" y="122.2" width="44.8" height="17.9" fill="#4361ee" />
-<rect x="457.6" y="114.5" width="44.8" height="7.7" fill="#ffd166" />
-<text x="480.0" y="154" font-size="9" fill="#999" text-anchor="middle">#8</text>
-<rect x="521.6" y="140.0" width="44.8" height="0.0" fill="#4361ee" />
-<rect x="521.6" y="140.0" width="44.8" height="0.0" fill="#ffd166" />
-<text x="544.0" y="154" font-size="9" fill="#999" text-anchor="middle">#9</text>
-<rect x="585.6" y="58.4" width="44.8" height="81.6" fill="#4361ee" />
-<rect x="585.6" y="4.0" width="44.8" height="54.4" fill="#ffd166" />
-<text x="608.0" y="154" font-size="9" fill="#999" text-anchor="middle">#10</text></svg>
+    <svg viewBox="0 0 640 160" width="100%" height="160" role="img" aria-label="stacked bar chart"><rect x="10.7" y="126.4" width="49.8" height="13.6" fill="#4361ee" />
+<rect x="10.7" y="117.3" width="49.8" height="9.1" fill="#ffd166" />
+<text x="35.6" y="154" font-size="9" fill="#999" text-anchor="middle">#1</text>
+<rect x="81.8" y="112.8" width="49.8" height="27.2" fill="#4361ee" />
+<rect x="81.8" y="94.7" width="49.8" height="18.1" fill="#ffd166" />
+<text x="106.7" y="154" font-size="9" fill="#999" text-anchor="middle">#2</text>
+<rect x="152.9" y="119.6" width="49.8" height="20.4" fill="#4361ee" />
+<rect x="152.9" y="106.0" width="49.8" height="13.6" fill="#ffd166" />
+<text x="177.8" y="154" font-size="9" fill="#999" text-anchor="middle">#3</text>
+<rect x="224.0" y="137.3" width="49.8" height="2.7" fill="#4361ee" />
+<rect x="224.0" y="135.5" width="49.8" height="1.8" fill="#ffd166" />
+<text x="248.9" y="154" font-size="9" fill="#999" text-anchor="middle">#4</text>
+<rect x="295.1" y="140.0" width="49.8" height="0.0" fill="#4361ee" />
+<rect x="295.1" y="140.0" width="49.8" height="0.0" fill="#ffd166" />
+<text x="320.0" y="154" font-size="9" fill="#999" text-anchor="middle">#5</text>
+<rect x="366.2" y="90.1" width="49.8" height="49.9" fill="#4361ee" />
+<rect x="366.2" y="60.7" width="49.8" height="29.5" fill="#ffd166" />
+<text x="391.1" y="154" font-size="9" fill="#999" text-anchor="middle">#6</text>
+<rect x="437.3" y="53.9" width="49.8" height="86.1" fill="#4361ee" />
+<rect x="437.3" y="4.0" width="49.8" height="49.9" fill="#ffd166" />
+<text x="462.2" y="154" font-size="9" fill="#999" text-anchor="middle">#7</text>
+<rect x="508.4" y="116.2" width="49.8" height="23.8" fill="#4361ee" />
+<rect x="508.4" y="106.0" width="49.8" height="10.2" fill="#ffd166" />
+<text x="533.3" y="154" font-size="9" fill="#999" text-anchor="middle">#8</text>
+<rect x="579.6" y="140.0" width="49.8" height="0.0" fill="#4361ee" />
+<rect x="579.6" y="140.0" width="49.8" height="0.0" fill="#ffd166" />
+<text x="604.4" y="154" font-size="9" fill="#999" text-anchor="middle">#9</text></svg>
     <h3>Cost by phase</h3>
     <svg viewBox="0 0 640 170" width="100%" height="170" role="img" aria-label="horizontal bar chart"><text x="0" y="25.4" font-size="11" fill="#e0e0e0">Foundation</text>
 <rect x="180" y="10.0" width="111.4" height="22" fill="#ef476f" />
@@ -210,9 +204,9 @@
   <section id="users">
     <h2>Users</h2>
     <div class="metrics"><div class="metric">
-      <div class="value">10</div>
+      <div class="value">9</div>
       <div class="label">Rohit — sessions</div>
-      <div class="label">2,370,000 tokens · $29.10</div>
+      <div class="label">1,570,000 tokens · $23.10</div>
     </div></div>
   </section>
 
@@ -378,7 +372,7 @@
     <details>
       <summary>Status Report</summary>
       <h1>sitrep — Status Report</h1>
-<blockquote><strong>Last Updated:</strong> 2026-07-08 — Session 10</blockquote>
+<blockquote><strong>Last Updated:</strong> 2026-07-08 — Session 9</blockquote>
 <blockquote><strong>Current Phase:</strong> Phase 3 (Sharper &amp; Self-Sufficient) — v0.3.0, all 9 Stories merged to main. Jira status transitions to Done pending session-owner approval.</blockquote>
 <blockquote><strong>Overall Progress:</strong> 23/23 legacy tasks shipped (v0.1+v0.2). v0.3 tracked as 9 Jira Stories — all 9 merged to main (GETSITREP-4, 13, 36, 8, 28, 17, 21, 25, 32); GETSITREP-47 (selfheal bugfix found during close-out) also merged. See PROJECT_PLAN.md.</blockquote>
 <blockquote><strong>Next Milestone:</strong> <code>v0.3.0</code></blockquote>
@@ -423,17 +417,6 @@
 <li>First-run bootstrap from CLAUDE.md</li>
 </ul>
 <h2>Session Log</h2>
-<h3>Session 10 — 2026-07-08</h3>
-<ul>
-<li><strong>User:</strong> Rohit</li>
-<li><strong>Branch:</strong> main</li>
-<li><strong>Focus:</strong> GETSITREP-51 (report/plan/progress read-only CLI commands) shipped, PR #19 merged; folded dashboard regeneration into session-end (ADR-0007), reusing GETSITREP-35&#39;s dashboardStaleTrigger threshold rather than leaving dashboard staleness fully manual or regenerating unconditionally. Separately discovered and resolved a parallel-session conflict: PR #18 had independently done its own Session 9 close-out before this session&#39;s own backfill landed on main; closed #18 as superseded, salvaged its one real fix (nudge-state .gitignore gap) as PR #20, merged.</li>
-<li><strong>Done:</strong> GETSITREP-51</li>
-<li><strong>Blockers:</strong> None</li>
-<li><strong>Tokens:</strong> ~800000 (estimate) | Cost: ~$6.00 (estimate)</li>
-<li><strong>Model:</strong> claude-sonnet-5</li>
-<li><strong>Next:</strong> Heavy session: 2 Explore subagents + 1 Plan subagent for GETSITREP-51 design, full implementation (3 new commands, dashboard.js refactor, session-end.js fold, ADR-0007), full test suite extension, plus unplanned but necessary work resolving the PR #18 parallel-session conflict (filed GETSITREP-56 to make this class of collision cheaply detectable next time, via an advisory open-PR check at session-start -- explicitly not proposing to solve real multi-session concurrency, which stays deferred to v1.0+ per PROJECT_PLAN.md). Also filed GETSITREP-54 (session-end needs an empty-run guard + previous-session reference) and GETSITREP-55 (CLI subcommands need --help support) earlier this session after an accidental garbage commit taught that lesson directly. GETSITREP-51 left as Jira &#39;In Review&#39; pending session-owner approval to mark Done. Next session: pick up the next v0.4 Tier 1/2 Story -- candidates are GETSITREP-42 (dashboard cost charts, needs GETSITREP-48 which is shipped), GETSITREP-44 (model cost breakdown), or GETSITREP-46 (dogfood the CLI for real, deferred since Session 6/7/8 each time) -- not picked here, a priority call for the session owner. Minor housekeeping noticed but not acted on: many merged Story branches (local and remote) were never deleted after their PRs merged -- worth a cleanup pass sometime, not urgent.</li>
-</ul>
 <h3>Session 9 — 2026-07-08</h3>
 <ul>
 <li><strong>User:</strong> Rohit</li>
@@ -577,14 +560,14 @@
     <h3>Archived Handoffs</h3>
     <p>No archived handoffs yet.</p>
     <h3>Archived Dashboards</h3>
-    <ul><li>dashboard-session-8-1783445444803.html</li><li>dashboard-session-9-1783510996010.html</li></ul>
+    <ul><li>dashboard-session-8-1783445444803.html</li></ul>
     <h3>Git Log (sitrep/, last 20)</h3>
-    <ul><li><code>30e0c98</code> 2026-07-08 — sitrep: dashboard — session 9</li><li><code>4bb27ea</code> 2026-07-08 — sitrep: session 9 — Backfill reconciliation: 4 v0.4 Stories (GETSITREP-48/35/49/50) merged to main across PRs #13-#17 without a sitrep session-end ever being run for them — this entry closes that gap.</li><li><code>d0f27eb</code> 2026-07-08 — Revert &quot;sitrep: session 9 — (not provided)&quot;</li><li><code>aa7f8e7</code> 2026-07-08 — sitrep: session 9 — (not provided)</li><li><code>3002321</code> 2026-07-08 — sitrep: v0.3 complete — all 9 Stories merged to main, dogfood files reconciled (#12)</li><li><code>d86f386</code> 2026-07-07 — GETSITREP-32: pre-launch housekeeping — README accuracy, v0.2.0 release, npm packaging fix (#10)</li><li><code>fc0db12</code> 2026-07-07 — sitrep: dashboard — session 7</li><li><code>fee5332</code> 2026-07-07 — sitrep: fix session 7 user attribution (unknown -&gt; Rohit)</li><li><code>016377c</code> 2026-07-07 — sitrep: session 7 — GETSITREP-28 (hash manifest, drift, lock/diff/restore) + GETSITREP-10 reopened and resolved (all 8 command MDs converted to thin wrappers, CLI gaps closed first) + PR merged to main + marketing ContentOps brief filed</li><li><code>08eeceb</code> 2026-07-07 — sitrep: selfheal — Created baseline hash manifest (sitrep/.sitrep-manifest.json) for 9 file(s), keyed to v0.2.0</li><li><code>c4229db</code> 2026-07-06 — sitrep: session 6 — code review, fixes, GETSITREP-8 merge, Jira Done, README CLI docs</li><li><code>65de825</code> 2026-07-05 — GETSITREP-13: refresh command MDs to 8-command canon, merge pulse into sitrep (#1)</li><li><code>f0174fa</code> 2026-04-06 — sitrep: session 4 — selfheal diagnostics and framework health fixes</li></ul>
+    <ul><li><code>4bb27ea</code> 2026-07-08 — sitrep: session 9 — Backfill reconciliation: 4 v0.4 Stories (GETSITREP-48/35/49/50) merged to main across PRs #13-#17 without a sitrep session-end ever being run for them — this entry closes that gap.</li><li><code>d0f27eb</code> 2026-07-08 — Revert &quot;sitrep: session 9 — (not provided)&quot;</li><li><code>aa7f8e7</code> 2026-07-08 — sitrep: session 9 — (not provided)</li><li><code>3002321</code> 2026-07-08 — sitrep: v0.3 complete — all 9 Stories merged to main, dogfood files reconciled (#12)</li><li><code>d86f386</code> 2026-07-07 — GETSITREP-32: pre-launch housekeeping — README accuracy, v0.2.0 release, npm packaging fix (#10)</li><li><code>fc0db12</code> 2026-07-07 — sitrep: dashboard — session 7</li><li><code>fee5332</code> 2026-07-07 — sitrep: fix session 7 user attribution (unknown -&gt; Rohit)</li><li><code>016377c</code> 2026-07-07 — sitrep: session 7 — GETSITREP-28 (hash manifest, drift, lock/diff/restore) + GETSITREP-10 reopened and resolved (all 8 command MDs converted to thin wrappers, CLI gaps closed first) + PR merged to main + marketing ContentOps brief filed</li><li><code>08eeceb</code> 2026-07-07 — sitrep: selfheal — Created baseline hash manifest (sitrep/.sitrep-manifest.json) for 9 file(s), keyed to v0.2.0</li><li><code>c4229db</code> 2026-07-06 — sitrep: session 6 — code review, fixes, GETSITREP-8 merge, Jira Done, README CLI docs</li><li><code>65de825</code> 2026-07-05 — GETSITREP-13: refresh command MDs to 8-command canon, merge pulse into sitrep (#1)</li><li><code>f0174fa</code> 2026-04-06 — sitrep: session 4 — selfheal diagnostics and framework health fixes</li></ul>
   
   </section>
 
   <footer>
-    <p>Generated by getsitrep dashboard on 2026-07-08T14:22:31.114Z</p>
+    <p>Generated by getsitrep dashboard on 2026-07-08T11:43:16.008Z</p>
   </footer>
 </body>
 </html>
