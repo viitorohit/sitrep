@@ -23,7 +23,7 @@
 // already owns it.
 
 const { parseArgs } = require('../lib/args');
-const { ok } = require('../lib/result');
+const { ok, fail } = require('../lib/result');
 const { readIfExists, writeFile, readJsonIfExists, writeJson, ensureDir, exists } = require('../lib/fs-helpers');
 const { readJsonInput } = require('../lib/input');
 const { extractProjectName, replaceHeaderField, insertSessionLogEntry } = require('../lib/markdown');
@@ -75,7 +75,25 @@ function normalizeSummary(raw, fallbackUser) {
   };
 }
 
-function buildSessionLogEntry(number, summary, branch) {
+// GETSITREP-54: the immediately prior session's number + one-line focus —
+// this is exactly the reference this project's own drift incidents (4
+// merged Stories going unlogged after Session 8, undetected for a full day)
+// would have made visible immediately: a session log entry chained to a
+// previous one that's actually two-plus Stories old reads as a red flag on
+// its own, without needing a manual git-log/Jira cross-check to catch it.
+function previousSessionSummary(dataJson) {
+  if (!dataJson || !Array.isArray(dataJson.sessions) || dataJson.sessions.length === 0) return null;
+  const prev = dataJson.sessions[dataJson.sessions.length - 1];
+  return { number: prev.number, focus: prev.focus };
+}
+
+function previousSessionLine(previousSession) {
+  return previousSession
+    ? `- **Since Session ${previousSession.number}:** ${previousSession.focus}`
+    : '- **Since Session:** — (this is the first recorded session)';
+}
+
+function buildSessionLogEntry(number, summary, branch, previousSession) {
   const costLine =
     summary.costUsd === null
       ? 'not tracked'
@@ -85,6 +103,7 @@ function buildSessionLogEntry(number, summary, branch) {
     `### Session ${number} — ${today()}`,
     `- **User:** ${summary.user}`,
     `- **Branch:** ${branch}`,
+    previousSessionLine(previousSession),
     `- **Focus:** ${summary.focus}`,
     `- **Done:** ${summary.tasksCompleted.length ? summary.tasksCompleted.join(', ') : 'None recorded'}`,
     `- **Blockers:** ${summary.blockers.length ? summary.blockers.join('; ') : 'None'}`,
@@ -142,11 +161,14 @@ function updateDataJson(dataJson, projectName, number, summary) {
   return data;
 }
 
-function writeHistoryRecord(number, projectName, summary, branch) {
+function writeHistoryRecord(number, projectName, summary, branch, previousSession) {
   const padded = String(number).padStart(3, '0');
   const filePath = path.join(paths.HISTORY_SESSIONS(), `session-${padded}.md`);
   const costLine =
     summary.costUsd === null ? 'not tracked' : `~$${summary.costUsd.toFixed(2)} (${summary.costLabel})`;
+  const previousLine = previousSession
+    ? `> **Since Session ${previousSession.number}:** ${previousSession.focus}`
+    : '> **Since Session:** — (this is the first recorded session)';
 
   const content = [
     `# Session ${number} — ${today()}`,
@@ -156,6 +178,7 @@ function writeHistoryRecord(number, projectName, summary, branch) {
     `> **Model:** ${summary.model}`,
     `> **Tokens:** ${summary.tokens.total} (${summary.costLabel}, input: ${summary.tokens.input}, output: ${summary.tokens.output})`,
     `> **Cost:** ${costLine}`,
+    previousLine,
     '',
     '## Focus',
     summary.focus,
@@ -189,10 +212,19 @@ function writeHistoryRecord(number, projectName, summary, branch) {
 
 function execute(argv) {
   const parsed = parseArgs(argv, SPEC);
-  const warnings = [];
+  // GETSITREP-54/55: a malformed invocation (e.g. an unrecognized flag like
+  // an accidental `--help` that slipped past cli.js's own interception —
+  // see src/cli.js) refuses outright, before any file is touched or
+  // anything is committed. This is deliberately different from Hard Law #5's
+  // fail-open guarantee: that law protects a LEGITIMATE bare invocation
+  // (no --data, no stdin, nothing to infer) from ever being blocked — it was
+  // never meant to license committing garbage data just because the
+  // invocation itself was broken. Refusing here surfaces the real problem
+  // immediately instead of silently writing a placeholder session record.
   if (!parsed.ok) {
-    warnings.push(`ignored: ${parsed.errors.join('; ')}`);
+    return fail('session-end', parsed.values, `Invalid arguments: ${parsed.errors.join('; ')} — session NOT recorded, nothing committed.`);
   }
+  const warnings = [];
 
   const input = readJsonInput(parsed.values.data);
   if (!input.ok) {
@@ -207,11 +239,12 @@ function execute(argv) {
   const summary = normalizeSummary(input.ok ? input.data : null, userName());
   const number = nextSessionNumber(dataJson);
   const branch = currentBranch();
+  const previousSession = previousSessionSummary(dataJson);
 
   const filesUpdated = [];
 
   if (statusContent) {
-    let updatedStatus = insertSessionLogEntry(statusContent, buildSessionLogEntry(number, summary, branch));
+    let updatedStatus = insertSessionLogEntry(statusContent, buildSessionLogEntry(number, summary, branch, previousSession));
     updatedStatus = replaceHeaderField(updatedStatus, 'Last Updated', `${today()} — Session ${number}`);
     writeFile(paths.STATUS_REPORT(), updatedStatus);
     filesUpdated.push('STATUS_REPORT.md');
@@ -224,7 +257,7 @@ function execute(argv) {
   writeJson(paths.DATA_JSON(), updatedData);
   filesUpdated.push('.sitrep-data.json');
 
-  const historyPath = writeHistoryRecord(number, projectName, summary, branch);
+  const historyPath = writeHistoryRecord(number, projectName, summary, branch, previousSession);
   filesUpdated.push(path.relative(process.cwd(), historyPath));
 
   // GETSITREP-51: fold a dashboard regeneration into this same commit,

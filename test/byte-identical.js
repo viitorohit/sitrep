@@ -75,6 +75,16 @@ const CASES = [
   { name: 'selfheal diff --file with no command dir in fixture', argv: ['selfheal', 'diff', '--file', 'selfheal'] },
   { name: 'init on existing project (residue stop)', argv: ['init', '--yes'] },
   { name: 'plan-update --generate on existing plan (no-op passthrough)', argv: ['plan-update', '--generate'] },
+  // GETSITREP-55: --help must be intercepted before execute() runs at all,
+  // for every command, including the ones that mutate/commit.
+  { name: '--help: session-end --help (must not commit, see also session-end-dashboard.js)', argv: ['session-end', '--help'] },
+  { name: '--help: dashboard -h', argv: ['dashboard', '-h'] },
+  { name: '--help: capture --help', argv: ['capture', '--help'] },
+  { name: '--help: nudge-check --help (hidden from top-level help, still answers)', argv: ['nudge-check', '--help'] },
+  // GETSITREP-54/55: an unrecognized flag that ISN'T --help (so it reaches
+  // session-end.js's own parseArgs, not cli.js's earlier interception) must
+  // refuse rather than silently committing a placeholder session record.
+  { name: 'bad input: session-end --bogus-flag (must refuse, not commit)', argv: ['session-end', '--bogus-flag'] },
   { name: 'report (no args)', argv: ['report'] },
   { name: 'report --model claude-sonnet-5', argv: ['report', '--model', 'claude-sonnet-5'] },
   { name: 'bad input: report --phase and --model together', argv: ['report', '--phase', '1', '--model', 'claude-sonnet-5'] },

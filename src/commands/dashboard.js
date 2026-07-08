@@ -12,7 +12,7 @@
 // than throwing when its source is missing.
 
 const { parseArgs } = require('../lib/args');
-const { ok } = require('../lib/result');
+const { ok, fail } = require('../lib/result');
 const { readIfExists, readJsonIfExists, writeFile, ensureDir, exists } = require('../lib/fs-helpers');
 const {
   extractProjectName,
@@ -600,9 +600,17 @@ function generate() {
 
 function execute(argv) {
   const parsed = parseArgs(argv, SPEC);
-  // Dashboard "must never fail" per its own spec — bad args become a
-  // warning, not a refusal to generate the report.
-  const warning = parsed.ok ? '' : ` (ignored: ${parsed.errors.join('; ')})`;
+  // GETSITREP-55: dashboard takes no flags at all (SPEC={}), so ANY flag
+  // here is a malformed invocation — refuse rather than silently ignoring
+  // it and generating a report anyway (matches the other Intentional
+  // commands: capture/selfheal/handoff/plan-update/init all already refuse
+  // on bad args; this file and session-end.js were the two exceptions).
+  // Note: this only affects the standalone `getsitrep dashboard` command —
+  // session-end.js's fold-in calls generate() directly with no args at all,
+  // so it's entirely unaffected by this.
+  if (!parsed.ok) {
+    return fail('dashboard', parsed.values, `Invalid arguments: ${parsed.errors.join('; ')} — dashboard NOT regenerated, nothing committed.`);
+  }
 
   const result = generate();
   const gitResult = commit(['sitrep/'], `sitrep: dashboard — session ${result.sessionNumber}`);
@@ -613,7 +621,7 @@ function execute(argv) {
     `Size: ${result.sizeKb}KB${result.exceedsSizeTarget ? ' ⚠️ exceeds the 80KB target' : ''}`,
     `Archived: ${result.archived || 'none'}`,
     gitResult.committed ? 'Committed.' : `Not committed (${gitResult.reason}).`,
-    `Sections: Summary, Progress, Active Sprint, Sessions, Costs, Users, Decisions, Risks, Documents, History${warning}`,
+    'Sections: Summary, Progress, Active Sprint, Sessions, Costs, Users, Decisions, Risks, Documents, History',
     '=================',
   ];
 
