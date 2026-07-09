@@ -75,6 +75,9 @@ const CASES = [
   { name: 'selfheal diff --file with no command dir in fixture', argv: ['selfheal', 'diff', '--file', 'selfheal'] },
   { name: 'init on existing project (residue stop)', argv: ['init', '--yes'] },
   { name: 'plan-update --generate on existing plan (no-op passthrough)', argv: ['plan-update', '--generate'] },
+  { name: '--version', argv: ['--version'] },
+  { name: '-v', argv: ['-v'] },
+  { name: 'version (bare word)', argv: ['version'] },
   // GETSITREP-55: --help must be intercepted before execute() runs at all,
   // for every command, including the ones that mutate/commit.
   { name: '--help: session-end --help (must not commit, see also session-end-dashboard.js)', argv: ['session-end', '--help'] },
