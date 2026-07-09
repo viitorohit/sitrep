@@ -7,6 +7,7 @@
 const registry = require('./commands');
 const { ok, fail } = require('./lib/result');
 const { render } = require('./lib/render');
+const packageJson = require('../package.json');
 
 const COMMAND_NAMES = Object.keys(registry);
 
@@ -52,10 +53,22 @@ const VISIBLE_COMMANDS = [
 ];
 
 function helpResult() {
-  const lines = ['Usage: getsitrep <command> [args]', '', 'Commands:', ...VISIBLE_COMMANDS.map((name) => `  ${COMMAND_HELP[name]}`)].join(
-    '\n'
-  );
+  const lines = [
+    'Usage: getsitrep <command> [args]',
+    '',
+    'Options:',
+    '  --version, -v               Print the installed version',
+    '',
+    'Commands:',
+    ...VISIBLE_COMMANDS.map((name) => `  ${COMMAND_HELP[name]}`),
+  ].join('\n');
   return ok('help', {}, lines);
+}
+
+// GETSITREP-60: version is sourced from package.json, never hardcoded —
+// same "one source of truth" reasoning as COMMAND_HELP above.
+function versionResult() {
+  return ok('version', {}, `getsitrep v${packageJson.version}`);
 }
 
 // GETSITREP-55: `getsitrep <command> --help`/`-h` prints this instead of
@@ -87,6 +100,13 @@ async function run(argv) {
 
   if (!commandName || commandName === '--help' || commandName === '-h' || commandName === 'help') {
     const result = helpResult();
+    render(result);
+    process.exitCode = 0;
+    return;
+  }
+
+  if (commandName === '--version' || commandName === '-v' || commandName === 'version') {
+    const result = versionResult();
     render(result);
     process.exitCode = 0;
     return;
