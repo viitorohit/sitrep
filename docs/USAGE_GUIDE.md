@@ -1,7 +1,7 @@
 # sitrep — Usage Guide
 
-> Official documentation for using sitrep in Claude Code sessions.
-> Version: 0.2.0
+> Official documentation for using sitrep — via slash commands in Claude Code, or the `getsitrep` CLI directly from any AI tool or a bare terminal.
+> Version: 0.3.1
 
 ---
 
@@ -37,12 +37,15 @@
 
 ```bash
 cd your-project
-curl -fsSL https://raw.githubusercontent.com/viitorohit/sitrep/main/install.sh | bash
+npx getsitrep init
 ```
 
-This creates:
+The wizard asks for your plan source (native/Jira/OpenSpec/Spec Kit), cost source, and which AI tool(s) you use, then creates:
 - `sitrep/` folder with PROJECT_PLAN.md and STATUS_REPORT.md
 - `.claude/commands/` with all 8 slash commands
+- `sitrep.config.json` and, for whichever tool(s) you selected, the hooks that fire session tracking automatically
+
+Prefer a global command instead of `npx` each time? `npm install -g getsitrep`, then `getsitrep init`.
 
 ### Customize your project plan
 
@@ -103,7 +106,7 @@ That's it. Two commands minimum per session. Everything else is optional.
 ```bash
 mkdir my-new-app && cd my-new-app
 git init
-curl -fsSL https://raw.githubusercontent.com/viitorohit/sitrep/main/install.sh | bash
+npx getsitrep init
 ```
 
 When prompted, enter your project name and your name. Then open the generated files and customize them:
@@ -591,6 +594,8 @@ The beauty of git-backed tracking: nothing is ever truly lost, and any damage is
 
 ## Command Reference
 
+The 8 slash commands below are thin wrappers over the `getsitrep` CLI — everything in this column also works as `getsitrep <command>` directly from a terminal, a CI job, or any AI tool that isn't Claude Code.
+
 | Command | What you type | When to use | Modifies files? |
 |---------|--------------|-------------|-----------------|
 | Start session | `/session-start` | Beginning of every session | No |
@@ -601,6 +606,16 @@ The beauty of git-backed tracking: nothing is ever truly lost, and any damage is
 | Health check | `/selfheal` or `/selfheal deep` | When things seem off | Yes + commit |
 | Handoff | `/handoff` or `/handoff human` | Switching context or people | Yes + commit |
 | Dashboard | `/dashboard` | Visual progress report | Yes + commit |
+
+**CLI-only (no slash-command equivalent yet — run these with `getsitrep <command>`):**
+
+| Command | What you type | When to use | Modifies files? |
+|---------|--------------|-------------|-----------------|
+| Cost report | `getsitrep report [--phase N \| --ticket ID \| --model NAME]` | "What did this phase/ticket/model actually cost?" | No |
+| Plan view | `getsitrep plan [--phase N]` | Read-only view of the plan — overview, or one phase's full content | No |
+| Progress | `getsitrep progress` | Quick, source-agnostic progress readout with a visual bar | No |
+
+Every command — slash or CLI — accepts `--help`/`-h` to print its own usage instead of running, safe to explore without risk of an accidental write or commit.
 
 ---
 
@@ -632,7 +647,7 @@ The beauty of git-backed tracking: nothing is ever truly lost, and any damage is
 
 **"sitrep files not found"**
 - Run `/selfheal`. It searches for misplaced files and moves them to `sitrep/`.
-- If files truly don't exist, re-run the installer to recreate templates: `curl -fsSL https://raw.githubusercontent.com/viitorohit/sitrep/main/install.sh | bash`
+- If files truly don't exist, re-run `npx getsitrep init` to recreate templates — it detects prior sitrep state and won't overwrite what's already there.
 
 **"Task counts don't match"**
 - Run `/selfheal`. It recalculates and syncs both files automatically.
@@ -655,7 +670,7 @@ The beauty of git-backed tracking: nothing is ever truly lost, and any damage is
 
 **"I broke the sitrep files"**
 - Restore from git: `git checkout HEAD~1 -- sitrep/`
-- Or re-run the installer (won't overwrite existing files): `curl -fsSL https://raw.githubusercontent.com/viitorohit/sitrep/main/install.sh | bash`
+- Or re-run `npx getsitrep init` (won't overwrite existing files, safe to re-run)
 
 ---
 
