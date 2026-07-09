@@ -1,5 +1,6 @@
 # Cost Data Schema — v0.3
 
+> **Last verified:** 2026-07-09 against package v0.3.1 — still accurate; `by_model` (GETSITREP-44) reuses this same schema per-session, no new fields needed.
 > **Status:** Binding spec for GETSITREP-4. No cost number in sitrep may exist without an `actual`/`estimate` label — this is a hard law, not a preference.
 
 ## The rule

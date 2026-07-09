@@ -1,7 +1,7 @@
 # sitrep — Usage Guide
 
-> Official documentation for using sitrep — via slash commands in Claude Code, or the `getsitrep` CLI directly from any AI tool or a bare terminal.
-> Version: 0.3.1
+> Official documentation for using sitrep — via slash commands in Claude Code, or the `getsitrep` CLI directly on Cursor, Codex, a bare terminal, or CI. See [Compatibility](../README.md#compatibility) for exactly what each tool gets.
+> Version: 0.3.1 · Last updated: 2026-07-09
 
 ---
 
@@ -40,9 +40,9 @@ cd your-project
 npx getsitrep init
 ```
 
-The wizard asks for your plan source (native/Jira/OpenSpec/Spec Kit), cost source, and which AI tool(s) you use, then creates:
+The wizard asks for your plan source (native/Jira/OpenSpec/Spec Kit), cost source, and which AI tool(s) you use — Claude Code, Cursor, Codex, or none of those (CLI-only, no hooks) — then creates:
 - `sitrep/` folder with PROJECT_PLAN.md and STATUS_REPORT.md
-- `.claude/commands/` with all 8 slash commands
+- `.claude/commands/` with all 8 slash commands (Claude Code specifically — see [Compatibility](../README.md#compatibility) for what other tools get)
 - `sitrep.config.json` and, for whichever tool(s) you selected, the hooks that fire session tracking automatically
 
 Prefer a global command instead of `npx` each time? `npm install -g getsitrep`, then `getsitrep init`.
@@ -56,18 +56,17 @@ Open `sitrep/PROJECT_PLAN.md` and fill in:
 
 ### Start your first session
 
-Open Claude Code in your project directory:
-```bash
-cd your-project
-claude
-```
-
-Type:
+**Claude Code:**
 ```
 /session-start
 ```
 
-You're tracking.
+**Cursor, Codex, or a bare terminal:**
+```bash
+getsitrep session-start
+```
+
+Either way, you're tracking. If you configured hooks during `init`, this already ran automatically and you don't need to type anything.
 
 ---
 
@@ -95,6 +94,21 @@ That's it. Two commands minimum per session. Everything else is optional.
 
 ---
 
+## Intelligent Nudges
+
+If you configured hooks during `init` (Claude Code, Cursor, or Codex), sitrep also watches for a few *real, observable* signals mid-session and surfaces at most one suggestion at a time — never repeats one you've already seen, never more than one per check. These are the actual messages, verbatim from the code:
+
+```
+💡 sitrep: consider `/selfheal` — 3 command file(s) have drifted from the canonical version
+💡 sitrep: consider `/dashboard` — 5 sessions logged since the last dashboard view
+💡 sitrep: consider `/capture` — uncommitted changes present for a while — worth capturing as a tracked task if this is new scope
+💡 sitrep: consider `/handoff` — this has been a long session — consider a handoff checkpoint
+```
+
+Each is grounded in something sitrep can genuinely check — `selfheal`'s own drift detection, a real count of sessions since the last dashboard regeneration, `git status`, or a proxy for session length — never a guess dressed up as insight. You don't configure this; it's on by default once hooks are wired up, and silent otherwise.
+
+---
+
 ## Use Cases
 
 ### 1. Starting a New Project
@@ -109,13 +123,9 @@ git init
 npx getsitrep init
 ```
 
-When prompted, enter your project name and your name. Then open the generated files and customize them:
+When prompted, enter your project name and your name. Then open the generated files and customize them, using whichever AI tool you configured (Claude Code, Cursor, or Codex).
 
-```
-claude
-```
-
-Tell Claude:
+Tell your AI assistant:
 
 ```
 Read sitrep/PROJECT_PLAN.md. I want to build [describe your project].
@@ -426,14 +436,14 @@ It gets logged in the Key Decisions table with a date. Next time someone asks "w
 
 ```bash
 cd ~/code/project-a
-claude
-/session-start      # ← Project A context
+# open your AI tool here
+/session-start      # ← Project A context (or `getsitrep session-start` on Cursor/Codex)
 
 # Done with Project A
 /session-end
 
 cd ~/code/my-saas
-claude
+# open your AI tool here
 /session-start      # ← SaaS context
 ```
 
@@ -666,7 +676,7 @@ Every command — slash or CLI — accepts `--help`/`-h` to print its own usage 
 
 **"Cost estimates seem wrong"**
 - Costs are estimates based on session activity level. They won't be exact.
-- For more accurate tracking, note the actual token count from your Claude Code usage stats and update `.sitrep-data.json` manually.
+- For actual (not estimated) figures, install [ccusage](https://github.com/ryoppippi/ccusage) — sitrep reads its real token counts and cost automatically, no manual editing needed.
 
 **"I broke the sitrep files"**
 - Restore from git: `git checkout HEAD~1 -- sitrep/`

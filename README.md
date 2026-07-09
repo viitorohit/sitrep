@@ -1,24 +1,26 @@
 # SitRep
 
-**AI-native project management. Two markdown files. Eight slash commands. Zero dependencies.**
+> **v0.3.1** · Last updated 2026-07-09 — see [Roadmap](#roadmap) for what's shipped vs. in progress.
 
-> You don't need Jira to build with AI. You need a system that your AI assistant can read, update, and commit — automatically.
+**The continuity, cost, and nudge layer for agentic AI coding — works with Claude Code, Codex, Cursor, or any tool that reads a repo. Zero dependencies, zero lock-in.**
+
+> It sits *beside* Jira, OpenSpec, or Spec Kit, and reads whatever plan you already keep — never a replacement, never another system to maintain in parallel.
 
 ---
 
 ## The Problem
 
-AI coding tools start every session blank. No memory. No context. No idea what happened yesterday. You waste 15-20 minutes every session rebuilding context. Nobody knows what it cost.
+This isn't a claim that AI coding tools have no memory at all — several now offer session resumption, custom-instruction files, or their own context tricks. What none of them do is track *project* state: what phase you're actually in, what a feature cost across the models that built it, or carry any of that cleanly if you switch from Claude Code to Codex to Cursor on the same repo. Multiple agentic tools now routinely touch the same codebase over its life — and there's no shared layer underneath them that remembers where things stand, independent of which one is driving this week.
 
 ## The Fix
 
-**sitrep** lives inside your repo. Your AI reads it at session start, updates it at session end. Git tracks everything. A visual dashboard gives you the MIS view. Costs are logged per session.
+**sitrep** lives inside your repo as plain markdown, a small JSON file, and a zero-dependency CLI. Whichever AI tool opens the repo reads exactly where the project stands at session start, and writes back automatically at session end — cost, progress, and decisions included. Git is the database; nothing else to run, no account to create.
 
 ```bash
 npx getsitrep init
 ```
 
-That's the entire setup.
+One command. The wizard asks which tool(s) you use and wires up the rest — that's the entire setup, frictionless by design.
 
 ---
 
@@ -43,14 +45,14 @@ sitrep/
 ## Daily Workflow
 
 ```
-/session-start  →  know where you left off
+session-start  →  know where you left off
       ↓
    you build
       ↓
-/session-end    →  progress, costs, tokens, decisions — logged and committed
+session-end    →  progress, costs, tokens, decisions — logged and committed
 ```
 
-Two commands minimum. Everything else is optional but compounds in value.
+Two commands minimum. Everything else is optional but compounds in value. On Claude Code this is `/session-start` and `/session-end` typed in chat; on Cursor, Codex, or a bare terminal it's `getsitrep session-start`/`getsitrep session-end`; with hooks configured (Claude Code, Cursor, Codex all support this) it fires automatically and you don't type anything either way.
 
 ---
 
@@ -69,14 +71,14 @@ Two commands minimum. Everything else is optional but compounds in value.
 
 ---
 
-## CLI (v0.3.0, published)
+## CLI (v0.3.1, published)
 
 Alongside the slash-command files above, sitrep now also ships a real,
 dependency-free Node.js CLI (GETSITREP-8) that implements the same 8 commands
 as callable functions — usable from a bare terminal, a CI job, or any AI
 coding tool that can run a shell command, not just Claude Code.
 
-**Published on npm as of v0.3.0:**
+**Published on npm (v0.3.0 initial publish, v0.3.1 current):**
 
 ```bash
 npx getsitrep init
@@ -147,14 +149,29 @@ use and overlays cost + continuity on top of it, instead of replacing it.
   future external tool) works through one generic, agent-mediated mechanism:
   sitrep never authenticates to or stores credentials for anything external
   (see [ADR-0006](docs/adr/0006-tool-neutral-agent-mediated-integration.md)).
-- **Proactive nudges** — a `nudge-check` hook surfaces at most one
-  opportunity-detection suggestion per invocation (drift, a stale dashboard,
-  uncommitted work worth capturing), never more than one at a time.
+- **Intelligent nudges** — see below.
 
 Still in progress for v0.4: a scoped plan-vs-reality conflict check and a
 cost-optimization advisory. Follow along in
 [`sitrep/PROJECT_PLAN.md`](sitrep/PROJECT_PLAN.md) (Phase 4), which this repo
 keeps genuinely current on itself, dogfood-style.
+
+---
+
+## Intelligent Nudges
+
+sitrep watches for a handful of *real, observable* signals — not guesses — and surfaces at most one suggestion at a time, never repeating one you've already seen. No config, no dashboard to babysit. Bound to your tool's mid-session hook (`PostToolUse` on Claude Code/Codex, `afterFileEdit` on Cursor) via the same `getsitrep init` wizard that sets up everything else.
+
+Actual messages this produces, verbatim from the code:
+
+```
+💡 sitrep: consider `/selfheal` — 3 command file(s) have drifted from the canonical version
+💡 sitrep: consider `/dashboard` — 5 sessions logged since the last dashboard view
+💡 sitrep: consider `/capture` — uncommitted changes present for a while — worth capturing as a tracked task if this is new scope
+💡 sitrep: consider `/handoff` — this has been a long session — consider a handoff checkpoint
+```
+
+Each is tied to something sitrep can actually verify: `selfheal`'s own drift detection, a real count of sessions since the dashboard was last regenerated, `git status` showing uncommitted work, or a tick count standing in for session length (no tool currently exposes true elapsed time to a hook). Two triggers from the original design are deliberately *not* implemented rather than faked — a plan-vs-reality divergence check (needs the scoped conflict checker, still in progress) and context-hygiene nudges (no cross-tool telemetry exists yet to base them on honestly).
 
 ---
 
@@ -197,17 +214,22 @@ cd your-project
 npx getsitrep init
 ```
 
-Customize `sitrep/PROJECT_PLAN.md` with your phases. Open Claude Code:
+Customize `sitrep/PROJECT_PLAN.md` with your phases. Then, in whichever tool you configured:
 
 ```
-/session-start
+/session-start           (Claude Code)
+getsitrep session-start  (Cursor, Codex, bare terminal, CI)
 ```
+
+Or nothing at all, if you set up hooks during `init` — it fires on its own.
 
 You're tracking.
 
 ---
 
 ## Use Cases
+
+_Shown as slash commands (Claude Code shorthand) — swap `/foo` for `getsitrep foo` on Cursor, Codex, or a bare terminal, same result._
 
 | Situation | What to do |
 |-----------|-----------|
@@ -277,7 +299,18 @@ sitrep was born while building an AI product using only AI tools. Read the story
 
 ## Compatibility
 
-Built for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) slash commands. The markdown format works with any AI tool that can read and write files.
+sitrep is not built for one tool — the CLI (`getsitrep`) is the actual implementation, and every integration on top of it is an optional adapter:
+
+| Tool | Slash commands | Auto session tracking (hooks) |
+|---|---|---|
+| [Claude Code](https://docs.anthropic.com/en/docs/claude-code) | Yes — `init` copies the 8 command MDs into `.claude/commands/` | Yes — SessionStart + SessionEnd |
+| [Cursor](https://cursor.com) | Not yet — use `getsitrep <command>` directly | Yes — SessionStart + SessionEnd |
+| [Codex CLI](https://github.com/openai/codex) | Not yet — use `getsitrep <command>` directly | Yes — SessionStart + `Stop` (Codex has no native SessionEnd event) |
+| Anything else that reads a repo | Not yet | No hooks, but a factual (never imperative) `AGENTS.md` block tells the agent what's configured — see [ADR](docs/adr/) for why it's factual-only |
+
+Copilot/VS Code isn't covered yet — the reuse path it would need hasn't been verified against a live install (tracked as GETSITREP-38).
+
+Choose your tool(s) during `getsitrep init`; nothing here requires picking just one, and the underlying markdown files are always readable/writable by anything with filesystem access, hooks or not.
 
 ## Contributing
 
