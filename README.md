@@ -279,6 +279,10 @@ sitrep was born while building an AI product using only AI tools. Read the story
 
 Built for [Claude Code](https://docs.anthropic.com/en/docs/claude-code) slash commands. The markdown format works with any AI tool that can read and write files.
 
+## Contributing
+
+Zero-dependency core, no build step, `npm test` before any PR — see [CONTRIBUTING.md](CONTRIBUTING.md) for the full workflow and what a good PR looks like.
+
 ## License
 
 MIT
