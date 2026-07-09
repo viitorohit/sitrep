@@ -1,5 +1,6 @@
 # Command Canon — v0.3
 
+> **Last verified:** 2026-07-09 against package v0.3.1 — still accurate, no changes needed.
 > **Status:** Binding spec, authored by GETSITREP-13 per the signed-off audit (GETSITREP-41, Confluence: "Command MD Audit — v0.2 Baseline & Refresh Verdicts", 2026-07-02).
 > **Source of truth:** this file is canonical. The Confluence "Command MD Audit" page is a mirror copied FROM this file, not the other way around (flipped 2026-07-03 — see CLAUDE.md Sources of Truth and the ADR index).
 

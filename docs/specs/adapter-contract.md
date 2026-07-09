@@ -1,5 +1,6 @@
 # Adapter Contract — v0.4
 
+> **Last verified:** 2026-07-09 against package v0.3.1 — still accurate, no changes needed.
 > **Status:** Binding spec for GETSITREP-36 (Tier 0, v0.3). Defines the *interface* — GETSITREP-8 (CLI extraction) built against it, GETSITREP-21 (auto-run adapters) implemented the hook-writer side for Claude Code, Codex, and Cursor (`src/lib/hooks.js`) plus the AGENTS.md factual nudge (`src/lib/agents-md.js`), and GETSITREP-35 (v0.4, proactive command advisor) implemented the mid-session `PostToolUse`/`afterFileEdit` hook binding referenced below. Copilot/VS Code (GETSITREP-38) remains unimplemented — the reuse-path it depends on hasn't been verified against a live install. The "Hook event support" table below is still the unverified-against-live-vendor-docs snapshot noted in its own header; the writers implement that snapshot, they don't independently re-confirm it. GETSITREP-50 (v0.4) added the tool-neutral integration mechanism — see the new section below and ADR-0006.
 > **Source of truth:** this file is canonical. Confluence's "Command × Platform × Hook Mapping" page mirrors it, not the reverse (same flip as command-canon.md and cost-schema.md).
 
