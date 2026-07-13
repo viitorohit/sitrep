@@ -32,7 +32,6 @@
 //   existing, tested logic instead of duplicating it.
 
 const path = require('path');
-const { execFileSync } = require('child_process');
 const { parseArgs } = require('../lib/args');
 const { ok, fail } = require('../lib/result');
 const { exists, ensureDir, writeFile, readIfExists } = require('../lib/fs-helpers');
@@ -91,13 +90,22 @@ const SPEC = {
   },
 };
 
+// GETSITREP-62: detects `ccusage` without shelling out — scans PATH
+// directories directly (fs.existsSync via exists(), no child_process) rather
+// than invoking `which`. This is also more correct cross-platform than the
+// shell-out version was: `which` doesn't exist on Windows, so the old check
+// silently always returned false there; checking Windows executable
+// extensions here actually detects it.
 function detectCcusage() {
-  try {
-    execFileSync('which', ['ccusage'], { stdio: 'pipe' });
-    return true;
-  } catch {
-    return false;
+  const pathEnv = process.env.PATH || process.env.Path || '';
+  const dirs = pathEnv.split(path.delimiter).filter(Boolean);
+  const candidates = process.platform === 'win32' ? ['ccusage.cmd', 'ccusage.exe', 'ccusage'] : ['ccusage'];
+  for (const dir of dirs) {
+    for (const name of candidates) {
+      if (exists(path.join(dir, name))) return true;
+    }
   }
+  return false;
 }
 
 // Copies any canon command MD the target platform dir is missing, from the
