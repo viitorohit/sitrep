@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sitrep — the continuity, cost, and nudge layer for agentic AI coding</title>
+<meta name="description" content="sitrep is the continuity, cost, and nudge layer for agentic AI coding — works with Claude Code, Codex, Cursor, or any tool that reads a repo. Zero dependencies, zero lock-in.">
+<link rel="canonical" href="https://getsitrep.dev/">
+<meta property="og:title" content="sitrep — the continuity, cost, and nudge layer for agentic AI coding">
+<meta property="og:description" content="Every AI coding tool remembers something different. Nothing remembers the project. sitrep fixes that with plain markdown, one JSON file, and git as the database.">
+<meta property="og:url" content="https://getsitrep.dev/">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0b0d10">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%A1%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg:      #ffffff;
+    --surface: #f5f6f8;
+    --border:  #dde1e6;
+    --text:    #1c2128;
+    --muted:   #5b6570;
+    --accent:  #3a5fd9;
+    --accent-weak: #eef1fc;
+    --good:    #1f8a5f;
+    --code-bg:    #0d1013;
+    --code-border:#262b31;
+    --code-text:  #d7dbe0;
+    --code-muted: #7a828c;
+    --code-accent:#7fa2ff;
+    --code-good:  #3ecf8e;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg:      #0b0d10;
+      --surface: #14171b;
+      --border:  #262b31;
+      --text:    #e7e9ec;
+      --muted:   #8b929b;
+      --accent:  #7fa2ff;
+      --accent-weak: #182036;
+      --good:    #3fbd82;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b0d10; --surface: #14171b; --border: #262b31;
+    --text: #e7e9ec; --muted: #8b929b; --accent: #7fa2ff;
+    --accent-weak: #182036; --good: #3fbd82; color-scheme: dark;
+  }
+  :root[data-theme="light"] {
+    --bg: #ffffff; --surface: #f5f6f8; --border: #dde1e6;
+    --text: #1c2128; --muted: #5b6570; --accent: #3a5fd9;
+    --accent-weak: #eef1fc; --good: #1f8a5f; color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  .mono { font-family: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace; }
+  a { color: var(--accent); text-decoration: none; }
+  a.underline-hover:hover { text-decoration: underline; }
+  a:focus-visible, button:focus-visible, .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 40px); }
+
+  /* ---------- Nav ---------- */
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px clamp(20px, 4vw, 40px);
+    border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: var(--bg); z-index: 10;
+  }
+  .brand { display: flex; align-items: center; gap: 9px; }
+  .brand .mark {
+    width: 20px; height: 20px; background: var(--text);
+    border-radius: 5px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .brand .mark span { width: 7px; height: 7px; background: var(--bg); border-radius: 1.5px; }
+  .brand .name { font-weight: 700; font-size: 1.02rem; letter-spacing: -0.01em; }
+  .nav-links { display: flex; align-items: center; gap: clamp(10px, 2.4vw, 22px); font-size: 0.88rem; flex-shrink: 0; }
+  .nav-links a { color: var(--muted); white-space: nowrap; }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links .btn-star { margin-left: 4px; }
+  @media (max-width: 640px) {
+    .nav-links .link-text { display: none; }
+    .nav-links { gap: 10px; }
+    .brand .name { font-size: 0.96rem; }
+  }
+
+  .btn {
+    font-size: 0.86rem; font-weight: 600;
+    padding: 9px 16px; border-radius: 6px;
+    border: 1px solid var(--border);
+    background: transparent; color: var(--text);
+    cursor: pointer; display: inline-flex; align-items: center; gap: 7px;
+    line-height: 1.2;
+  }
+  .btn:hover { border-color: var(--text); text-decoration: none; }
+  .btn.primary { background: var(--text); color: var(--bg); border-color: var(--text); }
+  .btn.primary:hover { opacity: 0.88; }
+  .btn.small { padding: 7px 12px; font-size: 0.8rem; border-radius: 6px; }
+  .star-glyph { color: #c9891a; }
+
+  /* ---------- Section shell ---------- */
+  section { border-top: 1px solid var(--border); padding: clamp(44px, 7vw, 84px) 0; }
+  section.tight { padding: clamp(28px, 4.5vw, 44px) 0; }
+  .kicker {
+    display: flex; align-items: center; flex-wrap: wrap; row-gap: 4px; gap: 10px;
+    font-size: 0.76rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 20px;
+  }
+  .kicker .rule { width: 20px; height: 2px; background: var(--accent); border-radius: 1px; flex-shrink: 0; }
+  .kicker .n { color: var(--border); font-weight: 400; }
+  @media (max-width: 480px) { .kicker .n { display: none; } }
+
+  h1, h2, h3 { font-weight: 700; letter-spacing: -0.02em; text-wrap: balance; margin: 0; }
+  h2.h-sec { font-size: clamp(1.5rem, 2.6vw, 2.05rem); margin-bottom: 16px; }
+  p { margin: 0 0 1em; max-width: 62ch; color: var(--text); }
+  p.lead { font-size: 1.06rem; }
+  p.muted { color: var(--muted); }
+  p:last-child { margin-bottom: 0; }
+  code.mono { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 0.88em; }
+
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 5vw, 64px); align-items: start; min-width: 0; }
+  .split > * { min-width: 0; }
+  @media (max-width: 840px) { .split { grid-template-columns: 1fr; } }
+
+  /* ---------- Hero ---------- */
+  .hero { border-top: none; padding-top: clamp(48px, 8vw, 80px);
+    display: grid; grid-template-columns: 1.08fr 1fr; gap: clamp(30px, 5vw, 60px); align-items: center; min-width: 0; }
+  .hero > * { min-width: 0; }
+  @media (max-width: 880px) { .hero { grid-template-columns: 1fr; } }
+  .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
+  .badge {
+    font-size: 0.72rem; font-weight: 600; letter-spacing: 0.03em;
+    padding: 4px 9px; border-radius: 20px; border: 1px solid var(--border);
+    color: var(--muted); background: var(--surface);
+  }
+  .hero h1 { font-size: clamp(2.15rem, 4.4vw, 3.35rem); line-height: 1.1; margin-bottom: 18px; }
+  .hero p.lead { color: var(--muted); max-width: 46ch; margin-bottom: 8px; }
+  .hero p.sub { color: var(--muted); font-size: 0.95rem; max-width: 48ch; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+
+  /* ---------- Terminal (always dark, like a real editor) ---------- */
+  .term {
+    background: var(--code-bg); border: 1px solid var(--code-border);
+    border-radius: 10px; overflow: hidden;
+    box-shadow: 0 8px 30px -12px rgba(0,0,0,0.4);
+  }
+  .term-bar { display: flex; align-items: center; gap: 6px; padding: 11px 14px; border-bottom: 1px solid var(--code-border); }
+  .term-bar span { width: 9px; height: 9px; border-radius: 50%; background: #3a3f46; }
+  .term-bar .label { margin-left: 8px; font-family: ui-monospace, monospace; font-size: 0.72rem; color: var(--code-muted); }
+  .term-body { padding: 18px 18px 22px; font-family: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, monospace; font-size: 0.82rem; line-height: 1.85; color: var(--code-text); overflow-wrap: break-word; }
+  @media (max-width: 420px) { .term-body { font-size: 0.72rem; } }
+  .term-body .prompt { color: var(--code-muted); }
+  .term-body .cmd { color: #fff; font-weight: 600; }
+  .term-body .out { color: var(--code-muted); }
+  .term-body .ok { color: var(--code-good); }
+  .term-body .nudge { color: var(--code-accent); }
+  .caret { display: inline-block; width: 7px; height: 1.1em; background: var(--code-accent); vertical-align: -2px; animation: blink 1.1s steps(1) infinite; }
+  @media (prefers-reduced-motion: reduce) { .caret { animation: none; } }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ---------- file tree ---------- */
+  .tree { font-family: ui-monospace, monospace; font-size: 0.82rem; line-height: 1.8;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 16px 18px; overflow-x: auto; white-space: pre; }
+  .tree .dim { color: var(--muted); }
+
+  /* ---------- nudges ---------- */
+  .nudge-block { background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 10px;
+    padding: 18px 20px; font-family: ui-monospace, monospace; font-size: 0.85rem; line-height: 2.1;
+    overflow-x: auto; color: var(--code-text); }
+  .nudge-block .bullet { color: var(--code-accent); }
+
+  /* ---------- stats + proof ---------- */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; min-width: 0; }
+  .stats > * { min-width: 0; }
+  @media (max-width: 700px) { .stats { grid-template-columns: 1fr; } }
+  .stat { background: var(--bg); padding: 24px clamp(16px, 2.5vw, 26px); }
+  .stat .num { font-family: ui-monospace, monospace; font-size: clamp(1.7rem, 3.2vw, 2.15rem); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stat .label { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+  .stat .note { font-size: 0.8rem; color: var(--muted); margin-top: 10px; }
+  .est-tag { display: inline-block; font-family: ui-monospace, monospace; font-size: 0.62rem; letter-spacing: 0.04em; color: var(--accent); border: 1px solid var(--accent); border-radius: 4px; padding: 1px 5px; margin-left: 6px; vertical-align: 1px; }
+
+  .proof-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .proof-chip {
+    display: inline-flex; align-items: center; gap: 7px;
+    font-size: 0.82rem; padding: 8px 12px; border: 1px solid var(--border); border-radius: 20px;
+    color: var(--text); background: var(--surface);
+  }
+  .proof-chip:hover { border-color: var(--accent); text-decoration: none; }
+  .proof-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--good); flex-shrink: 0; }
+
+  .sample-wrap { margin-top: 28px; }
+  .sample-label { font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; }
+  .sample-block { background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 10px;
+    padding: 16px 18px; font-family: ui-monospace, monospace; font-size: 0.8rem; line-height: 1.7;
+    color: var(--code-text); overflow-x: auto; min-width: 0; }
+  .sample-block .k { color: var(--code-accent); }
+  .sample-block .s { color: var(--code-good); }
+  .sample-block .num-v { color: #e0b15c; }
+
+  /* ---------- table ---------- */
+  .table-wrap { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.88rem; min-width: 560px; }
+  th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid var(--border); }
+  th { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  td.yes { color: var(--good); font-family: ui-monospace, monospace; font-size: 0.85rem; }
+  td.no { color: var(--muted); font-family: ui-monospace, monospace; font-size: 0.85rem; }
+  td code.mono, th code.mono { white-space: nowrap; }
+  .table-wrap table td:first-child, .table-wrap table th:first-child { white-space: nowrap; }
+
+  /* ---------- status / roadmap ---------- */
+  .status-cols { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 5vw, 56px); min-width: 0; }
+  .status-cols > * { min-width: 0; }
+  @media (max-width: 760px) { .status-cols { grid-template-columns: 1fr; } }
+  .status-head { font-size: 0.8rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .status-head.shipped { color: var(--good); }
+  .status-head.progress { color: var(--muted); }
+  ul.status-list { list-style: none; margin: 0; padding: 0; font-size: 0.94rem; }
+  ul.status-list li { padding: 9px 0; border-bottom: 1px solid var(--border); display: flex; gap: 10px; }
+  ul.status-list li:last-child { border-bottom: none; }
+  ul.status-list .mark { font-family: ui-monospace, monospace; flex-shrink: 0; }
+  .shipped .mark { color: var(--good); }
+  .progress .mark { color: var(--muted); }
+
+  /* ---------- Operation (demoted, compact) ---------- */
+  .flow-inline { display: flex; align-items: stretch; gap: 0; flex-wrap: wrap; font-size: 0.9rem; }
+  .flow-inline .step { display: flex; align-items: center; gap: 10px; padding: 6px 0; }
+  .flow-inline .step b { font-family: ui-monospace, monospace; font-size: 0.82rem; font-weight: 600; }
+  .flow-inline .step span.d { color: var(--muted); }
+  .flow-inline .arrow { color: var(--border); margin: 0 16px; align-self: center; }
+  @media (max-width: 640px) {
+    .flow-inline { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .flow-inline .arrow { display: none; }
+    .flow-inline .step { padding: 2px 0; }
+  }
+
+  /* ---------- Open source ---------- */
+  .rules-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin: 22px 0 26px; min-width: 0; }
+  .rules-grid > * { min-width: 0; }
+  @media (max-width: 700px) { .rules-grid { grid-template-columns: 1fr; } }
+  .rule-card { border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; background: var(--surface); }
+  .rule-card .t { font-weight: 700; font-size: 0.92rem; margin-bottom: 5px; }
+  .rule-card .d { font-size: 0.86rem; color: var(--muted); }
+
+  /* ---------- About / profile + writing ---------- */
+  .profile-card { border: 1px solid var(--border); border-radius: 10px; padding: 22px; background: var(--surface); }
+  .avatar { width: 46px; height: 46px; border-radius: 50%; background: var(--text); color: var(--bg);
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; margin-bottom: 14px; }
+  .profile-card .who { font-weight: 700; font-size: 1.05rem; }
+  .profile-card .role { color: var(--accent); font-size: 0.86rem; font-weight: 600; margin-top: 2px; margin-bottom: 12px; }
+  .profile-links { display: flex; gap: 14px; margin-top: 16px; font-size: 0.86rem; }
+
+  .article-card { border: 1px solid var(--border); border-radius: 10px; padding: 22px; }
+  .article-card .eyebrow { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+  .article-card .title { font-weight: 700; font-size: 1.05rem; margin-bottom: 8px; line-height: 1.35; }
+  .article-card p { font-size: 0.92rem; color: var(--muted); }
+
+  /* ---------- Dispatch (final CTA) ---------- */
+  .dispatch { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: clamp(32px, 6vw, 52px); }
+  .dispatch h2 { font-size: clamp(1.5rem, 3vw, 2rem); margin-bottom: 12px; }
+  .copy-cmd { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 12px; background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 16px; font-family: ui-monospace, monospace; font-size: 0.92rem; margin: 18px 0 22px; max-width: 100%; }
+  .copy-cmd button { font-family: ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase;
+    background: transparent; border: 1px solid var(--border); border-radius: 5px; color: var(--muted); padding: 5px 9px; cursor: pointer; }
+  .copy-cmd button:hover { color: var(--accent); border-color: var(--accent); }
+
+  /* ---------- footer ---------- */
+  footer { border-top: 1px solid var(--border); padding: 30px 0 44px; font-size: 0.86rem; color: var(--muted); }
+  footer a { color: var(--muted); }
+  footer a:hover { color: var(--accent); }
+  .footer-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+  .footer-links { display: flex; gap: 18px; flex-wrap: wrap; }
+  .footer-fine { font-size: 0.8rem; color: var(--muted); border-top: 1px solid var(--border); padding-top: 16px; }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand">
+    <span class="mark"><span></span></span>
+    <span class="name">sitrep</span>
+  </div>
+  <div class="nav-links">
+    <a href="#open-source" class="underline-hover link-text">Open source</a>
+    <a href="#about" class="underline-hover link-text">About</a>
+    <a href="https://www.npmjs.com/package/getsitrep" target="_blank" rel="noopener" class="underline-hover link-text">npm</a>
+    <a class="btn small btn-star" href="https://github.com/viitorohit/sitrep" target="_blank" rel="noopener"><span class="star-glyph">★</span> Star</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div>
+      <div class="badges">
+        <span class="badge">MIT licensed</span>
+        <span class="badge">Zero dependencies</span>
+        <span class="badge">getsitrep@0.3.1 on npm</span>
+      </div>
+      <h1>Every AI coding tool remembers something different. Nothing remembers the project.</h1>
+      <p class="lead">sitrep is the continuity, cost, and nudge layer for agentic AI coding — works with Claude&nbsp;Code, Codex, Cursor, or any tool that reads a repo.</p>
+      <p class="sub">It sits beside Jira, OpenSpec, or Spec&nbsp;Kit and reads whatever plan you already keep — never a replacement, never another system to maintain in parallel.</p>
+      <div class="cta-row">
+        <button class="btn primary" id="copyHero" type="button">npx getsitrep init</button>
+        <a class="btn" href="https://github.com/viitorohit/sitrep" target="_blank" rel="noopener"><span class="star-glyph">★</span> Star on GitHub</a>
+      </div>
+    </div>
+
+    <div class="term" aria-label="Terminal transcript of a real sitrep session">
+      <div class="term-bar"><span></span><span></span><span></span><span class="label">bash — sitrep/</span></div>
+      <div class="term-body">
+        <div><span class="prompt">$</span> <span class="cmd">npx getsitrep init</span></div>
+        <div class="out">✓ configured: plan=native · cost=ccusage · tools=claude-code,cursor</div>
+        <div>&nbsp;</div>
+        <div><span class="prompt">$</span> <span class="cmd">getsitrep session-start</span></div>
+        <div class="out">Phase 3 · 9/9 stories shipped · last session 2026-07-08</div>
+        <div class="out">cost so far: $32.45 <span style="opacity:.7">(estimate)</span> · 0 blockers</div>
+        <div>&nbsp;</div>
+        <div class="out">... you build ...</div>
+        <div>&nbsp;</div>
+        <div class="nudge">consider `/handoff` — this has been a long session</div>
+        <div>&nbsp;</div>
+        <div><span class="prompt">$</span> <span class="cmd">getsitrep session-end</span></div>
+        <div class="ok">✓ progress, cost, tokens, decisions — logged and committed<span class="caret"></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 SITUATION -->
+  <section>
+    <div class="kicker"><span class="rule"></span> 01 / Situation <span class="n">— why this exists</span></div>
+    <div class="split">
+      <div>
+        <h2 class="h-sec">Built as a side effect, not the plan.</h2>
+        <p>sitrep came out of building another AI-assisted product solo — switching between Claude Code, Codex, and Cursor depending on the day, and losing the thread every time. Which phase were we actually in? What had this feature already cost? Which tool made a decision last week, and why did it decide that?</p>
+        <p class="muted">None of the coding tools tracked any of it. They're good at writing code — none of them are the operations layer underneath the code. So that layer got built directly into the repo instead, as plain markdown a human and an AI could both read, dogfooded on itself from commit one: this repo's own <code class="mono">STATUS_REPORT.md</code> is sitrep, tracking sitrep.</p>
+      </div>
+      <div>
+        <p>This isn't a claim that AI coding tools have no memory at all — several now offer session resumption, custom-instruction files, or their own context tricks. What none of them do is track <em style="font-style:normal">project</em> state, or carry it cleanly when you switch tools on the same repo.</p>
+        <p class="muted">Multiple agentic tools now routinely touch the same codebase over its life. There's no shared layer underneath them that remembers where things stand, independent of which one is driving this week — that's the gap sitrep fills.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 RESPONSE -->
+  <section>
+    <div class="kicker"><span class="rule"></span> 02 / Response <span class="n">— how it works</span></div>
+    <div class="split">
+      <div>
+        <h2 class="h-sec">Plain markdown. One JSON file. Git as the database.</h2>
+        <p>Whichever AI tool opens the repo reads exactly where the project stands at session start, and writes back automatically at session end — cost, progress, and decisions included. Nothing else to run, no account to create.</p>
+        <div class="cta-row" style="margin-top:18px">
+          <button class="btn copy-inline" type="button" data-cmd="npx getsitrep init">npx getsitrep init</button>
+        </div>
+      </div>
+      <div class="tree" aria-label="sitrep directory structure">sitrep/
+├── MANIFEST.md         <span class="dim">framework version + rules</span>
+├── PROJECT_PLAN.md     <span class="dim">what to build</span>
+├── STATUS_REPORT.md    <span class="dim">where you are</span>
+├── .sitrep-data.json   <span class="dim">cost + token + user data</span>
+├── HANDOFF.md          <span class="dim">context package</span>
+├── dashboard.html      <span class="dim">visual MIS report</span>
+└── history/
+    ├── sessions/
+    ├── handoffs/
+    └── dashboards/</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 SIGNAL -->
+  <section>
+    <div class="kicker"><span class="rule"></span> 03 / Signal <span class="n">— intelligent nudges</span></div>
+    <div class="split">
+      <div>
+        <h2 class="h-sec">Not a dashboard to babysit.</h2>
+        <p>sitrep watches a handful of real, observable signals — not guesses — and surfaces at most one suggestion at a time, never repeating one you've already seen. No config. Bound to your tool's mid-session hook via the same <code class="mono">getsitrep init</code> wizard that sets up everything else.</p>
+        <p class="muted">Each is tied to something verifiable: <code class="mono">selfheal</code>'s own drift detection, a real count of sessions since the dashboard was last regenerated, <code class="mono">git status</code> showing uncommitted work.</p>
+      </div>
+      <div class="nudge-block">
+        <div><span class="bullet">›</span> consider `/selfheal` — 3 command file(s) have drifted from the canonical version</div>
+        <div><span class="bullet">›</span> consider `/dashboard` — 5 sessions logged since the last dashboard view</div>
+        <div><span class="bullet">›</span> consider `/capture` — uncommitted changes present for a while</div>
+        <div><span class="bullet">›</span> consider `/handoff` — this has been a long session</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 AFTER-ACTION REPORT -->
+  <section>
+    <div class="kicker"><span class="rule"></span> 04 / After-Action Report <span class="n">— real numbers</span></div>
+    <h2 class="h-sec" style="margin-bottom:8px">sitrep has tracked its own build, session one to now.</h2>
+    <p class="muted" style="margin-bottom:24px">Eleven real sessions, building sitrep with sitrep — not a demo repo.</p>
+    <div class="stats">
+      <div class="stat">
+        <div class="num">11</div>
+        <div class="label">Sessions logged</div>
+        <div class="note">v0.1 → v0.3.1, 2026-03-11 to 2026-07-09</div>
+      </div>
+      <div class="stat">
+        <div class="num">~2.8M</div>
+        <div class="label">Tokens tracked<span class="est-tag">est.</span></div>
+        <div class="note">across 9 of 11 sessions — 2 explicitly logged as untracked, not guessed</div>
+      </div>
+      <div class="stat">
+        <div class="num">~$32</div>
+        <div class="label">Cost tracked<span class="est-tag">est.</span></div>
+        <div class="note">every figure carries an actual/estimate label — never blurred</div>
+      </div>
+    </div>
+    <div class="proof-row">
+      <a class="proof-chip" href="https://github.com/viitorohit/sitrep/blob/main/sitrep/STATUS_REPORT.md" target="_blank" rel="noopener"><span class="dot"></span>Full session log</a>
+      <a class="proof-chip" href="https://github.com/viitorohit/sitrep/pull/4" target="_blank" rel="noopener"><span class="dot"></span>PR #4 — CLI extraction</a>
+      <a class="proof-chip" href="https://github.com/viitorohit/sitrep/pull/19" target="_blank" rel="noopener"><span class="dot"></span>PR #19 — report/plan/progress</a>
+      <a class="proof-chip" href="https://github.com/viitorohit/sitrep/blob/main/docs/adr/0006-tool-neutral-agent-mediated-integration.md" target="_blank" rel="noopener"><span class="dot"></span>ADR-0006</a>
+      <a class="proof-chip" href="https://github.com/viitorohit/sitrep/blob/main/docs/specs/cost-schema.md" target="_blank" rel="noopener"><span class="dot"></span>Cost schema spec</a>
+      <a class="proof-chip" href="https://www.npmjs.com/package/getsitrep" target="_blank" rel="noopener"><span class="dot"></span>npm — published 2026-07-08</a>
+    </div>
+
+    <div class="sample-wrap">
+      <div class="sample-label">Sample entry — real data pulled from this repo's own <code class="mono" style="font-size:0.85em">sitrep/.sitrep-data.json</code>, not illustrative:</div>
+      <div class="sample-block">{<br>
+&nbsp;&nbsp;<span class="k">"number"</span>: <span class="num-v">1</span>,<br>
+&nbsp;&nbsp;<span class="k">"date"</span>: <span class="s">"2026-03-11"</span>,<br>
+&nbsp;&nbsp;<span class="k">"focus"</span>: <span class="s">"Extract sitrep from Atlas into standalone project"</span>,<br>
+&nbsp;&nbsp;<span class="k">"tokens"</span>: { <span class="k">"input"</span>: <span class="num-v">60000</span>, <span class="k">"output"</span>: <span class="num-v">40000</span>, <span class="k">"total"</span>: <span class="num-v">100000</span> },<br>
+&nbsp;&nbsp;<span class="k">"cost_usd"</span>: <span class="num-v">3</span>,<br>
+&nbsp;&nbsp;<span class="k">"model"</span>: <span class="s">"claude-opus-4-6"</span>,<br>
+&nbsp;&nbsp;<span class="k">"duration_minutes"</span>: <span class="num-v">90</span><br>
+}</div>
+      <div class="sample-label" style="margin-top:10px;margin-bottom:0"><a href="https://github.com/viitorohit/sitrep/blob/main/sitrep/.sitrep-data.json" target="_blank" rel="noopener">View the full file on GitHub →</a></div>
+    </div>
+  </section>
+
+  <!-- 05 THEATER -->
+  <section>
+    <div class="kicker"><span class="rule"></span> 05 / Theater <span class="n">— tool compatibility</span></div>
+    <h2 class="h-sec" style="margin-bottom:8px">Not built for one tool.</h2>
+    <p class="muted" style="margin-bottom:24px">The CLI (<code class="mono">getsitrep</code>) is the real implementation; every integration on top is an optional adapter. Not every tool has the same surface yet — this table says so plainly.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tool</th><th>Slash commands</th><th>Auto session tracking</th></tr></thead>
+        <tbody>
+          <tr><td>Claude Code</td><td class="yes">yes</td><td class="yes">yes — SessionStart + SessionEnd</td></tr>
+          <tr><td>Cursor</td><td class="no">CLI only</td><td class="yes">yes — SessionStart + SessionEnd</td></tr>
+          <tr><td>Codex CLI</td><td class="no">CLI only</td><td class="yes">yes — SessionStart + Stop</td></tr>
+          <tr><td>Anything else that reads a repo</td><td class="no">no</td><td class="no">no hooks — factual AGENTS.md block</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 06 STATUS -->
+  <section>
+    <div class="kicker"><span class="rule"></span> 06 / Status <span class="n">— roadmap</span></div>
+    <h2 class="h-sec" style="margin-bottom:24px">Shipped vs. in progress — checked against v0.3.1, not aspirational.</h2>
+    <div class="status-cols">
+      <div class="shipped">
+        <div class="status-head shipped">✓ Shipped</div>
+        <ul class="status-list">
+          <li><span class="mark">✓</span> Platform-agnostic CLI (not locked to Claude Code)</li>
+          <li><span class="mark">✓</span> Cost-to-outcome pipeline — cost by phase, ticket, model</li>
+          <li><span class="mark">✓</span> Native + OpenSpec + Spec Kit plan adapters</li>
+          <li><span class="mark">✓</span> Tool-neutral external integration, zero credentials stored</li>
+          <li><span class="mark">✓</span> Intelligent nudges</li>
+          <li><span class="mark">✓</span> Self-healing, visual dashboard, context handoffs</li>
+        </ul>
+      </div>
+      <div class="progress">
+        <div class="status-head progress">○ In progress</div>
+        <ul class="status-list">
+          <li><span class="mark">○</span> Scoped plan-vs-reality conflict check</li>
+          <li><span class="mark">○</span> Cost optimization advisory</li>
+          <li><span class="mark">○</span> Business-user brief generator</li>
+          <li><span class="mark">○</span> This landing page</li>
+          <li><span class="mark">○</span> GitHub Actions integration</li>
+          <li><span class="mark">○</span> Multi-project unified view</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 OPERATION — demoted, compact -->
+  <section class="tight">
+    <div class="kicker"><span class="rule"></span> 07 / Operation <span class="n">— the loop underneath all of this</span></div>
+    <div class="flow-inline">
+      <div class="step"><b>session-start</b><span class="d">&nbsp;— know where you left off</span></div>
+      <span class="arrow">→</span>
+      <div class="step"><b>you build</b><span class="d">&nbsp;— nudges surface as you go</span></div>
+      <span class="arrow">→</span>
+      <div class="step"><b>session-end</b><span class="d">&nbsp;— logged, costed, committed</span></div>
+    </div>
+    <p class="muted" style="margin-top:16px">Two commands minimum on Claude Code (<code class="mono">/session-start</code> / <code class="mono">/session-end</code>) or any terminal (<code class="mono">getsitrep session-start</code> / <code class="mono">session-end</code>). With hooks configured, it fires on its own.</p>
+  </section>
+
+  <!-- 08 USE CASES -->
+  <section>
+    <div class="kicker"><span class="rule"></span> 08 / Use Cases <span class="n">— when to reach for what</span></div>
+    <h2 class="h-sec" style="margin-bottom:8px">Ten situations, ten one-liners.</h2>
+    <p class="muted" style="margin-bottom:24px;max-width:60ch">Shown as slash commands (Claude Code shorthand) — swap <code class="mono">/foo</code> for <code class="mono">getsitrep foo</code> on Cursor, Codex, or a bare terminal, same result.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Situation</th><th>What to do</th></tr></thead>
+        <tbody>
+          <tr><td>Starting a new project</td><td class="mono" style="font-size:0.85rem"><code class="mono">npx getsitrep init</code> → customize plan → <code class="mono">/session-start</code></td></tr>
+          <tr><td>Resuming after a break</td><td class="mono" style="font-size:0.85rem"><code class="mono">/session-start</code> — zero context rebuilding</td></tr>
+          <tr><td>New task mid-session</td><td class="mono" style="font-size:0.85rem"><code class="mono">/capture "[description]" --phase N</code></td></tr>
+          <tr><td>Handing off to a person</td><td class="mono" style="font-size:0.85rem"><code class="mono">/handoff human</code> — 5-minute onboarding doc</td></tr>
+          <tr><td>Switching AI sessions</td><td class="mono" style="font-size:0.85rem"><code class="mono">/handoff ai</code> — structured context for next session</td></tr>
+          <tr><td>Checking costs</td><td class="mono" style="font-size:0.85rem"><code class="mono">/dashboard</code> — visual cost breakdown</td></tr>
+          <tr><td>Something feels wrong</td><td class="mono" style="font-size:0.85rem"><code class="mono">/selfheal</code> or <code class="mono">/selfheal deep</code></td></tr>
+          <tr><td>Stakeholder update</td><td class="mono" style="font-size:0.85rem"><code class="mono">/dashboard</code> → open HTML → print</td></tr>
+          <tr><td>End of day</td><td class="mono" style="font-size:0.85rem"><code class="mono">/session-end</code> — always, no exceptions</td></tr>
+          <tr><td>Forgot what I ran</td><td class="mono" style="font-size:0.85rem"><code class="mono">/sitrep</code> — quick read-only status check</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 09 DEVELOPER WORKFLOW -->
+  <section>
+    <div class="kicker"><span class="rule"></span> 09 / Developer Workflow <span class="n">— the full toolkit</span></div>
+    <h2 class="h-sec" style="margin-bottom:8px">Eight commands, canon-locked.</h2>
+    <p class="muted" style="margin-bottom:24px;max-width:60ch">No ninth command without a strong reason — complexity creep is a named risk this project tracks against itself. Each command is a single .md file with a real CLI function behind it, callable from chat or a bare terminal.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Command</th><th>When</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td><code class="mono">/session-start</code></td><td>Start of session</td><td>Reads status, prints orientation with cost summary</td></tr>
+          <tr><td><code class="mono">/session-end</code></td><td>End of session</td><td>Updates tasks, progress, costs, tokens, session log. Commits.</td></tr>
+          <tr><td><code class="mono">/sitrep</code></td><td>Anytime</td><td>Quick read-only status check</td></tr>
+          <tr><td><code class="mono">/capture</code></td><td>New work surfaces</td><td>Adds a task to the plan and status files</td></tr>
+          <tr><td><code class="mono">/plan-update</code></td><td>Scope changes</td><td>Records a feature, decision, or risk in the plan</td></tr>
+          <tr><td><code class="mono">/selfheal</code></td><td>Things feel off</td><td>Health check + auto-fix; <code class="mono" style="font-size:0.85em">deep</code> for a full codebase audit</td></tr>
+          <tr><td><code class="mono">/handoff</code></td><td>Switching context</td><td>Context package — <code class="mono" style="font-size:0.85em">human</code> or <code class="mono" style="font-size:0.85em">ai</code> mode</td></tr>
+          <tr><td><code class="mono">/dashboard</code></td><td>Visual report</td><td>Generates the full MIS dashboard as self-contained HTML</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="margin-top:18px"><a href="https://github.com/viitorohit/sitrep/blob/main/docs/USAGE_GUIDE.md" target="_blank" rel="noopener">15 worked use cases in the full USAGE_GUIDE.md →</a></p>
+  </section>
+
+  <!-- 10 OPEN SOURCE -->
+  <section id="open-source">
+    <div class="kicker"><span class="rule"></span> Open Source <span class="n">— built to be forked, not just used</span></div>
+    <h2 class="h-sec" style="margin-bottom:8px">The same rules this repo holds itself to.</h2>
+    <p class="muted" style="margin-bottom:6px;max-width:60ch">sitrep is dogfooded on itself — the governance below is what this repo's own history was built with, not a policy written after the fact.</p>
+    <div class="rules-grid">
+      <div class="rule-card"><div class="t">Zero dependencies</div><div class="d">The CLI uses Node.js builtins only — <code class="mono" style="font-size:0.82em">fs</code>, <code class="mono" style="font-size:0.82em">path</code>, <code class="mono" style="font-size:0.82em">readline</code>. Adding a dependency needs a strong reason.</div></div>
+      <div class="rule-card"><div class="t">No build step</div><div class="d">Every command is a single .js/.md file. No bundler, no transpiler, no compile step.</div></div>
+      <div class="rule-card"><div class="t">Every cost figure is labeled</div><div class="d">No PR introduces a cost/token number without an actual/estimate/mixed label — enforced, not just documented.</div></div>
+      <div class="rule-card"><div class="t">Fail-open, always</div><div class="d">Anything hook-fired must never block a developer's workflow — Hard Law #5, checked on every PR.</div></div>
+    </div>
+    <p style="margin-bottom:22px">Good first step: open an issue, or check <a href="https://github.com/viitorohit/sitrep/issues" target="_blank" rel="noopener">what's already tracked</a>. Templates exist for <a href="https://github.com/viitorohit/sitrep/blob/main/.github/ISSUE_TEMPLATE/bug_report.md" target="_blank" rel="noopener">bugs</a> and <a href="https://github.com/viitorohit/sitrep/blob/main/.github/ISSUE_TEMPLATE/feature_request.md" target="_blank" rel="noopener">features</a>, and every PR runs against the same test suite this repo uses on itself.</p>
+    <div class="cta-row">
+      <a class="btn primary" href="https://github.com/viitorohit/sitrep/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Read CONTRIBUTING.md</a>
+      <a class="btn" href="https://github.com/viitorohit/sitrep" target="_blank" rel="noopener"><span class="star-glyph">★</span> Star the repo</a>
+    </div>
+  </section>
+
+  <!-- 11 ABOUT -->
+  <section id="about">
+    <div class="kicker"><span class="rule"></span> About <span class="n">— who's behind this</span></div>
+    <div class="split">
+      <div class="profile-card">
+        <div class="avatar">RP</div>
+        <div class="who">Rohit P</div>
+        <div class="role">Creator &amp; maintainer, sitrep</div>
+        <p class="muted">Building sitrep in the open while building products with AI coding tools day to day — this repo is both the tool and its own longest-running dogfood test.</p>
+        <div class="profile-links">
+          <a href="https://github.com/viitorohit" target="_blank" rel="noopener" class="underline-hover">GitHub ↗</a>
+          <a href="https://www.linkedin.com/pulse/i-replaced-my-entire-dev-team-build-ai-product-3-tools-rohit-purohit-vlstc" target="_blank" rel="noopener" class="underline-hover">LinkedIn ↗</a>
+        </div>
+      </div>
+      <div class="article-card">
+        <div class="eyebrow">Writing</div>
+        <div class="title">"I Replaced My Entire Dev Team With 3 AI Tools. Here's What Broke First."</div>
+        <p>The build-in-public origin story — what broke, what held up, and why sitrep exists as a result.</p>
+        <p style="margin-top:14px"><a href="https://www.linkedin.com/pulse/i-replaced-my-entire-dev-team-build-ai-product-3-tools-rohit-purohit-vlstc" target="_blank" rel="noopener">Read on LinkedIn →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISPATCH -->
+  <section id="dispatch">
+    <div class="kicker"><span class="rule"></span> Dispatch <span class="n">— get started</span></div>
+    <div class="dispatch">
+      <h2>Install it. Star it. Or open a PR.</h2>
+      <p class="muted">The wizard asks which tool(s) you use and wires up the rest — that's the entire setup, frictionless by design. CONTRIBUTING.md has the ground rules if you'd rather help build it.</p>
+      <div class="copy-cmd">
+        <span>npx getsitrep init</span>
+        <button type="button" id="copyDispatch">copy</button>
+      </div>
+      <div class="cta-row" style="margin-top:0">
+        <a class="btn" href="https://github.com/viitorohit/sitrep#readme" target="_blank" rel="noopener">Read the README →</a>
+        <a class="btn" href="https://github.com/viitorohit/sitrep" target="_blank" rel="noopener"><span class="star-glyph">★</span> Star on GitHub</a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="brand"><span class="mark"><span></span></span><span class="name">sitrep</span></div>
+      <div class="footer-links">
+        <a href="https://github.com/viitorohit/sitrep" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.npmjs.com/package/getsitrep" target="_blank" rel="noopener">npm</a>
+        <a href="https://github.com/viitorohit/sitrep/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contributing</a>
+        <a href="https://github.com/viitorohit/sitrep/tree/main/docs/adr" target="_blank" rel="noopener">Architecture decisions</a>
+        <a href="https://www.linkedin.com/pulse/i-replaced-my-entire-dev-team-build-ai-product-3-tools-rohit-purohit-vlstc" target="_blank" rel="noopener">Writing</a>
+      </div>
+    </div>
+    <div class="footer-fine">MIT licensed · zero dependencies · built in public.</div>
+  </div>
+</footer>
+
+<script>
+  function flashCopied(el, original) {
+    var prev = el.textContent;
+    el.textContent = "copied ✓";
+    setTimeout(function () { el.textContent = original || prev; }, 1400);
+  }
+  document.getElementById("copyHero").addEventListener("click", function () {
+    navigator.clipboard && navigator.clipboard.writeText("npx getsitrep init");
+    flashCopied(this, "npx getsitrep init");
+  });
+  document.getElementById("copyDispatch").addEventListener("click", function () {
+    navigator.clipboard && navigator.clipboard.writeText("npx getsitrep init");
+    flashCopied(this, "copy");
+  });
+  document.querySelectorAll(".copy-inline").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var cmd = this.getAttribute("data-cmd");
+      navigator.clipboard && navigator.clipboard.writeText(cmd);
+      flashCopied(this, cmd);
+    });
+  });
+</script>
+</body>
+</html>
